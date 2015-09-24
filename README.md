@@ -25,6 +25,8 @@ Editar el archivo de configuración y establecer las rutas y URLs según el ento
 
 ---
 
+**DEMO: http://cloud.cygnux.org/sysMonDash/index.php**
+
 https://github.com/nuxsmin/sysMonDash
 
 http://cygnux.org
