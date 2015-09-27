@@ -13,11 +13,10 @@ $statusFile = '/var/lib/icinga/status.dat';
 $use_livestatus = true;
 
 // Socket livestatus
-//$livestatus_socket_path = '/var/lib/icinga/rw/live';
-$livestatus_socket_path = '/usr/lib/nagios/mk-livestatus/live';
+$livestatus_socket_path = '/var/lib/icinga/rw/live';
 
 // URL del servidor de Icinga/Nagios
-$monitorServerUrl = 'http://cloud.cygnux.org';
+$monitorServerUrl = 'http://your-monitor-server.com';
 
 // URL del CGI de Icinga/Nagios
 $cgiURL = $monitorServerUrl . '/cgi-bin/icinga';
@@ -66,4 +65,4 @@ $regexHostShow = '/.*/';
 $regexServiceNoShow = '/^SSH_.*/';
 
 // Hosts o servicios críticos que se muestran siempre
-$criticalItems = array('MAILSERVER');
+$criticalItems = array('CRITICAL_SERVER_NAME', 'OTHER_CRITICAL_SERVER_NAME');

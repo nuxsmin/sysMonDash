@@ -39,6 +39,12 @@ ob_start();
 // Obtener los avisos desde la monitorización y ordenarlos por tiempo de último cambio
 $hostsProblems = getHostsProblems();
 $servicesProblems = getServicesProblems();
+
+if ($hostsProblems === false || $servicesProblems === false){
+    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - No data from socket', true, 500);
+    exit();
+}
+
 $items = sortByTime(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
 
 // Array con los avisos filtrados
@@ -75,7 +81,7 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
                 </td>
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
-        <?php elseif ($res['displayedItems'] > 200): ?>
+        <?php elseif ($res['displayedItems'] > $maxDisplayItems): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages" class="error">

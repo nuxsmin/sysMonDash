@@ -32,18 +32,21 @@ $out = array();
 
 /**
  * Obtener un recurso del tipo Socket utilizando el socket unix de mklivestatus
- *
  * @return bool|resource
+ * @throws Exception
  */
 function getLiveSocket()
 {
     global $livestatus_socket_path;
 
-    $socket = stream_socket_client('unix://' . $livestatus_socket_path, $errno, $errstr);
+    if (file_exists($livestatus_socket_path) && filetype($livestatus_socket_path) === 'socket') {
+        $socket = stream_socket_client('unix://' . $livestatus_socket_path, $errno, $errstr);
 
-    if (!$socket) {
-        error_log("ERROR: $errno - $errstr");
-        return false;
+        if (!$socket) {
+            throw new Exception("ERROR: $errno - $errstr");
+        }
+    } else {
+        throw new Exception("ERROR: unable to read file $livestatus_socket_path");
     }
 
     return $socket;
@@ -101,10 +104,16 @@ function getHostsProblems($allHeaders = false)
         );
 
         $inData = implode("\n", $filter) . "\n\n";
-        $data = json_decode(getDataFromSocket($inData));
     } else {
         $inData = "GET hosts\nFilter: state != " . HOST_UP . "\nFilter: checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
-        $data = json_decode(getDataFromSocket($inData));
+    }
+
+    $jsonData = getDataFromSocket($inData);
+
+    if ($jsonData !== false) {
+        $data = json_decode($jsonData);
+    } else {
+        return false;
     }
 
     if ($allHeaders === false) {
@@ -124,7 +133,7 @@ function getHostsProblems($allHeaders = false)
  * Obtener el listado de servicios utilizando el socket de mklivestatus
  *
  * @param bool $allHeaders Obtener todas las cabeceras
- * @return array|mixed
+ * @return mixed
  */
 function getServicesProblems($allHeaders = false)
 {
@@ -189,10 +198,16 @@ function getServicesProblems($allHeaders = false)
         );
 
         $inData = implode("\n", $filter) . "\n\n";
-        $data = json_decode(getDataFromSocket($inData));
     } else {
         $inData = "GET services\nFilter: state != " . SERVICE_OK . "\nFilter: checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
-        $data = json_decode(getDataFromSocket($inData));
+    }
+
+    $jsonData = getDataFromSocket($inData);
+
+    if ($jsonData !== false) {
+        $data = json_decode($jsonData);
+    } else {
+        return false;
     }
 
     if ($allHeaders === false) {
@@ -212,7 +227,7 @@ function getServicesProblems($allHeaders = false)
  * Obtener el listado de paradas programadas.
  *
  * @param bool $allHeaders obtiene todas las cabeceras de la consulta
- * @return array|mixed
+ * @return mixed
  */
 function getScheduledDowntimes($allHeaders = false)
 {
@@ -231,10 +246,16 @@ function getScheduledDowntimes($allHeaders = false)
     if ($allHeaders === false) {
         $filter = array('GET downtimes', 'Columns: ' . implode(' ', $fields), 'ColumnHeaders: off', 'OutputFormat: json');
         $inData = implode("\n", $filter) . "\n\n";
-        $data = json_decode(getDataFromSocket($inData));
     } else {
         $inData = "GET downtimes\nColumnHeaders: off\nOutputFormat: json\n\n";
-        $data = json_decode(getDataFromSocket($inData));
+    }
+
+    $jsonData = getDataFromSocket($inData);
+
+    if ($jsonData !== false) {
+        $data = json_decode($jsonData);
+    } else {
+        return false;
     }
 
     if ($allHeaders === false) {
@@ -258,20 +279,17 @@ function getScheduledDowntimes($allHeaders = false)
  */
 function getDataFromSocket(&$inData)
 {
-    $socket = getLiveSocket();
-
-    if (!is_resource($socket)) {
-        return false;
-    }
-
     try {
+        $socket = getLiveSocket();
         fwrite($socket, $inData);
         $outData = stream_get_contents($socket);
         fclose($socket);
-        return $outData;
     } catch (Exception $e) {
+        error_log($e->getMessage());
         return false;
     }
+
+    return $outData;
 }
 
 /**
