@@ -1,6 +1,8 @@
 <?php
 /**
  * sysMonDash Config File
+ *
+ * Rename to config.php once configured
  */
 
 // Título para la página
