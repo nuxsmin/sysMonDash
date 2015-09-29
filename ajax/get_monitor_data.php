@@ -24,31 +24,31 @@
  */
 
 $time_start = microtime(true);
-
 define('APP_ROOT', '..');
+session_start();
 
-require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'functions.php';
+require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sysMonDash.php';
 
 $type = (isset($_GET['t']) && !empty($_GET['t'])) ? intval($_GET['t']) : 0;
 $timeout = (isset($_GET['to']) && !empty($_GET['to'])) ? intval($_GET['to']) : $refreshValue;
 
-$downtimes = getScheduledDowntimesGroupped();
+$downtimes = sysMonDash::getScheduledDowntimesGroupped();
 
 ob_start();
 
 // Obtener los avisos desde la monitorización y ordenarlos por tiempo de último cambio
-$hostsProblems = getHostsProblems();
-$servicesProblems = getServicesProblems();
+$hostsProblems = sysMonDash::getHostsProblems();
+$servicesProblems = sysMonDash::getServicesProblems();
 
-if ($hostsProblems === false || $servicesProblems === false){
+if ($hostsProblems === false || $servicesProblems === false) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - No data from socket', true, 500);
     exit();
 }
 
-$items = sortByTime(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
+$items = sysMonDash::sortByTime(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
 
 // Array con los avisos filtrados
-$res = printItems($items);
+$res = sysMonDash::printItems($items);
 
 $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostrar los avisos ocultos">Mostrar Todos</a>)' : '(<a href="index.php?t=' . VIEW_FRONTLINE . '" title="Mostrar sólo avisos importantes">Mostrar Menos</a>)';
 ?>
@@ -70,7 +70,7 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
         <?php endif; ?>
         </thead>
 
-        <?php if ($res['displayedItems'] === 0): ?>
+        <?php if (sysMonDash::$displayedItems === 0): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages">
@@ -81,29 +81,30 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
                 </td>
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
-        <?php elseif ($res['displayedItems'] > $maxDisplayItems): ?>
+        <?php elseif (sysMonDash::$displayedItems > $maxDisplayItems): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages" class="error">
                         Upss...parece que hay problemas
                         <br>
-                        Demasiados avisos (<?php echo $res['displayedItems']; ?>)
+                        Demasiados avisos (<?php echo sysMonDash::$displayedItems; ?>)
                         <br>
-                        Revisar incidencias en web de <a href="<?php echo $monitorServerUrl; ?>">Icinga</a>
+                        Revisar incidencias en web de <a href="<?php echo $monitorServerUrl; ?>">monitorización</a>
                     </div>
                 </td>
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
         <?php else: ?>
-        <?php foreach ($res['items'] as $line): ?>
+        <?php foreach ($res as $line): ?>
             <?php echo $line; ?>
         <?php endforeach; ?>
             <script>jQuery("#tblBoard thead").show()</script>
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php echo date('H:i:s', time()) . ' @' . sprintf('%.3f', microtime(true) - $time_start) . 's ' . '(auto en ' . $timeout . 's)'; ?>
-                <br><?php echo $res['totalItems'] - $res['displayedItems'], ' avisos ocultos ', $showAll; ?>
+                <?php printf('%s %d@%.3fs (auto en %ds)', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
+                <br>
+                <?php echo sysMonDash::$totalItems - sysMonDash::$displayedItems, ' avisos ocultos ', $showAll; ?>
             </td>
         </tr>
     </table>
@@ -129,7 +130,7 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
             <tr>
                 <td><?php echo $hostName; ?></td>
                 <td><?php echo (!empty($downtime['service_display_name'])) ? $downtime['service_display_name'] : $downtime['host_name']; ?></td>
-                <td><?php echo ($tiempoRestante > 0) ? 'Quedan ' . timeElapsed($tiempoRestante) : 'En parada'; ?></td>
+                <td><?php echo ($tiempoRestante > 0) ? 'Quedan ' . sysMonDash::timeElapsed($tiempoRestante) : 'En parada'; ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime['start_time']); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime['end_time']); ?></td>
                 <td><?php echo $downtime['author']; ?></td>
@@ -139,9 +140,10 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
         </tbody>
     </table>
 <?php endif; ?>
+
 <?php ob_end_flush(); ?>
 
-<?php if (checkRefreshSession()): ?>
+<?php if (sysMonDash::checkRefreshSession()): ?>
     <script>
         console.log('RELOAD');
         window.location.href = window.location.href;
