@@ -25,9 +25,9 @@ Editar el archivo de configuración y establecer las rutas y URLs según el ento
 
 ---
 
-**sysMonDash** is an optimized monitoring dashboard for large environments which have large number of items to monitor by showing those events that requires an special attention.
+**sysMonDash** is an optimized monitoring dashboard for large environments which have a large number of items to monitor by showing those events that requires an special attention.
 
-The monitoring layer can be performed by any application that uses Nagios core, because the connection between the dashboard and the monitoring system is done by MK livestatus http://mathias-kettner.com/checkmk_livestatus.html, which it's a plugin that retrieves the real time data from Nagios and it's channeled through an UNIX socket.
+The monitoring layer can be performed by any application that uses Nagios core, because the connection between the dashboard and the monitoring system is done by MK livestatus http://mathias-kettner.com/checkmk_livestatus.html, which is a plugin that retrieves the real time data from Nagios and then this is channeled through an UNIX socket.
 
 The **sysMonDash** key features are:
 
@@ -44,7 +44,7 @@ You need to have a running PHP webserver and setup the MK livestatus plugin in t
 
 Download the application from https://github.com/nuxsmin/sysMonDash and unpack it in the public webserver root.
 
-Edit the config file and set the paths and URLs according to your environment.
+Edit the config file and set the paths and URLs according to your environment. The config file has many comments that explains what does every option.
 
 ---
 
