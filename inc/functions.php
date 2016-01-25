@@ -4,7 +4,7 @@
  *
  * @author    nuxsmin
  * @link      http://cygnux.org
- * @copyright 2014-2015 Rubén Domínguez nuxsmin@cygnux.org
+ * @copyright 2014-2016 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -23,18 +23,27 @@
  *
  */
 
-require 'sysMonDash.php';
+use SMD\Core\sysMonDash;
+use SMD\Util\Util;
+
+define('APP_ROOT', '.');
+
+require APP_ROOT . DIRECTORY_SEPARATOR . 'Base.php';
 
 $raw = (isset($_GET['raw']) && intval($_GET['raw']) === 1);
 $allHeaders = (isset($_GET['allheaders']) && intval($_GET['allheaders']) === 1);
 
 if ($raw) {
+    $backendType = ($use_livestatus) ? sysMonDash::BACKEND_LIVESTATUS : sysMonDash::BACKEND_STATUS;
+    $SMD = new sysMonDash($backendType);
+    $SMD->getBackend()->setAllHeaders($allHeaders);
+
     echo '<pre>';
     echo 'Hosts', PHP_EOL;
-    print_r(sysMonDash::sortByTime(sysMonDash::getHostsProblems($allHeaders), 'last_hard_state_change'));
+    print_r(Util::arraySortByKey($SMD->getBackend()->getHostsProblems(), 'last_hard_state_change'));
     echo 'Servicios', PHP_EOL;
-    print_r(sysMonDash::sortByTime(sysMonDash::getServicesProblems($allHeaders), 'last_hard_state_change'));
+    print_r(Util::arraySortByKey($SMD->getBackend()->getServicesProblems(), 'last_hard_state_change'));
     echo 'Paradas', PHP_EOL;
-    print_r(sysMonDash::sortByTime(sysMonDash::getScheduledDowntimes($allHeaders), 'start_time', false));
+    print_r(Util::arraySortByKey($SMD->getBackend()->getScheduledDowntimesGroupped(), 'start_time', false));
     echo '</pre>';
 }

@@ -4,7 +4,7 @@
  *
  * @author    nuxsmin
  * @link      http://cygnux.org
- * @copyright 2014-2015 Rubén Domínguez nuxsmin@cygnux.org
+ * @copyright 2014-2016 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -23,50 +23,62 @@
  *
  */
 
-$time_start = microtime(true);
+use SMD\Core\Language;
+use SMD\Core\sysMonDash;
+use SMD\Http\Request;
+use SMD\Util\Util;
+
 define('APP_ROOT', '..');
-session_start();
 
-require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'sysMonDash.php';
+require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php';
 
-$type = (isset($_GET['t']) && !empty($_GET['t'])) ? intval($_GET['t']) : 0;
-$timeout = (isset($_GET['to']) && !empty($_GET['to'])) ? intval($_GET['to']) : $refreshValue;
+Request::checkCORS();
 
-$downtimes = sysMonDash::getScheduledDowntimesGroupped();
+$type = Request::analyze('t', VIEW_FRONTLINE);
+$timeout = Request::analyze('to', $refreshValue);
+
+$backendType = ($use_livestatus) ? sysMonDash::BACKEND_LIVESTATUS : sysMonDash::BACKEND_STATUS;
+$SMD = new sysMonDash($backendType);
+
+$downtimes = $SMD->getBackend()->getScheduledDowntimesGroupped();
 
 ob_start();
 
 // Obtener los avisos desde la monitorización y ordenarlos por tiempo de último cambio
-$hostsProblems = sysMonDash::getHostsProblems();
-$servicesProblems = sysMonDash::getServicesProblems();
+$hostsProblems = $SMD->getBackend()->getHostsProblems();
+$servicesProblems = $SMD->getBackend()->getServicesProblems();
 
 if ($hostsProblems === false || $servicesProblems === false) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - No data from socket', true, 500);
+    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - No data from backend', true, 500);
     exit();
 }
 
-$items = sysMonDash::sortByTime(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
+$items = Util::arraySortByKey(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
 
 // Array con los avisos filtrados
-$res = sysMonDash::printItems($items);
+$res = sysMonDash::getItems($items);
 
-$showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostrar los avisos ocultos">Mostrar Todos</a>)' : '(<a href="index.php?t=' . VIEW_FRONTLINE . '" title="Mostrar sólo avisos importantes">Mostrar Menos</a>)';
+if ($type !== 1) {
+    $showAll = '(<a href="index.php?t=' . VIEW_ALL . '" title="' . Language::t('Mostrar los avisos ocultos') . '">' . Language::t('Mostrar Todos') . '</a>)';
+} else {
+    $showAll = '(<a href="index.php?t=' . VIEW_FRONTLINE . '" title="' . Language::t('Mostrar sólo avisos importantes') . '">' . Language::t('Mostrar Menos') . '</a>)';
+}
+
 ?>
-
     <table id="tblBoard" width="90%" border="0" class="boldtable" align="center">
         <thead class="head">
-        <th width="3%">Estado</th>
+        <th width="3%"><?php echo Language::t('Estado'); ?></th>
         <?php if ($colLastcheck == true): ?>
-            <th width="13%">Desde</th>
+            <th width="13%"><?php echo Language::t('Desde'); ?></th>
         <?php endif; ?>
         <?php if ($colHost == true): ?>
-            <th width="25%">Host</th>
+            <th width="25%"><?php echo Language::t('Host'); ?></th>
         <?php endif; ?>
         <?php if ($colStatusInfo == true): ?>
-            <th width="30%">Información de Estado</th>
+            <th width="30%"><?php echo Language::t('Información de Estado'); ?></th>
         <?php endif; ?>
         <?php if ($colService == true): ?>
-            <th width="20%">Servicio</th>
+            <th width="20%"><?php echo Language::t('Servicio'); ?></th>
         <?php endif; ?>
         </thead>
 
@@ -76,7 +88,7 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
                     <div id="nomessages">
                         <img src="imgs/smile.png"/>
                         <br>
-                        No hay avisos para mostrar
+                        <?php echo Language::t('No hay avisos para mostrar'); ?>
                     </div>
                 </td>
             </tr>
@@ -85,11 +97,11 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
             <tr>
                 <td colspan="5">
                     <div id="nomessages" class="error">
-                        Upss...parece que hay problemas
+                        <?php echo Language::t('Upss...parece que hay problemas'); ?>
                         <br>
-                        Demasiados avisos (<?php echo sysMonDash::$displayedItems; ?>)
+                        <?php echo Language::t('Demasiados avisos'); ?> (<?php echo sysMonDash::$displayedItems; ?>)
                         <br>
-                        Revisar incidencias en web de <a href="<?php echo $monitorServerUrl; ?>">monitorización</a>
+                        <a href="<?php echo $monitorServerUrl; ?>"><?php echo Language::t('Revisar incidencias en web de monitorización'); ?></a>
                     </div>
                 </td>
             </tr>
@@ -102,26 +114,26 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php printf('%s %d@%.3fs (auto en %ds)', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
+                <?php printf('%s %d@%.3fs (auto %ds)', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
                 <br>
-                <?php echo sysMonDash::$totalItems - sysMonDash::$displayedItems, ' avisos ocultos ', $showAll; ?>
+                <?php printf('%d/%d %s  %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos ocultos'), $showAll); ?>
             </td>
         </tr>
     </table>
 
 <?php if (count($downtimes) > 0): ?>
-    <div class="title">Apagados Programados</div>
+    <div class="title"><?php echo Language::t('Apagados Programados'); ?></div>
 
     <table id="tblDowntime" border="0" align="center">
         <thead class="head">
         <tr>
-            <th>Servidor</th>
-            <th>Servicio</th>
-            <th>Estado</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-            <th>Autor</th>
-            <th>Comentario</th>
+            <th><?php echo Language::t('Servidor'); ?></th>
+            <th><?php echo Language::t('Servicio'); ?></th>
+            <th><?php echo Language::t('Estado'); ?></th>
+            <th><?php echo Language::t('Inicio'); ?></th>
+            <th><?php echo Language::t('Fin'); ?></th>
+            <th><?php echo Language::t('Autor'); ?></th>
+            <th><?php echo Language::t('Comentarios'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -130,7 +142,7 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
             <tr>
                 <td><?php echo $hostName; ?></td>
                 <td><?php echo (!empty($downtime['service_display_name'])) ? $downtime['service_display_name'] : $downtime['host_name']; ?></td>
-                <td><?php echo ($tiempoRestante > 0) ? 'Quedan ' . sysMonDash::timeElapsed($tiempoRestante) : 'En parada'; ?></td>
+                <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime['start_time']); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime['end_time']); ?></td>
                 <td><?php echo $downtime['author']; ?></td>
@@ -143,9 +155,9 @@ $showAll = ($type !== 1) ? '(<a href="index.php?t=' . VIEW_ALL . '" title="Mostr
 
 <?php ob_end_flush(); ?>
 
-<?php if (sysMonDash::checkRefreshSession()): ?>
+<?php if (Util::checkRefreshSession()): ?>
     <script>
-        console.log('RELOAD');
+        console.info('RELOAD');
         window.location.href = window.location.href;
     </script>
 <?php endif; ?>
