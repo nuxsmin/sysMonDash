@@ -126,7 +126,7 @@ class Zabbix extends Backend implements BackendInterface
     private function getEvents()
     {
         $params = [
-            'output' => ['acknowledged', 'object', 'objectid', 'clock'],
+            'output' => ['acknowledged', 'object', 'objectid', 'clock', 'value', 'value_changed'],
             'value' => 1,
             'sortfield' => 'clock',
             'sortorder' => 'DESC'
@@ -137,30 +137,29 @@ class Zabbix extends Backend implements BackendInterface
 
         foreach ($events as $event) {
             $trigger = $this->getTrigger($event->objectid);
+            $state = ((int)$trigger->value === 1) ?  $this->getTriggerState($trigger->priority) : $event->value;
 
             $result[] = [
-                'state' => $this->getTriggerState($trigger->priority),
-                'state_type' => $trigger->value,
-                'acknowledged' => $event->acknowledged,
+                'state' => (int)$state,
+                'state_type' => (int)$trigger->state,
+                'acknowledged' => (int)$event->acknowledged,
                 'host_display_name' => $trigger->hostname,
                 'display_name' => $trigger->host,
                 'check_command' => $trigger->triggerid,
                 'plugin_output' => $trigger->description,
-                'last_check' => $trigger->lastchange,
-                'last_time_up' => $trigger->lastchange,
-                'last_time_ok' => $trigger->lastchange,
-                'last_time_unreachable' => 0,
-                'last_hard_state_change' => $event->clock,
-                'last_hard_state' => $event->clock,
+                'last_check' => (int)$trigger->lastchange,
+//                'last_time_up' => $trigger->lastchange,
+//                'last_time_ok' => $trigger->lastchange,
+//                'last_time_unreachable' => 0,
+                'last_hard_state_change' => (int)$trigger->lastchange,
+                'last_hard_state' => (int)$event->clock,
                 'last_time_down' => 0,
-                'active_checks_enabled' => $trigger->status,
+                'active_checks_enabled' => (int)$trigger->status,
                 'scheduled_downtime_depth' => 0,
-                'current_attempt' => 1,
-                'max_attempts' => 0,
+                'current_attempt' => (int)$trigger->value,
+                'max_check_attempts' => 0,
                 'is_flapping' => 0,
-                'notifications_enabled' => 1,
-                'object' => $event->object,
-                'clock' => $event->clock,
+                'notifications_enabled' => 1
             ];
         }
 
@@ -179,7 +178,7 @@ class Zabbix extends Backend implements BackendInterface
             'triggerids' => $id,
             'expandData' => 1,
             'expandDescription' => 1,
-            'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange']
+            'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value']
         ];
 
         $trigger = $this->_Zabbix->triggerGet($params);
