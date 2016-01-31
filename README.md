@@ -44,7 +44,7 @@ The **sysMonDash** key features are:
 
 ### Installation
 
-You need to have a running PHP webserver and setup the MK livestatus plugin o Zabbix API in the monitoring server.
+You need to have a running PHP webserver and setup the MK livestatus plugin or Zabbix API in the monitoring server.
 
 Download the application from https://github.com/nuxsmin/sysMonDash and unpack it in the public webserver root.
 
