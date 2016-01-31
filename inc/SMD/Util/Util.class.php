@@ -24,6 +24,7 @@
  */
 
 namespace SMD\Util;
+use SMD\Core\Language;
 use SMD\Core\Session;
 
 /**
@@ -96,6 +97,19 @@ class Util
         }
 
         return false;
+    }
+
+    /**
+     * Info de la aplicación
+     *
+     * @return array
+     */
+    public static function getAppInfo()
+    {
+        return array(
+            'appCode' => '<a href="https://github.com/nuxsmin/sysMonDash" target="_blank" title="sysMonDash - GitHub">sysMonDash</a>',
+            'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>'
+        );
     }
 
     /**

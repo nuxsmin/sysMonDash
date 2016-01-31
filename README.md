@@ -4,7 +4,9 @@
 
 **sysMonDash** es un panel de monitorización optimizado para entornos con un alto número de elementos a monitorizar mostrando aquellos eventos que requieran de atención.
 
-La capa de monitorización puede ser realizada por cualquier aplicación que utilice el núcleo de Nagios, ya que la interconexión con éste se realiza con MK livestatus http://mathias-kettner.com/checkmk_livestatus.html, que es un plugin que obtiene la información en tiempo real de Nagios y la canaliza a través de un socket UNIX.
+Los backend soportados son Nagios, Icinga y Zabbix (experimental).
+
+Es posible utilizar Nagios o Icinga mediante el plugin 'mk_livestatus' (recomendado) o el archivo 'status.dat'.
 
 Las funcionalidades de **sysMonDash** son las siguientes:
 
@@ -17,7 +19,7 @@ Las funcionalidades de **sysMonDash** son las siguientes:
 
 ### Instalación
 
-Es necesario disponer de un servidor web con PHP y el plugin MK livestatus correctamente configurado en el sistema de monitorización.
+Es necesario disponer de un servidor web con PHP y el plugin MK livestatus o la API de Zabbix correctamente configurados en el sistema de monitorización.
 
 Descargar la aplicación desde https://github.com/nuxsmin/sysMonDash y descomprimirla en la ruta deseada (publicada por el servidor web).
 
@@ -27,7 +29,9 @@ Editar el archivo de configuración y establecer las rutas y URLs según el ento
 
 **sysMonDash** is an optimized monitoring dashboard for large environments which have a large number of items to monitor by showing those events that requires an special attention.
 
-The monitoring layer can be performed by any application that uses Nagios core, because the connection between the dashboard and the monitoring system is done by MK livestatus http://mathias-kettner.com/checkmk_livestatus.html, which is a plugin that retrieves the real time data from Nagios and then this is channeled through an UNIX socket.
+The supported backends are Nagios, Icinga and Zabbix (experimental).
+
+It's possible to use Nagios or Icinga through the 'mk_livestatus' plugin (recommended) or the 'status.dat' file.
 
 The **sysMonDash** key features are:
 
@@ -40,7 +44,7 @@ The **sysMonDash** key features are:
 
 ### Installation
 
-You need to have a running PHP webserver and setup the MK livestatus plugin in the monitoring server.
+You need to have a running PHP webserver and setup the MK livestatus plugin o Zabbix API in the monitoring server.
 
 Download the application from https://github.com/nuxsmin/sysMonDash and unpack it in the public webserver root.
 
@@ -48,7 +52,7 @@ Edit the config file and set the paths and URLs according to your environment. T
 
 ---
 
-**DEMO: http://cloud.cygnux.org/sysMonDash/index.php**
+**DEMO: http://sysmondash.cygnux.org**
 
 https://github.com/nuxsmin/sysMonDash
 

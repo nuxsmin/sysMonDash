@@ -28,16 +28,11 @@ namespace SMD\Core;
 use SMD\Backend\BackendInterface;
 use SMD\Backend\Livestatus;
 use SMD\Backend\Status;
+use SMD\Backend\Zabbix;
 use SMD\Util\Util;
 
 class sysMonDash
 {
-    /**
-     * Tipos de backends
-     */
-    const BACKEND_LIVESTATUS = 1;
-    const BACKEND_STATUS = 2;
-
     public static $totalItems;
     public static $displayedItems;
     /**
@@ -53,16 +48,24 @@ class sysMonDash
      * sysMonDash constructor.
      *
      * @param $type string El tipo de backend a utilizar
+     * @throws \Exception
      */
     public function __construct($type)
     {
-        switch ($type) {
-            case sysMonDash::BACKEND_LIVESTATUS:
+        switch (strtolower($type)) {
+            case 'livestatus':
                 $this->_backend = new Livestatus();
                 break;
-            case sysMonDash::BACKEND_STATUS:
+            case 'status':
                 $this->_backend = new Status();
                 break;
+            case 'zabbix':
+                global $zabbix_version, $zabbix_url, $zabbix_user, $zabbix_pass;
+
+                $this->_backend = new Zabbix($zabbix_version, $zabbix_url, $zabbix_user, $zabbix_pass);
+                break;
+            default:
+                throw new \Exception('Backend no soportado');
         }
     }
 

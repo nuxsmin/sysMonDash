@@ -22,8 +22,8 @@ tr.item-data > td, thead > th {
 }
 
 h1 {
-    font-size: 22px;
-    margin-left: 10px;
+    font-size: 1.3em;
+    margin-left: .5em;
 }
 
 .head {
@@ -85,11 +85,11 @@ h1 {
 }
 
 .statusinfo {
-    font-size: 14px !important;
+    font-size: .7em !important;
 }
 
 #total {
-    font-size: 14px;
+    font-size: .7em;
     color: #777;
     text-align: right;
 }
@@ -194,7 +194,6 @@ footer #project {
     text-align: right;
     color: #fff;
     padding: 1em;
-    font-size: 16px;
 }
 
 #nomessages {

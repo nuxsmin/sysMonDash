@@ -205,4 +205,12 @@ class Status extends Backend implements BackendInterface
             || $item['last_hard_state_change'] > (time() - $newItemTime / 2)
             || $item['is_flapping'] === 1);
     }
+
+    /**
+     * @return array
+     */
+    public function getProblems()
+    {
+        return array_merge($this->getHostsProblems(), $this->getServicesProblems());
+    }
 }

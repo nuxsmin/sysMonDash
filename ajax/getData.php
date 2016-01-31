@@ -37,23 +37,26 @@ Request::checkCORS();
 $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', $refreshValue);
 
-$backendType = ($use_livestatus) ? sysMonDash::BACKEND_LIVESTATUS : sysMonDash::BACKEND_STATUS;
-$SMD = new sysMonDash($backendType);
+try {
+    $SMD = new sysMonDash($backend);
 
-$downtimes = $SMD->getBackend()->getScheduledDowntimesGroupped();
+    // Obtener los avisos desde la monitorización
+    $problems = $SMD->getBackend()->getProblems();
 
-ob_start();
+    if ($problems === false) {
+        throw new Exception('No hay datos desde el backend');
+    }
 
-// Obtener los avisos desde la monitorización y ordenarlos por tiempo de último cambio
-$hostsProblems = $SMD->getBackend()->getHostsProblems();
-$servicesProblems = $SMD->getBackend()->getServicesProblems();
-
-if ($hostsProblems === false || $servicesProblems === false) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - No data from backend', true, 500);
+    $downtimes = $SMD->getBackend()->getScheduledDowntimesGroupped();
+} catch (Exception $e) {
+    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
     exit();
 }
 
-$items = Util::arraySortByKey(array_merge($hostsProblems, $servicesProblems), 'last_hard_state_change');
+ob_start();
+
+// Ordenar los items por tiempo de último cambio
+$items = Util::arraySortByKey($problems, 'last_hard_state_change');
 
 // Array con los avisos filtrados
 $res = sysMonDash::getItems($items);
@@ -114,7 +117,7 @@ if ($type !== 1) {
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php printf('%s %d@%.3fs (auto %ds)', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
+                <?php printf('%s %d@%.3fs (auto %ds) %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, $backend); ?>
                 <br>
                 <?php printf('%d/%d %s  %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos ocultos'), $showAll); ?>
             </td>

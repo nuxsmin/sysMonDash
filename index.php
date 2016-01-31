@@ -51,7 +51,6 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <body>
 <div id="logo">
     <img src="imgs/logo.png"/>
-
     <div id="hora"><h1></h1></div>
     <div id="titulo">
         <h1><?php echo Language::t('Panel Monitorización'); ?></h1>
@@ -62,9 +61,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <div id="monitor-data"></div>
 
 <footer>
-    <div id="project">
-        <a href="http://cygnux.org" target="_blank" title="<?php echo Language::t('Un proyecto de cygnux.org'); ?>">cygnux.org</a>
-    </div>
+    <div id="project"><?php echo implode(' :: ', \SMD\Util\Util::getAppInfo()); ?></div>
 </footer>
 
 <script type="text/javascript" src="js/functions.js"></script>

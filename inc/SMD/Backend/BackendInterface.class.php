@@ -28,31 +28,50 @@ namespace SMD\Backend;
 interface BackendInterface
 {
     /**
-     * @return mixed
+     * Devuelve los eventos
+     *
+     * @return array|bool
+     */
+    public function getProblems();
+
+    /**
+     * Devuelve los eventos de los hosts
+     *
+     * @return array|bool
      */
     public function getHostsProblems();
 
     /**
-     * @return mixed
+     * Devuelve los eventos de los servicios
+     *
+     * @return array|bool
      */
     public function getServicesProblems();
 
     /**
-     * @return mixed
+     * Devuelve los eventos programados
+     *
+     * @return array|bool
      */
     public function getScheduledDowntimes();
 
     /**
-     * @return mixed
+     * Devuelve los eventos programados agrupados
+     *
+     * @return array|bool
      */
     public function getScheduledDowntimesGroupped();
 
     /**
+     * Si se deben de devolver todas las cabeceras de los eventos
+     *
      * @return bool
      */
     public function isAllHeaders();
 
     /**
+     * Devolver todas las cabeceras de los eventos
+     *
      * @param $allHeaders
      */
     public function setAllHeaders($allHeaders);

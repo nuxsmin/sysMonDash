@@ -30,20 +30,22 @@ define('APP_ROOT', '.');
 
 require APP_ROOT . DIRECTORY_SEPARATOR . 'Base.php';
 
-$raw = (isset($_GET['raw']) && intval($_GET['raw']) === 1);
-$allHeaders = (isset($_GET['allheaders']) && intval($_GET['allheaders']) === 1);
+$raw = \SMD\Http\Request::analyze('raw', 0);
+$allHeaders = \SMD\Http\Request::analyze('allheaders', 0);
+
+echo '<pre>';
 
 if ($raw) {
-    $backendType = ($use_livestatus) ? sysMonDash::BACKEND_LIVESTATUS : sysMonDash::BACKEND_STATUS;
-    $SMD = new sysMonDash($backendType);
+    $SMD = new sysMonDash($backend);
     $SMD->getBackend()->setAllHeaders($allHeaders);
 
-    echo '<pre>';
     echo 'Hosts', PHP_EOL;
     print_r(Util::arraySortByKey($SMD->getBackend()->getHostsProblems(), 'last_hard_state_change'));
-    echo 'Servicios', PHP_EOL;
+    echo 'Services', PHP_EOL;
     print_r(Util::arraySortByKey($SMD->getBackend()->getServicesProblems(), 'last_hard_state_change'));
-    echo 'Paradas', PHP_EOL;
+    echo 'Downtimes', PHP_EOL;
     print_r(Util::arraySortByKey($SMD->getBackend()->getScheduledDowntimesGroupped(), 'start_time', false));
-    echo '</pre>';
+
 }
+
+echo '</pre>';

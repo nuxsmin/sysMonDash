@@ -12,19 +12,38 @@
 // Page Title
 $pageTitle = 'sysMonDash - Cuadro de Mandos';
 
+// El tipo de backend a utilizar
+// The backend type to use
+// livestatus | status | zabbix (experimental)
+$backend = 'livestatus';
+
 // Archivo con información de estado de Icinga
 // Icinga/Nagios status information file
 $statusFile = '/var/lib/icinga/status.dat';
 
-// Habilitar el uso de livestatus
-// Enable livestatus
-// http://mathias-kettner.de/checkmk_livestatus.html
-$use_livestatus = true;
-
 // Ruta al Socket livestatus
 // Livestatus' socket path
+// http://mathias-kettner.de/checkmk_livestatus.html
 $livestatus_socket_path = '/var/lib/icinga/rw/live';
 //$livestatus_socket_path = '/usr/lib/nagios/mk-livestatus/live';
+
+// La versión de Zabbix
+// The Zabbix version
+// 222 | 223 | 242 | 243
+$zabbix_version = 222;
+
+// La URL de la API de Zabbix
+// The Zabbix API URL
+// http://foo.bar/zabbix/api_jsonrpc.php
+$zabbix_url = '';
+
+// El usuario de Zabbix
+// The Zabbix user
+$zabbix_user = '';
+
+// La clave de Zabbix
+// The Zabbix password
+$zabbix_pass = '';
 
 // URL del cliente para realizar peticiones remotas (CORS)
 // Client URL to perform remote requests (CORS)

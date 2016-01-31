@@ -270,4 +270,12 @@ class Livestatus extends Backend implements BackendInterface
 
         return $out;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getProblems()
+    {
+        return array_merge($this->getHostsProblems(), $this->getServicesProblems());
+    }
 }
