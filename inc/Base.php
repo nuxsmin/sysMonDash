@@ -33,13 +33,10 @@ define('CSS_PATH', __DIR__ . DIRECTORY_SEPARATOR . APP_ROOT . DIRECTORY_SEPARATO
 
 define('DEBUG', true);
 
-session_start();
-
 // Empezar a calcular el tiempo y memoria utilizados
 $time_start = microtime(true);
 $memInit = memory_get_usage();
 
-require CONFIG_FILE;
 require CONSTANTS_FILE;
 
 require 'SplClassLoader.php';
@@ -47,3 +44,7 @@ require 'SplClassLoader.php';
 $ClassLoader = new SplClassLoader();
 $ClassLoader->setFileExtension('.class.php');
 $ClassLoader->register();
+
+session_start();
+
+\SMD\Core\Config::loadConfig(CONFIG_FILE);

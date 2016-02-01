@@ -60,9 +60,7 @@ class sysMonDash
                 $this->_backend = new Status();
                 break;
             case 'zabbix':
-                global $zabbix_version, $zabbix_url, $zabbix_user, $zabbix_pass;
-
-                $this->_backend = new Zabbix($zabbix_version, $zabbix_url, $zabbix_user, $zabbix_pass);
+                $this->_backend = new Zabbix(Config::getConfig()->getZabbixVersion(), Config::getConfig()->getZabbixUrl(), Config::getConfig()->getZabbixUser(), Config::getConfig()->getZabbixPass());
                 break;
             default:
                 throw new \Exception('Backend no soportado');
@@ -77,7 +75,7 @@ class sysMonDash
      */
     public static function getItems(&$items)
     {
-        global $newItemTime;
+        $newItemTime = Config::getConfig()->getNewItemTime();
 
         // Contador del no. de elementos
         self::$totalItems = 0;
@@ -112,7 +110,7 @@ class sysMonDash
      */
     private static function dashDisplay(array &$item, $newItem = false, $newItemUp = false)
     {
-        global $colLastcheck, $colHost, $colStatusInfo, $colService, $cgiURL, $type, $newItemTime;
+        global $type;
 
         $statusId = $item['state'];
         $ack = $item['acknowledged'];
@@ -170,7 +168,9 @@ class sysMonDash
 
         if ($newItem === true && $ack === 0 && !$scheduled && !$newItemUp) {
             $tdClass = "new";
-        } elseif ($newItemUp && time() - $item['last_hard_state_change'] <= $newItemTime / 2) {
+        } elseif ($newItemUp
+            && time() - $item['last_hard_state_change'] <= Config::getConfig()->getNewItemTime() / 2
+        ) {
 //            $trTitle = Language::t("OK - Recuperado");
             $trClass = "new-up";
             $statusName = Language::t('RECUPERADO');
@@ -188,20 +188,20 @@ class sysMonDash
 
         // Si 'host_display_name' está presente, el item es un servicio
         if (!isset($item['host_display_name'])) {
-            $link = $cgiURL . '/extinfo.cgi?type=1&host=' . $hostname;
+            $link = Config::getConfig()->getCgiURL() . '/extinfo.cgi?type=1&host=' . $hostname;
             $actionServiceLink = '';
         } else {
-            $link = $cgiURL . '/extinfo.cgi?type=2&host=' . $hostname . '&service=' . urlencode($serviceDesc);
+            $link = Config::getConfig()->getCgiURL() . '/extinfo.cgi?type=2&host=' . $hostname . '&service=' . urlencode($serviceDesc);
             $actionServiceLink = '';
         }
 
         $line = '<tr class="item-data ' . $trClass . '" title="' . sprintf(Language::t('Estado %s desde %s'), $statusName, $lastStateTime) . '">' . PHP_EOL;
         $line .= '<td>' . $statusName . '</td>';
-        $line .= ($colLastcheck == true) ? '<td title="' . sprintf('%s : %s', Language::t('Último check'), $lastCheckDuration) . '" class="' . $tdClass . '">' . $lastStateDuration . '</td>' . PHP_EOL : '';
-        $line .= ($colHost == true) ? '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a>' . $actionHostLink . '</td>' . PHP_EOL : '';
-        $line .= ($colStatusInfo == true) ? '<td class="statusinfo">' . $item['plugin_output'] . '</td>' . PHP_EOL : '';
+        $line .= (Config::getConfig()->isColLastcheck()) ? '<td title="' . sprintf('%s : %s', Language::t('Último check'), $lastCheckDuration) . '" class="' . $tdClass . '">' . $lastStateDuration . '</td>' . PHP_EOL : '';
+        $line .= (Config::getConfig()->isColHost()) ? '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a>' . $actionHostLink . '</td>' . PHP_EOL : '';
+        $line .= (Config::getConfig()->isColStatusInfo()) ? '<td class="statusinfo">' . $item['plugin_output'] . '</td>' . PHP_EOL : '';
 
-        if ($colService == true) {
+        if (Config::getConfig()->isColService()) {
             $line .= ($serviceDesc) ? '<td>' . $serviceDesc . $actionServiceLink . '</td>' . PHP_EOL : '<td>' . $item['check_command'] . $actionServiceLink . '</td>' . PHP_EOL;
         }
 
@@ -220,13 +220,14 @@ class sysMonDash
      */
     private static function filterItems(array &$item)
     {
-        global $regexHostShow, $regexServiceNoShow, $criticalItems;
-
         $hostname = (isset($item['host_display_name'])) ? $item['host_display_name'] : $item['display_name'];
 
         if ($item['acknowledged'] === 1
-            || (!preg_match($regexHostShow, $hostname) && !in_array($hostname, $criticalItems))
-            || (preg_match($regexServiceNoShow, $item['display_name']) && !in_array($item['display_name'], $criticalItems))
+            || (!preg_match(Config::getConfig()->getRegexHostShow(), $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()))
+            || (Config::getConfig()->getRegexServiceNoShow()
+                && is_array(Config::getConfig()->getCriticalItems())
+                && preg_match(Config::getConfig()->getRegexServiceNoShow(), $item['display_name'])
+                && !in_array($item['display_name'], Config::getConfig()->getCriticalItems()))
             || ($item['current_attempt'] <= $item['max_check_attempts'] && $item['state_type'] === 0 && $item['is_flapping'] === 0)
             || (isset($item['host_state']) && $item['state'] > SERVICE_WARNING && $item['host_state'] >= HOST_DOWN)
             || ($item['state_type'] === 1 && isset($item['last_time_unreachable']) && $item['last_time_unreachable'] > $item['last_check'])

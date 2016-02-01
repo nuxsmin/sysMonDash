@@ -26,6 +26,7 @@
 namespace SMD\Backend;
 
 use Exception;
+use SMD\Core\Config;
 use SMD\IO\Socket;
 use SMD\Util\Util;
 
@@ -42,8 +43,6 @@ class Livestatus extends Backend implements BackendInterface
      */
     public function getHostsProblems()
     {
-        global $newItemTime;
-
         $fields = array(
             'alias',
             'state',
@@ -76,7 +75,7 @@ class Livestatus extends Backend implements BackendInterface
                 'GET hosts',
                 'Filter: checks_enabled = 1',
                 'Filter: state != ' . HOST_UP,
-                'Filter: last_hard_state_change > ' . (time() - $newItemTime / 2),
+                'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
                 'Filter: is_flapping = 1',
                 'Or: 3',
                 'Columns: ' . implode(' ', $fields),
@@ -101,8 +100,6 @@ class Livestatus extends Backend implements BackendInterface
      */
     public function getServicesProblems()
     {
-        global $newItemTime;
-
         $fields = array(
             'acknowledged',
             'acknowledgement_type',
@@ -153,7 +150,7 @@ class Livestatus extends Backend implements BackendInterface
                 'GET services',
                 'Filter: checks_enabled = 1',
                 'Filter: state != ' . SERVICE_OK,
-                'Filter: last_hard_state_change > ' . (time() - $newItemTime / 2),
+                'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
                 'Filter: is_flapping = 1',
                 'Or: 3',
                 'Columns: ' . implode(' ', $fields),
@@ -217,6 +214,7 @@ class Livestatus extends Backend implements BackendInterface
     {
         try {
             $Socket = new Socket();
+            $Socket->setSocketFile(Config::getConfig()->getLivestatusSocketPath());
             $data = json_decode($Socket->getDataFromSocket($dataQuery));
 
             if (json_last_error() !== JSON_ERROR_NONE) {

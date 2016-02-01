@@ -23,6 +23,7 @@
  *
  */
 
+use SMD\Core\Config;
 use SMD\Core\Language;
 use SMD\Http\Request;
 
@@ -31,7 +32,7 @@ define('APP_ROOT', '.');
 require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php';
 
 $type = Request::analyze('t', VIEW_FRONTLINE);
-$timeout = Request::analyze('to', $refreshValue);
+$timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 $scroll = Request::analyze('scroll', ($type === VIEW_FRONTLINE || $type === VIEW_DISPLAY) ? 1 : 0);
 
 $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
@@ -41,7 +42,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
-    <title><?php echo Language::t($pageTitle); ?></title>
+    <title><?php echo Language::t(Config::getConfig()->getPageTitle()); ?></title>
     <meta name="author" content="Rubén Domínguez">
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -68,7 +69,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <script type="text/javascript">
     (function () {
         var config = SMD().getSMDConfig;
-        config.setRemoteServer('<?php echo $remoteServer; ?>');
+        config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
         config.setAjaxFile('<?php echo $ajaxFile; ?>');
         config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
         config.setTimeout(<?php echo $timeout; ?>);

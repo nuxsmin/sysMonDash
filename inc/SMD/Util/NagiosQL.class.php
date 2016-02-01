@@ -26,6 +26,7 @@
 namespace SMD\Util;
 
 use mysqli;
+use SMD\Core\Config;
 
 /**
  * Class NagiosQL con utilidades para obtener datos desde la BD de NagiosQL
@@ -41,9 +42,7 @@ class NagiosQL
      */
     public static function getHostsDBInfo()
     {
-        global $dbServer, $dbName, $dbUser, $dbUserPass;
-
-        $mysqli = new mysqli($dbServer, $dbUser, $dbUserPass, $dbName);
+        $mysqli = new mysqli(Config::getConfig()->getDbServer(), Config::getConfig()->getDbUser(), Config::getConfig()->getDbUserPass(), Config::getConfig()->getDbName());
 
         if ($mysqli->connect_errno) {
             error_log('(' . __FUNCTION__ . ') Fallo al conectar a MySQL: ' . $mysqli->connect_error);

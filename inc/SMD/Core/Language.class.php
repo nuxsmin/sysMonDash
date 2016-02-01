@@ -78,12 +78,12 @@ class Language
      */
     private static function getGlobalLang()
     {
-        global $language;
+        $language = Config::getConfig()->getLanguage();
 
         $browserLang = self::getBrowserLang();
 
         // Establecer a es_ES si no existe la traducción o no está establecido el lenguaje
-        if (!$language
+        if (!empty($language)
             && (preg_match('/^es_.*/i', $browserLang)
             || !self::checkLangFile($browserLang))
         ) {

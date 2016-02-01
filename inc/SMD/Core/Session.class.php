@@ -106,4 +106,44 @@ class Session
     {
         return self::getSessionKey('csshash');
     }
+
+    /**
+     * Guardar la configuración
+     *
+     * @param $config
+     */
+    public static function setConfig(Config $config)
+    {
+        self::setSessionKey('config', $config);
+    }
+
+    /**
+     * Devolver la configuración
+     *
+     * @return Config
+     */
+    public static function getConfig()
+    {
+        return self::getSessionKey('config');
+    }
+
+    /**
+     * Establecer la hora de carga de la configuración
+     *
+     * @param $time int
+     */
+    public static function setConfigTime($time)
+    {
+        self::setSessionKey('configTime', $time);
+    }
+
+    /**
+     * Devolver la hora de carga de la configuración
+     *
+     * @return int
+     */
+    public static function getConfigTime()
+    {
+        return self::getSessionKey('configTime', 0);
+    }
 }

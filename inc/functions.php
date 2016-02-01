@@ -31,12 +31,12 @@ define('APP_ROOT', '.');
 require APP_ROOT . DIRECTORY_SEPARATOR . 'Base.php';
 
 $raw = \SMD\Http\Request::analyze('raw', 0);
-$allHeaders = \SMD\Http\Request::analyze('allheaders', 0);
+$allHeaders = \SMD\Http\Request::analyze('allheaders', false, false, true);
 
 echo '<pre>';
 
 if ($raw) {
-    $SMD = new sysMonDash($backend);
+    $SMD = new sysMonDash(\SMD\Core\Config::getConfig()->getBackend());
     $SMD->getBackend()->setAllHeaders($allHeaders);
 
     echo 'Hosts', PHP_EOL;

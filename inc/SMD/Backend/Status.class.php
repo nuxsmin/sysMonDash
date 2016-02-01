@@ -25,6 +25,7 @@
 
 namespace SMD\Backend;
 
+use SMD\Core\Config;
 use SMD\Util\NagiosQL;
 
 /**
@@ -51,14 +52,12 @@ class Status extends Backend implements BackendInterface
      */
     private function getStatusData()
     {
-        global $statusFile, $useNagiosQLInfo;
-
         // Archivo con información de estado de Icinga
-        if (!$this->_fileData = file_get_contents($statusFile)) {
+        if (!$this->_fileData = file_get_contents(Config::getConfig()->getStatusFile())) {
             throw new \Exception('Error al obtener los datos de monitorización');
         }
 
-        if ($useNagiosQLInfo && !isset($_SESSION['dash_hostinfo'])) {
+        if (Config::getConfig()->isUseNagiosQLInfo() && !isset($_SESSION['dash_hostinfo'])) {
             $_SESSION['dash_hostinfo'] = NagiosQL::getHostsDBInfo();
         }
     }
@@ -199,10 +198,8 @@ class Status extends Backend implements BackendInterface
      */
     private function checkFilter(&$item)
     {
-        global $newItemTime;
-
         return ($item['current_state'] != 0
-            || $item['last_hard_state_change'] > (time() - $newItemTime / 2)
+            || $item['last_hard_state_change'] > (time() - Config::getConfig()->getNewItemTime() / 2)
             || $item['is_flapping'] === 1);
     }
 

@@ -24,6 +24,7 @@
  */
 
 namespace SMD\Http;
+use SMD\Core\Config;
 use SMD\Html\Html;
 use SMD\Util\Util;
 
@@ -176,9 +177,9 @@ class Request
      */
     public static function checkCORS()
     {
-        global $clientURL;
+        $clientURL = Config::getConfig()->getClientURL();
 
-        if (isset($clientURL) && !empty($clientURL)){
+        if (!empty($clientURL)){
             header('Access-Control-Allow-Origin: ' . $clientURL);
             header('Access-Control-Request-Method: GET');
 

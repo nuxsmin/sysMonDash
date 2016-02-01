@@ -26,6 +26,7 @@
 namespace SMD\Backend;
 
 use Exts\Zabbix\ZabbixApiLoader;
+use SMD\Util\Util;
 
 /**
  * Class Zabbix para la gestión de eventos de Zabbix
@@ -35,7 +36,7 @@ use Exts\Zabbix\ZabbixApiLoader;
 class Zabbix extends Backend implements BackendInterface
 {
     /** @var \Exts\Zabbix\V222\ZabbixApi|\Exts\Zabbix\V223\ZabbixApi|\Exts\Zabbix\V242\ZabbixApi|\Exts\Zabbix\V243\ZabbixApi */
-    private $_Zabbix = null;
+    private $Zabbix = null;
     /**
      * URL de la API de Zabbix
      *
@@ -60,6 +61,24 @@ class Zabbix extends Backend implements BackendInterface
      * @var int
      */
     private $version = 0;
+    /**
+     * Array con los hosts en mantenimiento
+     *
+     * @var array
+     */
+    private $hostsMaintenance = array();
+    /**
+     * Array con los eventos actuales
+     *
+     * @var array
+     */
+    private $events = array();
+    /**
+     * Array con las paradas programadas
+     *
+     * @var array
+     */
+    private $downtimes = array();
 
     /**
      * Zabbix constructor.
@@ -95,9 +114,17 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function connect()
     {
-        $this->_Zabbix = ZabbixApiLoader::getAPI($this->version);
-        $this->_Zabbix->setApiUrl($this->url);
-        $this->_Zabbix->userLogin(['user' => $this->user, 'password' => $this->pass]);
+        $this->Zabbix = ZabbixApiLoader::getAPI($this->version);
+        $this->Zabbix->setApiUrl($this->url);
+        $this->Zabbix->userLogin(['user' => $this->user, 'password' => $this->pass]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getHostsProblems()
+    {
+        return $this->getProblems();
     }
 
     /**
@@ -107,15 +134,7 @@ class Zabbix extends Backend implements BackendInterface
      */
     public function getProblems()
     {
-        return $this->getEvents();
-    }
-
-    /**
-     * @return array
-     */
-    public function getHostsProblems()
-    {
-        return $this->getEvents();
+        return $this->retrieveEvents();
     }
 
     /**
@@ -123,8 +142,10 @@ class Zabbix extends Backend implements BackendInterface
      *
      * @return array
      */
-    private function getEvents()
+    private function retrieveEvents()
     {
+        $this->getScheduledDowntimes();
+
         $params = [
             'output' => ['acknowledged', 'object', 'objectid', 'clock', 'value', 'value_changed'],
             'value' => 1,
@@ -132,14 +153,13 @@ class Zabbix extends Backend implements BackendInterface
             'sortorder' => 'DESC'
         ];
 
-        $result = [];
-        $events = $this->_Zabbix->eventGet($params);
+        $events = $this->Zabbix->eventGet($params);
 
         foreach ($events as $event) {
             $trigger = $this->getTrigger($event->objectid);
-            $state = ((int)$trigger->value === 1) ?  $this->getTriggerState($trigger->priority) : $event->value;
+            $state = ((int)$trigger->value === 1) ? $this->getTriggerState($trigger->priority) : $event->value;
 
-            $result[] = [
+            $this->events[] = [
                 'state' => (int)$state,
                 'state_type' => (int)$trigger->state,
                 'acknowledged' => (int)$event->acknowledged,
@@ -155,15 +175,15 @@ class Zabbix extends Backend implements BackendInterface
                 'last_hard_state' => (int)$event->clock,
                 'last_time_down' => 0,
                 'active_checks_enabled' => (int)$trigger->status,
-                'scheduled_downtime_depth' => 0,
+                'scheduled_downtime_depth' => $this->checkHostMaintenance($trigger->hosts),
                 'current_attempt' => (int)$trigger->value,
                 'max_check_attempts' => 0,
                 'is_flapping' => 0,
-                'notifications_enabled' => 1
+                'notifications_enabled' => 1,
             ];
         }
 
-        return $result;
+        return $this->events;
     }
 
     /**
@@ -178,10 +198,11 @@ class Zabbix extends Backend implements BackendInterface
             'triggerids' => $id,
             'expandData' => 1,
             'expandDescription' => 1,
+            'selectHosts' => 'extend',
             'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value']
         ];
 
-        $trigger = $this->_Zabbix->triggerGet($params);
+        $trigger = $this->Zabbix->triggerGet($params);
         return $trigger[0];
     }
 
@@ -215,17 +236,7 @@ class Zabbix extends Backend implements BackendInterface
      */
     public function getServicesProblems()
     {
-        // TODO: Implement getServicesProblems() method.
-    }
-
-    /**
-     * Devuelve los eventos programados
-     *
-     * @return array|bool
-     */
-    public function getScheduledDowntimes()
-    {
-        // TODO: Implement getScheduledDowntimes() method.
+        return array();
     }
 
     /**
@@ -235,6 +246,116 @@ class Zabbix extends Backend implements BackendInterface
      */
     public function getScheduledDowntimesGroupped()
     {
-        // TODO: Implement getScheduledDowntimesGroupped() method.
+        return $this->getScheduledDowntimes();
+    }
+
+    /**
+     * Devuelve los eventos programados
+     *
+     * @return array
+     */
+    public function getScheduledDowntimes()
+    {
+        if (count($this->downtimes) > 0) {
+            return $this->downtimes;
+        }
+
+        $params = [
+            'output' => ['active_since', 'active_till', 'description'],
+            'selectHosts' => 'extend',
+            'selectTimeperiods' => 'extend'
+        ];
+
+        $maintenances = $this->Zabbix->maintenanceGet($params);
+
+        foreach ($maintenances as $maintenance) {
+            $this->setHostsInMaintenance($maintenance->hosts);
+
+            if (time() <= $maintenance->active_till) {
+                $period = $this->getTimePeriod($maintenance->timeperiods);
+
+                $this->downtimes[] = [
+                    'author' => 'Zabbix',
+                    'comment' => $maintenance->description,
+                    'host_name' => $this->getHostsForMaintenance($maintenance->maintenanceid),
+                    'is_service' => 0,
+                    'service_display_name' => '-',
+                    'start_time' => $period['start'],
+                    'end_time' => $period['end'],
+                    'id' => $maintenance->maintenanceid
+                ];
+            }
+        }
+
+        return $this->downtimes;
+    }
+
+    /**
+     * Obtener los hosts en mantenimiento
+     *
+     * @param array $hosts
+     * @return array
+     */
+    private function setHostsInMaintenance(array $hosts)
+    {
+        foreach ($hosts as $host) {
+            if ((int)$host->maintenance_status === 1) {
+                $this->hostsMaintenance[$host->hostid] = [
+                    'host' => $host->host,
+                    'maintenanceid' => (int)$host->maintenanceid
+                ];
+            }
+        }
+    }
+
+    /**
+     * Obtener el periodo de tiempo más cercano al tiempo actual
+     *
+     * @param array $timePeriods
+     * @return int
+     */
+    private function getTimePeriod(array $timePeriods)
+    {
+        $result = [];
+
+        foreach ($timePeriods as $timePeriod) {
+            $end = $timePeriod->start_date + $timePeriod->period;
+
+            if (time() <= $end) {
+                $result[] = ['start' => $timePeriod->start_date, 'end' => $end];
+            }
+        }
+
+        return Util::arraySortByKey($result, 'end')[0];
+    }
+
+    /**
+     * Obtener los hosts de un mantenimiento
+     *
+     * @param $maintenanceId
+     * @return string
+     */
+    private function getHostsForMaintenance($maintenanceId)
+    {
+        $hosts = [];
+
+        foreach ($this->hostsMaintenance as $host) {
+            if ((int)$host['maintenanceid'] === (int)$maintenanceId) {
+                $hosts[] = $host['host'];
+            }
+        }
+
+        return (count($hosts) > 0) ? implode(',', $hosts) : '';
+    }
+
+    /**
+     * Comprobar si el host del objeto trigger está en mantenimiento
+     *
+     * @param array $hosts
+     * @return int
+     */
+    private function checkHostMaintenance(array $hosts)
+    {
+        return ((int)$hosts[0]->maintenance_status === 1) ? 1 : 0;
     }
 }

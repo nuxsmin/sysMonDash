@@ -23,6 +23,7 @@
  *
  */
 
+use SMD\Core\Config;
 use SMD\Core\Language;
 use SMD\Core\sysMonDash;
 use SMD\Http\Request;
@@ -35,10 +36,10 @@ require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php
 Request::checkCORS();
 
 $type = Request::analyze('t', VIEW_FRONTLINE);
-$timeout = Request::analyze('to', $refreshValue);
+$timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 
 try {
-    $SMD = new sysMonDash($backend);
+    $SMD = new sysMonDash(Config::getConfig()->getBackend());
 
     // Obtener los avisos desde la monitorización
     $problems = $SMD->getBackend()->getProblems();
@@ -71,16 +72,16 @@ if ($type !== 1) {
     <table id="tblBoard" width="90%" border="0" class="boldtable" align="center">
         <thead class="head">
         <th width="3%"><?php echo Language::t('Estado'); ?></th>
-        <?php if ($colLastcheck == true): ?>
+        <?php if (Config::getConfig()->isColLastcheck()): ?>
             <th width="13%"><?php echo Language::t('Desde'); ?></th>
         <?php endif; ?>
-        <?php if ($colHost == true): ?>
+        <?php if (Config::getConfig()->isColHost()): ?>
             <th width="25%"><?php echo Language::t('Host'); ?></th>
         <?php endif; ?>
-        <?php if ($colStatusInfo == true): ?>
+        <?php if (Config::getConfig()->isColStatusInfo()): ?>
             <th width="30%"><?php echo Language::t('Información de Estado'); ?></th>
         <?php endif; ?>
-        <?php if ($colService == true): ?>
+        <?php if (Config::getConfig()->isColService()): ?>
             <th width="20%"><?php echo Language::t('Servicio'); ?></th>
         <?php endif; ?>
         </thead>
@@ -96,7 +97,7 @@ if ($type !== 1) {
                 </td>
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
-        <?php elseif (sysMonDash::$displayedItems > $maxDisplayItems): ?>
+        <?php elseif (sysMonDash::$displayedItems > Config::getConfig()->getMaxDisplayItems()): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages" class="error">
@@ -104,7 +105,7 @@ if ($type !== 1) {
                         <br>
                         <?php echo Language::t('Demasiados avisos'); ?> (<?php echo sysMonDash::$displayedItems; ?>)
                         <br>
-                        <a href="<?php echo $monitorServerUrl; ?>"><?php echo Language::t('Revisar incidencias en web de monitorización'); ?></a>
+                        <a href="<?php echo Config::getConfig()->getMonitorServerUrl(); ?>"><?php echo Language::t('Revisar incidencias en web de monitorización'); ?></a>
                     </div>
                 </td>
             </tr>
@@ -117,7 +118,7 @@ if ($type !== 1) {
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php printf('%s %d@%.3fs (auto %ds) %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, $backend); ?>
+                <?php printf('%s %d@%.3fs (auto %ds) %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, Config::getConfig()->getBackend()); ?>
                 <br>
                 <?php printf('%d/%d %s  %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos ocultos'), $showAll); ?>
             </td>
@@ -143,7 +144,7 @@ if ($type !== 1) {
         <?php foreach ($downtimes as $hostName => $downtime): ?>
             <?php $tiempoRestante = $downtime['start_time'] - time(); ?>
             <tr>
-                <td><?php echo $hostName; ?></td>
+                <td><?php echo $downtime['host_name']; ?></td>
                 <td><?php echo (!empty($downtime['service_display_name'])) ? $downtime['service_display_name'] : $downtime['host_name']; ?></td>
                 <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime['start_time']); ?></td>

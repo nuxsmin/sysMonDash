@@ -33,26 +33,15 @@ use Exception;
  */
 class Socket
 {
+    /** @var string */
+    private $socketFile = null;
+
     /**
-     * Obtener un recurso del tipo Socket utilizando el socket unix de mklivestatus
-     * @return bool|resource
-     * @throws Exception
+     * @param string $socketFile
      */
-    private function getLiveSocket()
+    public function setSocketFile($socketFile)
     {
-        global $livestatus_socket_path;
-
-        if (file_exists($livestatus_socket_path) && filetype($livestatus_socket_path) === 'socket') {
-            $socket = stream_socket_client('unix://' . $livestatus_socket_path, $errno, $errstr);
-
-            if (!$socket) {
-                throw new Exception("ERROR: $errno - $errstr");
-            }
-        } else {
-            throw new Exception("ERROR: unable to read file $livestatus_socket_path");
-        }
-
-        return $socket;
+        $this->socketFile = $socketFile;
     }
 
     /**
@@ -74,5 +63,25 @@ class Socket
         }
 
         return $outData;
+    }
+
+    /**
+     * Obtener un recurso del tipo Socket utilizando el socket unix de mklivestatus
+     * @return bool|resource
+     * @throws Exception
+     */
+    private function getLiveSocket()
+    {
+        if (file_exists($this->socketFile) && filetype($this->socketFile) === 'socket') {
+            $socket = stream_socket_client('unix://' . $this->socketFile, $errno, $errstr);
+
+            if (!$socket) {
+                throw new Exception("ERROR: $errno - $errstr");
+            }
+        } else {
+            throw new Exception("ERROR: unable to read file $this->socketFile");
+        }
+
+        return $socket;
     }
 }
