@@ -139,7 +139,9 @@ function SMD() {
                 totalHeight = jQuery(document).height();
 
                 if (totalHeight > window.innerHeight) {
-                    setTimeout('pageScroll()', Config.getTimeout() / 2);
+                    setTimeout(function(){
+                        pageScroll();
+                    }, Config.getTimeout() / 2);
                 }
             }
 

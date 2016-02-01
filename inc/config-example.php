@@ -1,6 +1,11 @@
 <?php
 /**
  * sysMonDash Config File
+ *
+ * Copiar este archivo a config.php y modificar según entorno
+ *
+ * Copy this file to config.php and set the options to fit you environment
+ *
  */
 
 // Idioma por defecto

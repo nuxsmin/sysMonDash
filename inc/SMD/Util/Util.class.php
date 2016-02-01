@@ -86,9 +86,10 @@ class Util
     {
         $version = 1;
 
-        if (!isset($_SESSION['EXPIRE'], $_SESSION['VERSION'])
+        if (session_status() === PHP_SESSION_ACTIVE
+            && (!isset($_SESSION['EXPIRE'], $_SESSION['VERSION'])
             || $_SESSION['EXPIRE'] - time() < 0
-            || $_SESSION['VERSION'] < $version
+            || $_SESSION['VERSION'] < $version)
         ) {
             $_SESSION['VERSION'] = $version;
             $_SESSION['EXPIRE'] = time() + 7200;
