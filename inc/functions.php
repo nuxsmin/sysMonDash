@@ -36,15 +36,15 @@ $allHeaders = \SMD\Http\Request::analyze('allheaders', false, false, true);
 echo '<pre>';
 
 if ($raw) {
-    $SMD = new sysMonDash(\SMD\Core\Config::getConfig()->getBackend());
-    $SMD->getBackend()->setAllHeaders($allHeaders);
+    $Backend = sysMonDash::getBackend();
+    $Backend->setAllHeaders($allHeaders);
 
     echo 'Hosts', PHP_EOL;
-    print_r(Util::arraySortByKey($SMD->getBackend()->getHostsProblems(), 'last_hard_state_change'));
+    print_r(Util::arraySortByKey($Backend->getHostsProblems(), 'last_hard_state_change'));
     echo 'Services', PHP_EOL;
-    print_r(Util::arraySortByKey($SMD->getBackend()->getServicesProblems(), 'last_hard_state_change'));
+    print_r(Util::arraySortByKey($Backend->getServicesProblems(), 'last_hard_state_change'));
     echo 'Downtimes', PHP_EOL;
-    print_r(Util::arraySortByKey($SMD->getBackend()->getScheduledDowntimesGroupped(), 'start_time', false));
+    print_r(Util::arraySortByKey($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
 
 }
 

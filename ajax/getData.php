@@ -39,33 +39,31 @@ $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 
 try {
-    $SMD = new sysMonDash(Config::getConfig()->getBackend());
+    $Backend = sysMonDash::getBackend();
 
     // Obtener los avisos desde la monitorización
-    $problems = $SMD->getBackend()->getProblems();
+    $items = $Backend->getProblems();
 
-    if ($problems === false) {
+    if ($items === false) {
         throw new Exception('No hay datos desde el backend');
     }
 
-    $downtimes = $SMD->getBackend()->getScheduledDowntimesGroupped();
+    $downtimes = $Backend->getScheduledDowntimesGroupped();
 } catch (Exception $e) {
+    error_log(implode(';', $e->getTrace()[0]));
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
     exit();
 }
 
 ob_start();
 
-// Ordenar los items por tiempo de último cambio
-$items = Util::arraySortByKey($problems, 'last_hard_state_change');
-
 // Array con los avisos filtrados
 $res = sysMonDash::getItems($items);
 
 if ($type !== 1) {
-    $showAll = '(<a href="index.php?t=' . VIEW_ALL . '" title="' . Language::t('Mostrar los avisos ocultos') . '">' . Language::t('Mostrar Todos') . '</a>)';
+    $showAll = '<a href="index.php?t=' . VIEW_ALL . '" title="' . Language::t('Mostrar los avisos ocultos') . '">' . Language::t('Mostrar Todos') . '</a>';
 } else {
-    $showAll = '(<a href="index.php?t=' . VIEW_FRONTLINE . '" title="' . Language::t('Mostrar sólo avisos importantes') . '">' . Language::t('Mostrar Menos') . '</a>)';
+    $showAll = '<a href="index.php?t=' . VIEW_FRONTLINE . '" title="' . Language::t('Mostrar sólo avisos importantes') . '">' . Language::t('Mostrar Menos') . '</a>';
 }
 
 ?>
@@ -111,16 +109,16 @@ if ($type !== 1) {
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
         <?php else: ?>
-        <?php foreach ($res as $line): ?>
-            <?php echo $line; ?>
-        <?php endforeach; ?>
+            <?php foreach ($res as $line): ?>
+                <?php echo $line; ?>
+            <?php endforeach; ?>
             <script>jQuery("#tblBoard thead").show()</script>
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php printf('%s %d@%.3fs (auto %ds) %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, Config::getConfig()->getBackend()); ?>
-                <br>
-                <?php printf('%d/%d %s  %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos ocultos'), $showAll); ?>
+                <?php printf('%s | %d@%.4fs | auto %ds | %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, Config::getConfig()->getBackend()); ?>
+                |
+                <?php printf('%d/%d %s %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos'), $showAll); ?>
             </td>
         </tr>
     </table>
@@ -141,16 +139,17 @@ if ($type !== 1) {
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($downtimes as $hostName => $downtime): ?>
-            <?php $tiempoRestante = $downtime['start_time'] - time(); ?>
+        <?php foreach ($downtimes as $downtime): ?>
+            <?php /** @var $downtime \SMD\Backend\Event\DowntimeInterface */ ?>
+            <?php $tiempoRestante = $downtime->getStartTime() - time(); ?>
             <tr>
-                <td><?php echo $downtime['host_name']; ?></td>
-                <td><?php echo (!empty($downtime['service_display_name'])) ? $downtime['service_display_name'] : $downtime['host_name']; ?></td>
+                <td><?php echo $downtime->getHostName(); ?></td>
+                <td><?php echo ($downtime->getServiceDisplayName()) ? $downtime->getServiceDisplayName() : $downtime->getHostName(); ?></td>
                 <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
-                <td><?php echo date('d-m-Y H:i', $downtime['start_time']); ?></td>
-                <td><?php echo date('d-m-Y H:i', $downtime['end_time']); ?></td>
-                <td><?php echo $downtime['author']; ?></td>
-                <td><?php echo $downtime['comment']; ?></td>
+                <td><?php echo date('d-m-Y H:i', $downtime->getStartTime()); ?></td>
+                <td><?php echo date('d-m-Y H:i', $downtime->getEndTime()); ?></td>
+                <td><?php echo $downtime->getAuthor(); ?></td>
+                <td><?php echo $downtime->getComment(); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

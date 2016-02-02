@@ -26,7 +26,12 @@
 namespace SMD\Backend;
 
 use Exception;
+use SMD\Backend\Event\Downtime;
+use SMD\Backend\Event\DowntimeInterface;
+use SMD\Backend\Event\Host;
+use SMD\Backend\Event\Service;
 use SMD\Core\Config;
+use SMD\Core\Language;
 use SMD\IO\Socket;
 use SMD\Util\Util;
 
@@ -50,13 +55,9 @@ class Livestatus extends Backend implements BackendInterface
             'display_name',
             'current_attempt',
             'max_check_attempts',
-            'hard_state',
             'is_flapping',
             'plugin_output',
-            'notes',
             'acknowledged',
-            'acknowledgement_type',
-            'action_url_expanded',
             'active_checks_enabled',
             'last_hard_state',
             'scheduled_downtime_depth',
@@ -66,7 +67,6 @@ class Livestatus extends Backend implements BackendInterface
             'last_time_unreachable',
             'last_time_up',
             'host_alias',
-            'host_is_flapping',
             'state_type'
         );
 
@@ -90,7 +90,34 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        return ($this->isAllHeaders() === false) ? $this->mapDataValues($fields, $data) : $data;
+        $events = [];
+
+        foreach ($data as $event) {
+            $Event = new Host();
+            $Event->setAlias($event[0]);
+            $Event->setState($event[1]);
+            $Event->setCheckCommand($event[2]);
+            $Event->setDisplayName($event[3]);
+            $Event->setCurrentAttempt($event[4]);
+            $Event->setMaxCheckAttempts($event[5]);
+            $Event->setIsFlapping($event[6]);
+            $Event->setPluginOutput($event[7]);
+            $Event->setAcknowledged($event[8]);
+            $Event->setActiveChecksEnabled($event[9]);
+            $Event->setLastHardState($event[10]);
+            $Event->setScheduledDowntimeDepth($event[11]);
+            $Event->setLastCheck($event[12]);
+            $Event->setLastHardStateChange($event[13]);
+            $Event->setLastTimeDown($event[14]);
+            $Event->setLastTimeUnreachable($event[15]);
+            $Event->setLastTimeUp($event[16]);
+            $Event->setHostAlias($event[17]);
+            $Event->setStateType($event[18]);
+
+            $events[] = $Event;
+        }
+
+        return ($this->isAllHeaders() === false) ? $events : $data;
     }
 
     /**
@@ -102,25 +129,11 @@ class Livestatus extends Backend implements BackendInterface
     {
         $fields = array(
             'acknowledged',
-            'acknowledgement_type',
-            'action_url_expanded',
             'active_checks_enabled',
             'check_command',
-            'checks_enabled',
             'current_attempt',
             'display_name',
-            'has_been_checked',
-            'host_action_url_expanded',
-            'host_active_checks_enabled',
             'host_alias',
-            'host_checks_enabled',
-            'host_current_attempt',
-            'host_is_flapping',
-            'host_last_check',
-            'host_last_hard_state_change',
-            'host_last_state',
-            'host_last_state_change',
-            'host_last_time_down',
             'host_last_time_unreachable',
             'host_last_time_up',
             'host_state',
@@ -130,19 +143,15 @@ class Livestatus extends Backend implements BackendInterface
             'last_check',
             'last_hard_state',
             'last_hard_state_change',
-            'last_state',
-            'last_state_change',
             'last_time_critical',
             'last_time_ok',
             'last_time_unknown',
-            'last_time_warning',
-            'perf_data',
             'plugin_output',
-            'pnpgraph_present',
             'state',
             'state_type',
             'scheduled_downtime_depth',
-            'max_check_attempts'
+            'max_check_attempts',
+            'pnpgraph_present',
         );
 
         if ($this->isAllHeaders() === false) {
@@ -165,7 +174,38 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        return ($this->isAllHeaders() === false) ? $this->mapDataValues($fields, $data) : $data;
+        $events = [];
+
+        foreach ($data as $event) {
+            $Event = new Service();
+            $Event->setAcknowledged($event[0]);
+            $Event->setActiveChecksEnabled($event[1]);
+            $Event->setCheckCommand($event[2]);
+            $Event->setCurrentAttempt($event[3]);
+            $Event->setDisplayName($event[4]);
+            $Event->setHostAlias($event[5]);
+            $Event->setHostLastTimeUnreachable($event[6]);
+            $Event->setHostLastTimeUp($event[7]);
+            $Event->setHostState($event[8]);
+            $Event->setHostDisplayName($event[9]);
+            $Event->setHostScheduledDowntimeDepth($event[10]);
+            $Event->setIsFlapping($event[11]);
+            $Event->setLastCheck($event[12]);
+            $Event->setLastHardState($event[13]);
+            $Event->setLastHardStateChange($event[14]);
+            $Event->setLastTimeDown($event[15]);
+            $Event->setLastTimeUp($event[16]);
+            $Event->setLastTimeUnreachable($event[17]);
+            $Event->setPluginOutput($event[18]);
+            $Event->setState($event[19]);
+            $Event->setStateType($event[20]);
+            $Event->setScheduledDowntimeDepth($event[21]);
+            $Event->setMaxCheckAttempts($event[22]);
+
+            $events[] = $Event;
+        }
+
+        return ($this->isAllHeaders() === false) ? $events : $data;
     }
 
     /**
@@ -201,7 +241,24 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        return ($this->isAllHeaders() === false) ? $this->mapDataValues($fields, $data) : $data;
+        $downtimes = [];
+
+        foreach ($data as $downtime) {
+            $Downtime = new Downtime();
+            $Downtime->setAuthor($downtime[0]);
+            $Downtime->setComment($downtime[1]);
+            $Downtime->setDuration($downtime[2]);
+            $Downtime->setHostAlias($downtime[3]);
+            $Downtime->setHostName($downtime[4]);
+            $Downtime->setIsService($downtime[5]);
+            $Downtime->setServiceDisplayName($downtime[6]);
+            $Downtime->setStartTime($downtime[7]);
+            $Downtime->setEndTime($downtime[8]);
+
+            $downtimes[] = $Downtime;
+        }
+
+        return ($this->isAllHeaders() === false) ? $downtimes : $data;
     }
 
     /**
@@ -238,31 +295,29 @@ class Livestatus extends Backend implements BackendInterface
         $groupCount = 5;
         $hosts = array();
         $out = array();
-        $downtimes = Util::arraySortByKey($this->getScheduledDowntimes(), 'start_time', false);
+        $downtimes = Util::arraySortByProperty($this->getScheduledDowntimes(), 'start_time', false);
 
         // Recorrer el array de eventos y contabilizar el número de veces que aparece cada host
         foreach ($downtimes as $downtime) {
+            /** @var $downtime DowntimeInterface */
+
             // Incrementar el contador y silenciar avisos
-            @$hosts[$downtime['host_alias']]['count']++;
+            @$hosts[$downtime->getHostHash()]['count']++;
         }
 
         // Recorrer el array de eventos y agrupar aquellos eventos de un host que se repitan más de $groupCount.
         // Se utiliza un nuevo array con la clave el nombre del host
         foreach ($downtimes as $downtime) {
-            $hostName = $downtime['host_alias'];
-            $hostCounter = $hosts[$hostName]['count'];
+            /** @var $downtime DowntimeInterface */
 
-            if (isset($out[$hostName])) {
-                continue;
-            } elseif ($hostCounter > $groupCount) {
-                $out[$hostName]['host_alias'] = $hostName;
-                $out[$hostName]['service_display_name'] = 'Programado para ' . $hostCounter . ' servicios';
-                $out[$hostName]['start_time'] = $downtime['start_time'];
-                $out[$hostName]['end_time'] = $downtime['end_time'];
-                $out[$hostName]['author'] = $downtime['author'];
-                $out[$hostName]['comment'] = $downtime['comment'];
-            } else {
-                $out[$hostName] = $downtime;
+            $hash = $downtime->getHostHash();
+            $hostCounter = $hosts[$hash]['count'];
+
+            if ($hostCounter > $groupCount) {
+                $downtime->setServiceDisplayName(sprintf(Language::t('Programado para %d servicios'), $hostCounter));
+                $out[$hash] = $downtime;
+            } elseif (!isset($out[$hash])) {
+                $out[$hash] = $downtime;
             }
         }
 

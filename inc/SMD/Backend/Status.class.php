@@ -25,6 +25,8 @@
 
 namespace SMD\Backend;
 
+use SMD\Backend\Event\Host;
+use SMD\Backend\Event\Service;
 use SMD\Core\Config;
 use SMD\Util\NagiosQL;
 
@@ -65,12 +67,64 @@ class Status extends Backend implements BackendInterface
     /**
      * @return mixed
      */
+    public function getScheduledDowntimes()
+    {
+        // TODO: Implement getScheduledDowntimes() method.
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getScheduledDowntimesGroupped()
+    {
+        // TODO: Implement getScheduledDowntimesGroupped() method.
+    }
+
+    /**
+     * @return array
+     */
+    public function getProblems()
+    {
+        return array_merge($this->getHostsProblems(), $this->getServicesProblems());
+    }
+
+    /**
+     * @return mixed
+     */
     public function getHostsProblems()
     {
         // Obtenemos los bloques que corresponden al estado de los hosts y servicios
         preg_match_all('/hoststatus {.*}/isU', $this->_fileData, $hostsData);
 
-        return $this->getItemsArray($hostsData);
+        $events = [];
+
+        foreach ($this->getItemsArray($hostsData) as $event) {
+            $Event = new Host();
+            $Event->setAcknowledged($event['problem_has_been_acknowledged']);
+            $Event->setActiveChecksEnabled($event['active_checks_enabled']);
+            $Event->setCheckCommand($event['check_command']);
+            $Event->setCurrentAttempt($event['current_attempt']);
+            $Event->setDisplayName($event['host_name']);
+            $Event->setHostAlias($event['host_name']);
+            $Event->setHostDisplayName($event['host_name']);
+            $Event->setIsFlapping($event['is_flapping']);
+            $Event->setLastCheck($event['last_check']);
+            $Event->setLastHardState($event['last_hard_state']);
+            $Event->setLastHardStateChange($event['last_hard_state_change']);
+            $Event->setLastTimeDown($event['last_time_down']);
+            $Event->setLastTimeUp($event['last_time_up']);
+            $Event->setLastTimeUnreachable($event['last_time_unreachable']);
+            $Event->setPluginOutput($event['plugin_output']);
+            $Event->setState($event['current_state']);
+            $Event->setStateType($event['state_type']);
+            $Event->setScheduledDowntimeDepth($event['scheduled_downtime_depth']);
+            $Event->setMaxCheckAttempts($event['max_attempts']);
+            $Event->setNotificationsEnabled($event['notifications_enabled']);
+
+            $events[] = $Event;
+        }
+
+        return $events;
     }
 
     /**
@@ -92,29 +146,18 @@ class Status extends Backend implements BackendInterface
      */
     private function getItemsArray(array $rawItems)
     {
-        $items = array();
-        $masterKeys = $this->getFields();
-        $regexPattern = implode('|', array_keys($masterKeys));
+        $items = [];
+        $regexPattern = implode('|', $this->getFields());
 
         foreach ($rawItems[0] as $rawItem) {
             preg_match_all('/\t(' . $regexPattern . ')=(.*)/', $rawItem, $itemsValues);
 
             // Combinar las claves originales con sus valores y ordenar por clave
             $itemData = array_combine($itemsValues[1], array_map(array($this, 'clearArrayValues'), $itemsValues[2]));
-            ksort($itemData);
 
-            // Obtener las claves unificadas para el array de valores del elemento
-            // Es necesario obtener qué claves se encuentran en la expresión regular
-            if (!isset($keys)) {
-                foreach (array_keys($itemData) as $key){
-                    $keys[] = $masterKeys[$key];
-                }
-            }
-
+            // Comprobar si se muestra el evento
             if ($this->checkFilter($itemData)) {
-                // Combinar las claves unificadas con los valores
-                // Array de datos de hosts. Se utiliza la función "clearArrayValues" para transformar los valores
-                $items[] = array_combine($keys, array_values($itemData));
+                $items[] = $itemData;
             }
         }
 
@@ -128,28 +171,41 @@ class Status extends Backend implements BackendInterface
      */
     private function getFields()
     {
-        return array(
-            'current_state' => 'state',
-            'state_type' => 'state_type',
-            'problem_has_been_acknowledged' => 'acknowledged',
-            'host_name' => 'host_display_name',
-            'service_description' => 'display_name',
-            'check_command' => 'check_command',
-            'plugin_output' => 'plugin_output',
-            'last_check' => 'last_check',
-            'last_time_up' => 'last_time_up',
-            'last_time_ok' => 'last_time_ok',
-            'last_time_unreachable' => 'last_time_unreachable',
-            'last_hard_state_change' => 'last_hard_state_change',
-            'last_hard_state' => 'last_hard_state',
-            'last_time_down' => 'last_time_down',
-            'active_checks_enabled' => 'active_checks_enabled',
-            'scheduled_downtime_depth' => 'scheduled_downtime_depth',
-            'current_attempt' => 'current_attempt',
-            'max_attempts' => 'max_check_attempts',
-            'is_flapping' => 'is_flapping',
-            'notifications_enabled' => 'notifications_enabled'
-        );
+        return [
+            'current_state',
+            'state_type',
+            'problem_has_been_acknowledged',
+            'host_name',
+            'service_description',
+            'check_command',
+            'plugin_output',
+            'last_check',
+            'last_time_up',
+            'last_time_ok',
+            'last_time_unreachable',
+            'last_hard_state_change',
+            'last_hard_state',
+            'last_time_down',
+            'active_checks_enabled',
+            'scheduled_downtime_depth',
+            'current_attempt',
+            'max_attempts',
+            'is_flapping',
+            'notifications_enabled'
+        ];
+    }
+
+    /**
+     * Filtro para determinar qué items devolver
+     *
+     * @param $item
+     * @return bool
+     */
+    private function checkFilter($item)
+    {
+        return ($item['current_state'] != 0
+            || $item['last_hard_state_change'] > (time() - Config::getConfig()->getNewItemTime() / 2)
+            || $item['is_flapping'] === 1);
     }
 
     /**
@@ -160,23 +216,32 @@ class Status extends Backend implements BackendInterface
         // Obtenemos los bloques que corresponden al estado de los servicios
         preg_match_all('/servicestatus {.*}/isU', $this->_fileData, $servicesData);
 
-        return $this->getItemsArray($servicesData);
-    }
+        $events = [];
 
-    /**
-     * @return mixed
-     */
-    public function getScheduledDowntimes()
-    {
-        // TODO: Implement getScheduledDowntimes() method.
-    }
+        foreach ($this->getItemsArray($servicesData) as $event) {
+            $Event = new Service();
+            $Event->setAcknowledged($event['problem_has_been_acknowledged']);
+            $Event->setActiveChecksEnabled($event['active_checks_enabled']);
+            $Event->setCheckCommand($event['check_command']);
+            $Event->setCurrentAttempt($event['current_attempt']);
+            $Event->setDisplayName($event['service_description']);
+            $Event->setHostAlias($event['host_name']);
+            $Event->setHostDisplayName($event['host_name']);
+            $Event->setIsFlapping($event['is_flapping']);
+            $Event->setLastCheck($event['last_check']);
+            $Event->setLastHardState($event['last_hard_state']);
+            $Event->setLastHardStateChange($event['last_hard_state_change']);
+            $Event->setPluginOutput($event['plugin_output']);
+            $Event->setState($event['current_state']);
+            $Event->setStateType($event['state_type']);
+            $Event->setScheduledDowntimeDepth($event['scheduled_downtime_depth']);
+            $Event->setMaxCheckAttempts($event['max_attempts']);
+            $Event->setNotificationsEnabled($event['notifications_enabled']);
 
-    /**
-     * @return mixed
-     */
-    public function getScheduledDowntimesGroupped()
-    {
-        // TODO: Implement getScheduledDowntimesGroupped() method.
+            $events[] = $Event;
+        }
+
+        return $events;
     }
 
     /**
@@ -188,26 +253,5 @@ class Status extends Backend implements BackendInterface
     private function clearArrayValues($value)
     {
         return (is_numeric($value)) ? intval($value) : htmlentities($value);
-    }
-
-    /**
-     * Filtro para determinar qué items devolver
-     *
-     * @param $item
-     * @return bool
-     */
-    private function checkFilter(&$item)
-    {
-        return ($item['current_state'] != 0
-            || $item['last_hard_state_change'] > (time() - Config::getConfig()->getNewItemTime() / 2)
-            || $item['is_flapping'] === 1);
-    }
-
-    /**
-     * @return array
-     */
-    public function getProblems()
-    {
-        return array_merge($this->getHostsProblems(), $this->getServicesProblems());
     }
 }

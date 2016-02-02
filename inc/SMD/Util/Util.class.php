@@ -52,6 +52,24 @@ class Util
     }
 
     /**
+     * Ordenar un array por una propiedad dada.
+     *
+     * @param array $data El array a ordenar
+     * @param string $propertyName La clave de ordenación
+     * @param bool $sortAsc El orden de ordenación
+     * @return mixed
+     */
+    public static function arraySortByProperty(array &$data, $propertyName, $sortAsc = true)
+    {
+        // Ordenar el array multidimensional por la propiedad $propertyName de mayor a menor
+        usort($data, function ($a, $b) use ($propertyName, $sortAsc) {
+            return ($sortAsc) ? ($a->{$propertyName} < $b->{$propertyName}) :($a->{$propertyName} > $b->{$propertyName});
+        });
+
+        return $data;
+    }
+
+    /**
      * Función para calcular el tiempo transcurrido
      *
      * @param int $secs El tiempo en formato UNIX
@@ -122,4 +140,15 @@ class Util
     {
         return hash_file('md5', APP_ROOT . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css');
     }
+
+    /**
+     * Comprobar la versión de PHP
+     *
+     * @return bool
+     */
+    public static function checkPHPVersion()
+    {
+        return (version_compare(PHP_VERSION, '5.4.0') >= 0);
+    }
+
 }

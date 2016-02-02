@@ -25,7 +25,7 @@
 
 namespace SMD\Core;
 
-use SMD\Backend\BackendInterface;
+use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Livestatus;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
@@ -39,33 +39,6 @@ class sysMonDash
      * @var array Los eventos a mostrar
      */
     private static $_outData;
-    /**
-     * @var BackendInterface
-     */
-    protected $_backend;
-
-    /**
-     * sysMonDash constructor.
-     *
-     * @param $type string El tipo de backend a utilizar
-     * @throws \Exception
-     */
-    public function __construct($type)
-    {
-        switch (strtolower($type)) {
-            case 'livestatus':
-                $this->_backend = new Livestatus();
-                break;
-            case 'status':
-                $this->_backend = new Status();
-                break;
-            case 'zabbix':
-                $this->_backend = new Zabbix(Config::getConfig()->getZabbixVersion(), Config::getConfig()->getZabbixUrl(), Config::getConfig()->getZabbixUser(), Config::getConfig()->getZabbixPass());
-                break;
-            default:
-                throw new \Exception('Backend no soportado');
-        }
-    }
 
     /**
      * Función para mostrar los avisos
@@ -75,6 +48,9 @@ class sysMonDash
      */
     public static function getItems(&$items)
     {
+        // Ordenar los items por tiempo de último cambio
+        Util::arraySortByProperty($items, 'lastHardStateChange');
+
         $newItemTime = Config::getConfig()->getNewItemTime();
 
         // Contador del no. de elementos
@@ -84,10 +60,12 @@ class sysMonDash
 
         // Recorremos el array y mostramos los elementos
         foreach ($items as $item) {
-            $newItemUp = ($item['state'] === 0 && (isset($item['last_time_up']) || isset($item['last_time_ok']))) ? (abs(time() - $item['last_hard_state_change']) < $newItemTime / 2) : false;
+            /** @var $item EventInterface */
+
+            $newItemUp = ($item->getState() === 0 && ($item->getLastTimeUp() || $item->getLastTimeOk())) ? (abs(time() - $item->getLastHardStateChange()) < $newItemTime / 2) : false;
 
             // Detectar si es un elemento nuevo, no se trata de un "RECOVERY" y no está "ACKNOWLEDGED"
-            $newItem = (time() - $item['last_hard_state_change'] <= $newItemTime && !$newItemUp && $item['acknowledged'] === 0);
+            $newItem = (time() - $item->getLastHardState() <= $newItemTime && !$newItemUp && !$item->isAcknowledged());
 
             // Mostrar elemento
             if (self::dashDisplay($item, $newItem, $newItemUp)) {
@@ -103,24 +81,24 @@ class sysMonDash
     /**
      * Función para mostrar los elementos del Dashboard
      *
-     * @param array $item El elemento que contiene los datos.
+     * @param EventInterface $item El elemento que contiene los datos.
      * @param bool $newItem Si es un nuevo elemento
      * @param bool $newItemUp Si es un nuevo elemento recuperado
      * @return bool
      */
-    private static function dashDisplay(array &$item, $newItem = false, $newItemUp = false)
+    private static function dashDisplay(EventInterface $item, $newItem = false, $newItemUp = false)
     {
         global $type;
 
-        $statusId = $item['state'];
-        $ack = $item['acknowledged'];
-        $lastStateTime = date("m-d-Y H:i:s", $item['last_hard_state_change']);
-        $lastStateDuration = Util::timeElapsed(time() - $item['last_hard_state_change']);
-        $lastCheckDuration = Util::timeElapsed(time() - $item['last_check']);
-        $serviceDesc = $item['display_name'];
-        $hostname = (isset($item['host_display_name'])) ? $item['host_display_name'] : $item['display_name'];
-        $hostAlias = (isset($item['host_alias'])) ? $item['host_alias'] : ((isset($item['alias'])) ? $item['alias'] : $hostname);
-        $scheduled = ($item['scheduled_downtime_depth'] >= 1 || (isset($item['host_scheduled_downtime_depth']) && $item['host_scheduled_downtime_depth'] >= 1));
+        $statusId = $item->getState();
+        $ack = $item->isAcknowledged();
+        $lastStateTime = date("m-d-Y H:i:s", $item->getLastHardStateChange());
+        $lastStateDuration = Util::timeElapsed(time() - $item->getLastHardStateChange());
+        $lastCheckDuration = Util::timeElapsed(time() - $item->getLastCheck());
+        $serviceDesc = ($item->getDisplayName()) ? $item->getDisplayName() : $item->getCheckCommand();
+        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
+        $hostAlias = ($item->getHostAlias()) ? $item->getHostAlias() : (($item->getAlias()) ? $item->getAlias() : $hostname);
+        $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || ($item->getHostScheduledDowntimeDepth() >= 1));
         $tdClass = '';
         $statusName = '';
 
@@ -152,8 +130,8 @@ class sysMonDash
                 break;
         }
 
-        if ((isset($item['host_last_time_unreachable']) && $item['host_last_time_unreachable'] >= $item['host_last_time_up'] && !$newItemUp) ||
-            (isset($item['last_time_unreachable']) && $item['last_time_unreachable'] > $item['last_check'] && $item['state_type'] === 1)
+        if (($item->getHostLastTimeUnreachable() > $item->getHostLastTimeUp() && !$newItemUp) ||
+            ($item->getLastTimeUnreachable() > $item->getLastCheck() && $item->getStateType() === 1)
         ) {
 //            $trTitle = Language::t("INALCANZABLE - Verificar objeto padre");
             $trClass = "unknown";
@@ -169,12 +147,12 @@ class sysMonDash
         if ($newItem === true && $ack === 0 && !$scheduled && !$newItemUp) {
             $tdClass = "new";
         } elseif ($newItemUp
-            && time() - $item['last_hard_state_change'] <= Config::getConfig()->getNewItemTime() / 2
+            && time() - $item->getLastHardStateChange() <= Config::getConfig()->getNewItemTime() / 2
         ) {
 //            $trTitle = Language::t("OK - Recuperado");
             $trClass = "new-up";
             $statusName = Language::t('RECUPERADO');
-        } elseif ($item['is_flapping']) {
+        } elseif ($item->isIsFlapping()) {
 //            $trTitle = Language::t("CAMBIANTE - Frecuente cambio entre estados");
             $trClass = "flapping";
             $statusName = Language::t('CAMBIANTE');
@@ -184,10 +162,11 @@ class sysMonDash
             $statusName = Language::t('RECONOCIDO');
         }
 
-        $actionHostLink = (isset($item['pnpgraph_present']) && $item['pnpgraph_present'] !== -1) ? '<a href="/pnp4nagios/index.php/graph?host=' . $hostname . '&srv=_HOST_" rel="/pnp4nagios/index.php/popup?host=' . $hostname . '&srv=_HOST_" class="action-link" target="blank"><img src="imgs/graph.png" /></a>' : '';
+//        $actionHostLink = (isset($item['pnpgraph_present']) && $item['pnpgraph_present'] !== -1) ? '<a href="/pnp4nagios/index.php/graph?host=' . $hostname . '&srv=_HOST_" rel="/pnp4nagios/index.php/popup?host=' . $hostname . '&srv=_HOST_" class="action-link" target="blank"><img src="imgs/graph.png" /></a>' : '';
+        $actionHostLink = '';
 
         // Si 'host_display_name' está presente, el item es un servicio
-        if (!isset($item['host_display_name'])) {
+        if (!empty($item->getHostDisplayName())) {
             $link = Config::getConfig()->getCgiURL() . '/extinfo.cgi?type=1&host=' . $hostname;
             $actionServiceLink = '';
         } else {
@@ -196,13 +175,22 @@ class sysMonDash
         }
 
         $line = '<tr class="item-data ' . $trClass . '" title="' . sprintf(Language::t('Estado %s desde %s'), $statusName, $lastStateTime) . '">' . PHP_EOL;
-        $line .= '<td>' . $statusName . '</td>';
-        $line .= (Config::getConfig()->isColLastcheck()) ? '<td title="' . sprintf('%s : %s', Language::t('Último check'), $lastCheckDuration) . '" class="' . $tdClass . '">' . $lastStateDuration . '</td>' . PHP_EOL : '';
-        $line .= (Config::getConfig()->isColHost()) ? '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a>' . $actionHostLink . '</td>' . PHP_EOL : '';
-        $line .= (Config::getConfig()->isColStatusInfo()) ? '<td class="statusinfo">' . $item['plugin_output'] . '</td>' . PHP_EOL : '';
+        $line .= '<td class="center">' . $statusName . '</td>';
+
+        if (Config::getConfig()->isColLastcheck()) {
+            $line .= '<td title="' . sprintf('%s : %s', Language::t('Último check'), $lastCheckDuration) . '" class="center ' . $tdClass . '">' . $lastStateDuration . '</td>' . PHP_EOL;
+        }
+
+        if (Config::getConfig()->isColHost()) {
+            $line .= '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a>' . $actionHostLink . '</td>' . PHP_EOL;
+        }
+
+        if (Config::getConfig()->isColStatusInfo()) {
+            $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
+        }
 
         if (Config::getConfig()->isColService()) {
-            $line .= ($serviceDesc) ? '<td>' . $serviceDesc . $actionServiceLink . '</td>' . PHP_EOL : '<td>' . $item['check_command'] . $actionServiceLink . '</td>' . PHP_EOL;
+            $line .= '<td class="center">' . $serviceDesc . $actionServiceLink . '</td>' . PHP_EOL;
         }
 
         $line .= '</tr>' . PHP_EOL;
@@ -215,22 +203,22 @@ class sysMonDash
     /**
      * Función para filtrar los avisos a mostrar
      *
-     * @param array $item El elemento a verificar
+     * @param EventInterface $item El elemento a verificar
      * @return bool
      */
-    private static function filterItems(array &$item)
+    private static function filterItems(EventInterface $item)
     {
-        $hostname = (isset($item['host_display_name'])) ? $item['host_display_name'] : $item['display_name'];
+        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
 
-        if ($item['acknowledged'] === 1
+        if ($item->isAcknowledged()
             || (!preg_match(Config::getConfig()->getRegexHostShow(), $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()))
             || (Config::getConfig()->getRegexServiceNoShow()
                 && is_array(Config::getConfig()->getCriticalItems())
-                && preg_match(Config::getConfig()->getRegexServiceNoShow(), $item['display_name'])
-                && !in_array($item['display_name'], Config::getConfig()->getCriticalItems()))
-            || ($item['current_attempt'] <= $item['max_check_attempts'] && $item['state_type'] === 0 && $item['is_flapping'] === 0)
-            || (isset($item['host_state']) && $item['state'] > SERVICE_WARNING && $item['host_state'] >= HOST_DOWN)
-            || ($item['state_type'] === 1 && isset($item['last_time_unreachable']) && $item['last_time_unreachable'] > $item['last_check'])
+                && preg_match(Config::getConfig()->getRegexServiceNoShow(), $item->getDisplayName())
+                && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems()))
+            || ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts() && $item->getStateType() === 0 && !$item->isIsFlapping())
+            || ($item->getHostState() && $item->getState() > SERVICE_WARNING && $item->getHostState() >= HOST_DOWN)
+            || ($item->getStateType() === 1 && $item->getLastTimeUnreachable() > $item->getLastCheck())
         ) {
             return false;
         }
@@ -239,10 +227,25 @@ class sysMonDash
     }
 
     /**
-     * @return BackendInterface
+     * Seleccionar el backend
+     *
+     * @return Livestatus|Status|Zabbix
+     * @throws \Exception
      */
-    public function getBackend()
+    public static function getBackend()
     {
-        return $this->_backend;
+        $backend = strtolower(Config::getConfig()->getBackend());
+
+        switch ($backend) {
+            case 'livestatus':
+                return new Livestatus();
+            case 'status':
+                return new Status();
+            case 'zabbix':
+                return new Zabbix(Config::getConfig()->getZabbixVersion(), Config::getConfig()->getZabbixUrl(), Config::getConfig()->getZabbixUser(), Config::getConfig()->getZabbixPass());
+                break;
+            default:
+                throw new \Exception(sprintf('Backend no soportado (%s)', $backend));
+        }
     }
 }

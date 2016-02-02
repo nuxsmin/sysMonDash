@@ -26,7 +26,12 @@
 namespace SMD\Backend;
 
 use Exts\Zabbix\ZabbixApiLoader;
+use SMD\Backend\Event\Downtime;
+use SMD\Backend\Event\Event;
+use SMD\Backend\Event\EventInterface;
+use SMD\Backend\Event\Trigger;
 use SMD\Util\Util;
+use SplFixedArray;
 
 /**
  * Class Zabbix para la gestión de eventos de Zabbix
@@ -70,9 +75,9 @@ class Zabbix extends Backend implements BackendInterface
     /**
      * Array con los eventos actuales
      *
-     * @var array
+     * @var EventInterface[]
      */
-    private $events = array();
+    private $events;
     /**
      * Array con las paradas programadas
      *
@@ -155,32 +160,29 @@ class Zabbix extends Backend implements BackendInterface
 
         $events = $this->Zabbix->eventGet($params);
 
+        $this->events = [];
+
         foreach ($events as $event) {
             $trigger = $this->getTrigger($event->objectid);
             $state = ((int)$trigger->value === 1) ? $this->getTriggerState($trigger->priority) : $event->value;
 
-            $this->events[] = [
-                'state' => (int)$state,
-                'state_type' => (int)$trigger->state,
-                'acknowledged' => (int)$event->acknowledged,
-                'host_display_name' => $trigger->hostname,
-                'display_name' => $trigger->host,
-                'check_command' => $trigger->triggerid,
-                'plugin_output' => $trigger->description,
-                'last_check' => (int)$trigger->lastchange,
-//                'last_time_up' => $trigger->lastchange,
-//                'last_time_ok' => $trigger->lastchange,
-//                'last_time_unreachable' => 0,
-                'last_hard_state_change' => (int)$trigger->lastchange,
-                'last_hard_state' => (int)$event->clock,
-                'last_time_down' => 0,
-                'active_checks_enabled' => (int)$trigger->status,
-                'scheduled_downtime_depth' => $this->checkHostMaintenance($trigger->hosts),
-                'current_attempt' => (int)$trigger->value,
-                'max_check_attempts' => 0,
-                'is_flapping' => 0,
-                'notifications_enabled' => 1,
-            ];
+            $Event = new Trigger();
+            $Event->setState($state);
+            $Event->setStateType($trigger->state);
+            $Event->setAcknowledged($event->acknowledged);
+            $Event->setHostDisplayName($trigger->hostname);
+            $Event->setDisplayName($trigger->host);
+            $Event->setCheckCommand($trigger->triggerid);
+            $Event->setPluginOutput($trigger->description);
+            $Event->setLastCheck($trigger->lastchange);
+            $Event->setLastHardStateChange($trigger->lastchange);
+            $Event->setLastHardState($event->clock);
+            $Event->setActiveChecksEnabled($trigger->status);
+            $Event->setScheduledDowntimeDepth($this->checkHostMaintenance($trigger->hosts));
+            $Event->setCurrentAttempt($trigger->value);
+            $Event->setNotificationsEnabled(1);
+
+            $this->events[] = $Event;
         }
 
         return $this->events;
@@ -274,16 +276,16 @@ class Zabbix extends Backend implements BackendInterface
             if (time() <= $maintenance->active_till) {
                 $period = $this->getTimePeriod($maintenance->timeperiods);
 
-                $this->downtimes[] = [
-                    'author' => 'Zabbix',
-                    'comment' => $maintenance->description,
-                    'host_name' => $this->getHostsForMaintenance($maintenance->maintenanceid),
-                    'is_service' => 0,
-                    'service_display_name' => '-',
-                    'start_time' => $period['start'],
-                    'end_time' => $period['end'],
-                    'id' => $maintenance->maintenanceid
-                ];
+                $Downtime = new Downtime();
+                $Downtime->setAuthor('Zabbix');
+                $Downtime->setComment($maintenance->description);
+                $Downtime->setHostName($this->getHostsForMaintenance($maintenance->maintenanceid));
+                $Downtime->setIsService(false);
+                $Downtime->setServiceDisplayName('-');
+                $Downtime->setStartTime($period['start']);
+                $Downtime->setEndTime($period['end']);
+
+                $this->downtimes[] = $Downtime;
             }
         }
 
@@ -326,7 +328,9 @@ class Zabbix extends Backend implements BackendInterface
             }
         }
 
-        return Util::arraySortByKey($result, 'end')[0];
+        Util::arraySortByKey($result, 'end');
+
+        return $result[0];
     }
 
     /**
