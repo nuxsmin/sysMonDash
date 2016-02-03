@@ -23,9 +23,12 @@
  *
  */
 
+use SMD\Core\Config;
+use SMD\Storage\XmlHandler;
+
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
 
-define('CONFIG_FILE', __DIR__ . DIRECTORY_SEPARATOR . 'config.php');
+define('XML_CONFIG_FILE', DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'sysMonDash' . DIRECTORY_SEPARATOR . 'config.xml');
 define('CONSTANTS_FILE', __DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 define('MODEL_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'SMD');
 define('LOCALES_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'locales');
@@ -47,4 +50,4 @@ $ClassLoader->register();
 
 session_start();
 
-\SMD\Core\Config::loadConfig(CONFIG_FILE);
+Config::loadConfig(new XmlHandler(XML_CONFIG_FILE));

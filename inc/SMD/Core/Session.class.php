@@ -112,7 +112,7 @@ class Session
      *
      * @param $config
      */
-    public static function setConfig(Config $config)
+    public static function setConfig(ConfigData $config)
     {
         self::setSessionKey('config', $config);
     }
@@ -120,7 +120,7 @@ class Session
     /**
      * Devolver la configuración
      *
-     * @return Config
+     * @return ConfigData
      */
     public static function getConfig()
     {

@@ -24,6 +24,8 @@
  */
 
 namespace SMD\Core;
+use ReflectionObject;
+use SMD\Storage\StorageInterface;
 
 /**
  * Class Config
@@ -36,573 +38,73 @@ class Config
      */
     const TIMEOUT_REFRESH = 3600;
 
-    /** @var string */
-    private $language = 'en_US';
-    /** @var string */
-    private $pageTitle = 'sysMonDash - Cuadro de Mandos';
-    /** @var string */
-    private $backend = 'livestatus';
-    /** @var string */
-    private $statusFile = '/var/lib/icinga/status.dat';
-    /** @var string */
-    private $livestatus_socket_path = '/var/lib/icinga/rw/live';
-    /** @var int */
-    private $zabbix_version = 222;
-    /** @var string */
-    private $zabbix_url = 'http://foo.bar/zabbix/api_jsonrpc.php';
-    /** @var string */
-    private $zabbix_user = 'zabbix';
-    /** @var string */
-    private $zabbix_pass = 'zabbix_pass';
-    /** @var string */
-    private $clientURL = '';
-    /** @var string */
-    private $remoteServer = '';
-    /** @var string */
-    private $monitorServerUrl = 'http://foo.bar';
-    /** @var string */
-    private $cgiURL = '';
-    /** @var int */
-    private $refreshValue = 10;
-    /** @var bool */
-    private $colLastcheck = true;
-    /** @var bool */
-    private $colHost = true;
-    /** @var bool */
-    private $colStatusInfo = true;
-    /** @var bool */
-    private $colService = true;
-    /** @var int */
-    private $newItemTime = 900;
-    /** @var int */
-    private $maxDisplayItems = 200;
-    /** @var bool */
-    private $useNagiosQLInfo = false;
-    /** @var string */
-    private $dbServer = 'localhost';
-    /** @var string */
-    private $dbName = 'nagiosql_db';
-    /** @var string */
-    private $dbUser = 'nagiosql_user';
-    /** @var string */
-    private $dbUserPass = 'nagiosql_pass';
-    /** @var string */
-    private $regexHostShow = '/.*/';
-    /** @var string */
-    private $regexServiceNoShow = '//';
-    /** @var array */
-    private $criticalItems = array();
-
-    /**
-     * @return string
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @param string $language
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPageTitle()
-    {
-        return $this->pageTitle;
-    }
-
-    /**
-     * @param string $pageTitle
-     */
-    public function setPageTitle($pageTitle)
-    {
-        $this->pageTitle = $pageTitle;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBackend()
-    {
-        return $this->backend;
-    }
-
-    /**
-     * @param string $backend
-     */
-    public function setBackend($backend)
-    {
-        $this->backend = $backend;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatusFile()
-    {
-        return $this->statusFile;
-    }
-
-    /**
-     * @param string $statusFile
-     */
-    public function setStatusFile($statusFile)
-    {
-        $this->statusFile = $statusFile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLivestatusSocketPath()
-    {
-        return $this->livestatus_socket_path;
-    }
-
-    /**
-     * @param string $livestatus_socket_path
-     */
-    public function setLivestatusSocketPath($livestatus_socket_path)
-    {
-        $this->livestatus_socket_path = $livestatus_socket_path;
-    }
-
-    /**
-     * @return int
-     */
-    public function getZabbixVersion()
-    {
-        return $this->zabbix_version;
-    }
-
-    /**
-     * @param int $zabbix_version
-     */
-    public function setZabbixVersion($zabbix_version)
-    {
-        $this->zabbix_version = $zabbix_version;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixUrl()
-    {
-        return $this->zabbix_url;
-    }
-
-    /**
-     * @param string $zabbix_url
-     */
-    public function setZabbixUrl($zabbix_url)
-    {
-        $this->zabbix_url = $zabbix_url;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixUser()
-    {
-        return $this->zabbix_user;
-    }
-
-    /**
-     * @param string $zabbix_user
-     */
-    public function setZabbixUser($zabbix_user)
-    {
-        $this->zabbix_user = $zabbix_user;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixPass()
-    {
-        return $this->zabbix_pass;
-    }
-
-    /**
-     * @param string $zabbix_pass
-     */
-    public function setZabbixPass($zabbix_pass)
-    {
-        $this->zabbix_pass = $zabbix_pass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClientURL()
-    {
-        return $this->clientURL;
-    }
-
-    /**
-     * @param string $clientURL
-     */
-    public function setClientURL($clientURL)
-    {
-        $this->clientURL = $clientURL;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRemoteServer()
-    {
-        return $this->remoteServer;
-    }
-
-    /**
-     * @param string $remoteServer
-     */
-    public function setRemoteServer($remoteServer)
-    {
-        $this->remoteServer = $remoteServer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMonitorServerUrl()
-    {
-        return $this->monitorServerUrl;
-    }
-
-    /**
-     * @param string $monitorServerUrl
-     */
-    public function setMonitorServerUrl($monitorServerUrl)
-    {
-        $this->monitorServerUrl = $monitorServerUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCgiURL()
-    {
-        return $this->cgiURL;
-    }
-
-    /**
-     * @param string $cgiURL
-     */
-    public function setCgiURL($cgiURL)
-    {
-        $this->cgiURL = $cgiURL;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRefreshValue()
-    {
-        return $this->refreshValue;
-    }
-
-    /**
-     * @param int $refreshValue
-     */
-    public function setRefreshValue($refreshValue)
-    {
-        $this->refreshValue = $refreshValue;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isColLastcheck()
-    {
-        return $this->colLastcheck;
-    }
-
-    /**
-     * @param boolean $colLastcheck
-     */
-    public function setColLastcheck($colLastcheck)
-    {
-        $this->colLastcheck = $colLastcheck;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isColHost()
-    {
-        return $this->colHost;
-    }
-
-    /**
-     * @param boolean $colHost
-     */
-    public function setColHost($colHost)
-    {
-        $this->colHost = $colHost;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isColStatusInfo()
-    {
-        return $this->colStatusInfo;
-    }
-
-    /**
-     * @param boolean $colStatusInfo
-     */
-    public function setColStatusInfo($colStatusInfo)
-    {
-        $this->colStatusInfo = $colStatusInfo;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isColService()
-    {
-        return $this->colService;
-    }
-
-    /**
-     * @param boolean $colService
-     */
-    public function setColService($colService)
-    {
-        $this->colService = $colService;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNewItemTime()
-    {
-        return $this->newItemTime;
-    }
-
-    /**
-     * @param int $newItemTime
-     */
-    public function setNewItemTime($newItemTime)
-    {
-        $this->newItemTime = $newItemTime;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxDisplayItems()
-    {
-        return $this->maxDisplayItems;
-    }
-
-    /**
-     * @param int $maxDisplayItems
-     */
-    public function setMaxDisplayItems($maxDisplayItems)
-    {
-        $this->maxDisplayItems = $maxDisplayItems;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isUseNagiosQLInfo()
-    {
-        return $this->useNagiosQLInfo;
-    }
-
-    /**
-     * @param boolean $useNagiosQLInfo
-     */
-    public function setUseNagiosQLInfo($useNagiosQLInfo)
-    {
-        $this->useNagiosQLInfo = $useNagiosQLInfo;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbServer()
-    {
-        return $this->dbServer;
-    }
-
-    /**
-     * @param string $dbServer
-     */
-    public function setDbServer($dbServer)
-    {
-        $this->dbServer = $dbServer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbName()
-    {
-        return $this->dbName;
-    }
-
-    /**
-     * @param string $dbName
-     */
-    public function setDbName($dbName)
-    {
-        $this->dbName = $dbName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbUser()
-    {
-        return $this->dbUser;
-    }
-
-    /**
-     * @param string $dbUser
-     */
-    public function setDbUser($dbUser)
-    {
-        $this->dbUser = $dbUser;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbUserPass()
-    {
-        return $this->dbUserPass;
-    }
-
-    /**
-     * @param string $dbUserPass
-     */
-    public function setDbUserPass($dbUserPass)
-    {
-        $this->dbUserPass = $dbUserPass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexHostShow()
-    {
-        return $this->regexHostShow;
-    }
-
-    /**
-     * @param string $regexHostShow
-     */
-    public function setRegexHostShow($regexHostShow)
-    {
-        if (empty($regexHostShow)){
-            $regexHostShow = '/.*/';
-        }
-
-        $this->regexHostShow = $regexHostShow;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegexServiceNoShow()
-    {
-        return $this->regexServiceNoShow;
-    }
-
-    /**
-     * @param string $regexServiceNoShow
-     */
-    public function setRegexServiceNoShow($regexServiceNoShow)
-    {
-        $this->regexServiceNoShow = $regexServiceNoShow;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCriticalItems()
-    {
-        return $this->criticalItems;
-    }
-
-    /**
-     * @param array $criticalItems
-     */
-    public function setCriticalItems($criticalItems)
-    {
-        $this->criticalItems = $criticalItems;
-    }
-
     /**
      * Obtener la configuración o devolver una nueva
      *
-     * @return Config
+     * @return ConfigData
      */
     public static function getConfig()
     {
         $Config = Session::getConfig();
 
-        return (gettype($Config) === 'object') ? $Config : new Config();
+        return (gettype($Config) === 'object') ? $Config : new ConfigData();
     }
 
     /**
      * Cargar la configuración desde el archivo
      *
-     * @param $file string La ruta al archivo de configuración
+     * @param StorageInterface $Storage
      */
-    public static function loadConfig($file)
+    public static function loadConfig(StorageInterface $Storage)
     {
-        $Config = Session::getConfig();
+        $ConfigData = Session::getConfig();
 
-        if (gettype($Config) !== 'object'
+        if (gettype($ConfigData) !== 'object'
             || time() >= (Session::getConfigTime() + self::TIMEOUT_REFRESH)
         ) {
-            require $file;
-
-            $Config = new Config();
-            $Config->setLanguage($language);
-            $Config->setPageTitle($pageTitle);
-            $Config->setBackend($backend);
-            $Config->setStatusFile($statusFile);
-            $Config->setLivestatusSocketPath($livestatus_socket_path);
-            $Config->setZabbixVersion($zabbix_version);
-            $Config->setZabbixUrl($zabbix_url);
-            $Config->setZabbixUser($zabbix_user);
-            $Config->setZabbixPass($zabbix_pass);
-            $Config->setClientURL($clientURL);
-            $Config->setRemoteServer($remoteServer);
-            $Config->setMonitorServerUrl($monitorServerUrl);
-            $Config->setCgiURL($cgiURL);
-            $Config->setRefreshValue($refreshValue);
-            $Config->setColLastcheck($colLastcheck);
-            $Config->setColHost($colHost);
-            $Config->setColStatusInfo($colStatusInfo);
-            $Config->setColService($colService);
-            $Config->setNewItemTime($newItemTime);
-            $Config->setMaxDisplayItems($maxDisplayItems);
-            $Config->setUseNagiosQLInfo($useNagiosQLInfo);
-            $Config->setDbServer($dbServer);
-            $Config->setDbName($dbName);
-            $Config->setDbUser($dbUser);
-            $Config->setDbUserPass($dbUserPass);
-            $Config->setRegexHostShow($regexHostShow);
-            $Config->setRegexServiceNoShow($regexServiceNoShow);
-            $Config->setCriticalItems($criticalItems);
-
-            Session::setConfig($Config);
+            Session::setConfig(self::arrayMapper($Storage));
             Session::setConfigTime(time());
         }
+    }
+
+    /**
+     * @param StorageInterface $Storage
+     * @param ConfigData $Config
+     */
+    public static function saveConfig(StorageInterface $Storage, ConfigData $Config = null)
+    {
+        if (is_null($Config)){
+            $Storage->setItems(self::getConfig());
+        } else {
+            $Config->setHash(uniqid());
+            $Storage->setItems($Config);
+        }
+
+        $Storage->save('config');
+
+        Session::setConfigTime(0);
+    }
+
+    /**
+     * Mapear el array de elementos de configuración con las propieades de la
+     * clase ConfigData
+     *
+     * @param StorageInterface $Storage
+     * @return ConfigData
+     */
+    private static function arrayMapper(StorageInterface $Storage)
+    {
+        $items = $Storage->load('config')->getItems();
+
+        $ConfigData = new ConfigData();
+        $Reflection = new ReflectionObject($ConfigData);
+
+        foreach($Reflection->getProperties() as $property){
+            $property->setAccessible(true);
+            $property->setValue($ConfigData, $items[$property->getName()]);
+            $property->setAccessible(false);
+        }
+
+        return $ConfigData;
     }
 }

@@ -21,7 +21,7 @@ tr.item-data > td, thead > th {
     border-bottom: 1px solid #fff;
 }
 
-h1 {
+#logo h1 {
     font-size: 1.3em;
     margin-left: .5em;
 }
@@ -182,18 +182,19 @@ footer #project {
     top: 0;
     left: 0;
     width: 100%;
-    margin: 1.5em auto;
+    margin: 0 auto;
     text-align: center;
     color: #fff;
-    font-size: 16px;
+    font-size: .8em;
     display: inline-block;
 }
 
 #titulo {
-    float: right;
+    position: absolute;
+    top: 0;
+    right: 1em;
     text-align: right;
     color: #fff;
-    padding: 1em;
 }
 
 #nomessages {
@@ -258,4 +259,8 @@ div.title {
     text-align: center;
     border-top: 1px solid #d9d9d9;
     padding: .5em 0;
+}
+
+.center {
+    text-align: center;
 }

@@ -126,8 +126,10 @@ class Util
     public static function getAppInfo()
     {
         return array(
+            'appVersion' => 'v' . implode('.', self::getVersion()),
             'appCode' => '<a href="https://github.com/nuxsmin/sysMonDash" target="_blank" title="sysMonDash - GitHub">sysMonDash</a>',
-            'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>'
+            'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>',
+
         );
     }
 
@@ -149,6 +151,34 @@ class Util
     public static function checkPHPVersion()
     {
         return (version_compare(PHP_VERSION, '5.4.0') >= 0);
+    }
+
+    /**
+     * Devuelve la versión de sysMonDash
+     *
+     * @param bool $retBuild
+     * @return array|int
+     */
+    public static function getVersion($retBuild = false)
+    {
+        $build = 2016020201;
+        $version = [1,0];
+
+        return ($retBuild) ? array_push($version, $build) : $version;
+    }
+
+    /**
+     * Comprobar si el archivo se puede leer/escribir
+     *
+     * @return bool
+     */
+    public static function checkConfigFile()
+    {
+        if (!file_exists(XML_CONFIG_FILE)){
+            return touch(XML_CONFIG_FILE);
+        }
+
+        return (is_writable(XML_CONFIG_FILE));
     }
 
 }

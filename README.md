@@ -23,7 +23,7 @@ Es necesario disponer de un servidor web con PHP y el plugin MK livestatus o la 
 
 Descargar la aplicación desde https://github.com/nuxsmin/sysMonDash y descomprimirla en la ruta deseada (publicada por el servidor web).
 
-Editar el archivo de configuración y establecer las rutas y URLs según el entorno.
+Acceder a http://tuservidor.com/sysMonDash/config.php y configurar según tu entorno.
 
 ---
 
@@ -48,7 +48,7 @@ You need to have a running PHP webserver and setup the MK livestatus plugin or Z
 
 Download the application from https://github.com/nuxsmin/sysMonDash and unpack it in the public webserver root.
 
-Edit the config file and set the paths and URLs according to your environment. The config file has many comments that explains what does every option.
+Point to http://yourserver.com/sysMonDash/config.php and set it according to your environment. 
 
 ---
 

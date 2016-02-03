@@ -50,7 +50,6 @@ try {
 
     $downtimes = $Backend->getScheduledDowntimesGroupped();
 } catch (Exception $e) {
-    error_log(implode(';', $e->getTrace()[0]));
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
     exit();
 }

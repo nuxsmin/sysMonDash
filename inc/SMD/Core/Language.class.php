@@ -55,7 +55,9 @@ class Language
     {
         $sessionLang = Session::getLanguage();
 
-        if ($sessionLang === false) {
+        if ($sessionLang === false
+            && self::checkLangFile(self::$_lang)
+        ) {
             include_once self::getLangFile(self::$_lang);
 
             if (isset($LANG)
@@ -79,17 +81,16 @@ class Language
     private static function getGlobalLang()
     {
         $language = Config::getConfig()->getLanguage();
-
         $browserLang = self::getBrowserLang();
 
         // Establecer a es_ES si no existe la traducción o no está establecido el lenguaje
         if (!empty($language)
-            && (preg_match('/^es_.*/i', $browserLang)
-            || !self::checkLangFile($browserLang))
+            && ((preg_match('/^es_.*/i', $browserLang)
+            || !self::checkLangFile($browserLang)))
         ) {
             $lang = 'es_ES';
         } else {
-            $lang = ($language) ? $language : $browserLang;
+            $lang = $browserLang;
         }
 
         return $lang;

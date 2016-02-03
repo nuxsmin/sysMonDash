@@ -64,7 +64,7 @@ function SMD() {
         };
         this.getRemoteServer = function () {
             return remoteServer;
-        }
+        };
     }
 
     var totalHeight;
@@ -209,7 +209,31 @@ function SMD() {
         window.location.reload(false);
     }
 
+    var saveConfig = function(obj) {
+        jQuery.ajax({
+            url: getRootPath() + '/ajax/saveConfig.php',
+            type: 'post',
+            dataType: 'json',
+            data: obj.serialize(),
+            success: function(data) {
+                var target = jQuery("#result");
+
+                target.removeClass();
+
+                if (data.status == 0) {
+                    target.addClass('ok');
+                } else {
+                    target.addClass('error');
+                }
+
+                target.html(data.description);
+            }
+        });
+    };
+
     return {
-        getSMDConfig: Config
+        getSMDConfig: Config,
+        saveSMDConfig: saveConfig,
+        getRootPath: getRootPath
     }
 }

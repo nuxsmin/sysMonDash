@@ -47,6 +47,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/pure-min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css?v=<?php echo \SMD\Core\Session::getCssHash(); ?>">
 </head>
 <body>
