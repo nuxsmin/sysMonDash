@@ -24,6 +24,7 @@
  */
 
 namespace SMD\Util;
+
 use SMD\Core\Language;
 use SMD\Core\Session;
 
@@ -45,7 +46,7 @@ class Util
     {
         // Ordenar el array multidimensional por la clave $fielName de mayor a menor
         usort($data, function ($a, $b) use ($fieldName, $sortAsc) {
-            return ($sortAsc) ? ($a[$fieldName] < $b[$fieldName]) :($a[$fieldName] > $b[$fieldName]);
+            return ($sortAsc) ? ($a[$fieldName] < $b[$fieldName]) : ($a[$fieldName] > $b[$fieldName]);
         });
 
         return $data;
@@ -63,7 +64,7 @@ class Util
     {
         // Ordenar el array multidimensional por la propiedad $propertyName de mayor a menor
         usort($data, function ($a, $b) use ($propertyName, $sortAsc) {
-            return ($sortAsc) ? ($a->{$propertyName} < $b->{$propertyName}) :($a->{$propertyName} > $b->{$propertyName});
+            return ($sortAsc) ? ($a->{$propertyName} < $b->{$propertyName}) : ($a->{$propertyName} > $b->{$propertyName});
         });
 
         return $data;
@@ -97,6 +98,8 @@ class Util
 
     /**
      * Comprobar si es necesario reiniciar la página para actualizar
+     * Este método es util cuando se tienen varios paneles de monitorización
+     * y se requiere de actualizar el estilo visual.
      *
      * @return bool
      */
@@ -104,18 +107,26 @@ class Util
     {
         $version = 1;
 
-        if (session_status() === PHP_SESSION_ACTIVE
-            && (!isset($_SESSION['EXPIRE'], $_SESSION['VERSION'])
-            || $_SESSION['EXPIRE'] - time() < 0
-            || $_SESSION['VERSION'] < $version)
-        ) {
-            $_SESSION['VERSION'] = $version;
-            $_SESSION['EXPIRE'] = time() + 7200;
-            Session::setCssHash(self::getCssHash());
-            return true;
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            if (!isset($_SESSION['VERSION'])) {
+                $_SESSION['VERSION'] = $version;
+                Session::setCssHash(self::getCssHash());
+            } elseif ($_SESSION['VERSION'] < $version) {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    /**
+     * Devuelve el hash del archivo CSS
+     *
+     * @return string
+     */
+    public static function getCssHash()
+    {
+        return hash_file('md5', APP_ROOT . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css');
     }
 
     /**
@@ -134,13 +145,17 @@ class Util
     }
 
     /**
-     * Devuelve el hash del archivo CSS
+     * Devuelve la versión de sysMonDash
      *
-     * @return string
+     * @param bool $retBuild
+     * @return array|int
      */
-    public static function getCssHash()
+    public static function getVersion($retBuild = false)
     {
-        return hash_file('md5', APP_ROOT . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css');
+        $build = 2016020201;
+        $version = [1, 0];
+
+        return ($retBuild) ? array_push($version, $build) : $version;
     }
 
     /**
@@ -154,27 +169,13 @@ class Util
     }
 
     /**
-     * Devuelve la versión de sysMonDash
-     *
-     * @param bool $retBuild
-     * @return array|int
-     */
-    public static function getVersion($retBuild = false)
-    {
-        $build = 2016020201;
-        $version = [1,0];
-
-        return ($retBuild) ? array_push($version, $build) : $version;
-    }
-
-    /**
      * Comprobar si el archivo se puede leer/escribir
      *
      * @return bool
      */
     public static function checkConfigFile()
     {
-        if (!file_exists(XML_CONFIG_FILE)){
+        if (!file_exists(XML_CONFIG_FILE)) {
             return touch(XML_CONFIG_FILE);
         }
 
