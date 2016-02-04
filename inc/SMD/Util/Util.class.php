@@ -105,7 +105,7 @@ class Util
      */
     public static function checkRefreshSession()
     {
-        $version = 1;
+        $version = intval(implode('', self::getVersion(true)));
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             if (!isset($_SESSION['VERSION'])) {
@@ -152,7 +152,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2016020201;
+        $build = 2016020401;
         $version = [1, 0];
 
         return ($retBuild) ? array_push($version, $build) : $version;
