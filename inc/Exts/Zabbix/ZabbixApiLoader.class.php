@@ -52,7 +52,7 @@ class ZabbixApiLoader
      *
      * @param $version int la versión de la API
      *
-     * @return V222\ZabbixApi|V223\ZabbixApi|V242\ZabbixApi|V243\ZabbixApi
+     * @return V223\ZabbixApi|V243\ZabbixApi
      * @throws \Exception
      */
     public static function getAPI($version)

@@ -173,10 +173,8 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <label for="backend_zabbix_version"><?php echo Language::t('Versión API de Zabbix'); ?></label>
                         <select id="backend_zabbix_version" name="backend_zabbix_version"
                                 data-selected="<?php echo Config::getConfig()->getZabbixVersion(); ?>">
-                            <option value="222">2.2.2</option>
-                            <option value="223">2.2.3</option>
-                            <option value="242">2.4.2</option>
-                            <option value="243">2.4.3</option>
+                            <option value="223">2.2</option>
+                            <option value="243">2.4</option>
                         </select>
                     </div>
                     <div class="pure-control-group">
