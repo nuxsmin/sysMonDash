@@ -122,30 +122,31 @@ function SMD() {
 
         setTime();
 
-        jQuery('#icinga_header').attr('src', jQuery('#icinga_header').attr('src'));
-
         var url = Config.getRemoteServer() + Config.getAjaxFile();
-        placeHolder.load(url, function (response, status, xhr) {
-            jQuery(this).empty();
 
-            if (status == "error") {
-                jQuery(this).html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");
-                return;
-            }
+        jQuery.ajax({
+            url: url,
+            cache: false,
+            timeout: 5000,
+            dataType: 'html',
+            success: function(data){
+                placeHolder.html(data);
 
-            jQuery(this).html(response);
+                if (Config.getScroll()) {
+                    totalHeight = jQuery(document).height();
 
-            if (Config.getScroll()) {
-                totalHeight = jQuery(document).height();
-
-                if (totalHeight > window.innerHeight) {
-                    setTimeout(function(){
-                        pageScroll();
-                    }, Config.getTimeout() / 2);
+                    if (totalHeight > window.innerHeight) {
+                        setTimeout(function(){
+                            pageScroll();
+                        }, Config.getTimeout() / 2);
+                    }
                 }
-            }
 
-            jQuery('.new').blink({bgcolor_on: hex2rgb('#F7FE2E'), fgcolor_on: hex2rgb('#333333')});
+                jQuery('.new').blink({bgcolor_on: hex2rgb('#F7FE2E'), fgcolor_on: hex2rgb('#333333')});
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                placeHolder.html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");
+            }
         });
     }
 

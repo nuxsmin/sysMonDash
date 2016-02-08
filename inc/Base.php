@@ -39,6 +39,7 @@ define('DEBUG', true);
 // Empezar a calcular el tiempo y memoria utilizados
 $time_start = microtime(true);
 $memInit = memory_get_usage();
+$file = substr($_SERVER['SCRIPT_FILENAME'], strrpos($_SERVER['SCRIPT_FILENAME'], '/') + 1);
 
 require CONSTANTS_FILE;
 
@@ -50,4 +51,14 @@ $ClassLoader->register();
 
 session_start();
 
-Config::loadConfig(new XmlHandler(XML_CONFIG_FILE));
+try {
+    Config::loadConfig(new XmlHandler(XML_CONFIG_FILE));
+} catch (\Exception $e) {
+    error_log(\SMD\Core\Language::t($e->getMessage()));
+
+    \SMD\Core\Session::setConfig(new \SMD\Core\ConfigData());
+
+    if ($file !== 'config.php') {
+        header('Location: config.php');
+    }
+}

@@ -86,7 +86,7 @@ class ConfigData
     /** @var string */
     private $regexServiceNoShow = '//';
     /** @var array */
-    private $criticalItems = array();
+    private $criticalItems = [];
     /** @var string */
     private $hash = '';
 

@@ -74,7 +74,7 @@ class XmlHandler implements StorageInterface
     public function load($tag = 'root')
     {
         if (!$this->checkSourceFile()) {
-            throw new \Exception('No es posible leer/escribir el archivo');
+            throw new \Exception(sprintf('No es posible leer/escribir el archivo: %s', $this->file));
         }
 
         $this->Dom->load($this->file);

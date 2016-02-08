@@ -80,3 +80,5 @@ $LANG['URL del cliente'] = 'Client URL';
 $LANG['URL del servidor remoto'] = 'Remote server URL';
 $LANG['URL del servidor de monitorización'] = 'Monitoring server URL';
 $LANG['Aplicación'] = 'Application';
+$LANG['No es posible leer/escribir el archivo: %s'] = 'Unable to read/write to the file: %s';
+$LANG['No hay elementos para guardar'] = 'There aren\'t items to save';
