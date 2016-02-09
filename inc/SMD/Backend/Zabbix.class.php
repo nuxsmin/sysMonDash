@@ -191,33 +191,6 @@ class Zabbix extends Backend implements BackendInterface
             }
         }
 
-        // Obtener los eventos que están OK
-        $params['filter'] = ['value' => 0, 'lastChangeSince' => time() - (Config::getConfig()->getNewItemTime() / 2 )];
-
-        $eventsOk = $this->Zabbix->triggerGet($params);
-
-        foreach ($eventsOk as $event) {
-            foreach ($event->hosts as $host) {
-                $Event = new Trigger();
-                $Event->setState($host->value);
-                $Event->setStateType($event->state);
-                $Event->setAcknowledged($event->lastEvent->acknowledged);
-                $Event->setHostDisplayName($host->name);
-                $Event->setDisplayName($host->name);
-                $Event->setCheckCommand($event->triggerid);
-                $Event->setPluginOutput($event->description);
-                $Event->setLastCheck($event->lastchange);
-                $Event->setLastHardStateChange($event->lastchange);
-                $Event->setLastHardState($event->lastchange);
-                $Event->setActiveChecksEnabled($event->status);
-                $Event->setScheduledDowntimeDepth($host->maintenance_status);
-                $Event->setCurrentAttempt($event->value);
-                $Event->setNotificationsEnabled(true);
-
-                $this->events[] = $Event;
-            }
-        }
-
         return $this->events;
     }
 
@@ -346,17 +319,6 @@ class Zabbix extends Backend implements BackendInterface
     }
 
     /**
-     * Comprobar si el host del objeto trigger está en mantenimiento
-     *
-     * @param array $hosts
-     * @return int
-     */
-    private function checkHostMaintenance(array $hosts)
-    {
-        return ((int)$hosts[0]->maintenance_status === 1) ? 1 : 0;
-    }
-
-    /**
      * Devuelve los eventos de los servicios
      *
      * @return array|bool
@@ -374,6 +336,17 @@ class Zabbix extends Backend implements BackendInterface
     public function getScheduledDowntimesGroupped()
     {
         return $this->getScheduledDowntimes();
+    }
+
+    /**
+     * Comprobar si el host del objeto trigger está en mantenimiento
+     *
+     * @param array $hosts
+     * @return int
+     */
+    private function checkHostMaintenance(array $hosts)
+    {
+        return ((int)$hosts[0]->maintenance_status === 1) ? 1 : 0;
     }
 
     /**
