@@ -107,6 +107,7 @@ class Zabbix extends Backend implements BackendInterface
         $this->url = $url;
         $this->user = $user;
         $this->pass = $pass;
+        $this->events = [];
 
         $this->connect();
     }
@@ -160,34 +161,61 @@ class Zabbix extends Backend implements BackendInterface
             'expandDescription' => true,
             'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
             'selectHosts' => ['hostid', 'name', 'maintenance_status'],
-            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
+            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
             'sortfield' => ['lastchange'],
             'sortorder' => ['DESC'],
             'limit' => Config::getConfig()->getMaxDisplayItems()
         ];
 
-        $events = $this->Zabbix->triggerGet($params);
+        $eventsError = $this->Zabbix->triggerGet($params);
 
-        $this->events = [];
+        foreach ($eventsError as $event) {
+            foreach ($event->hosts as $host) {
+                $Event = new Trigger();
+                $Event->setState($this->getTriggerState($event->priority));
+                $Event->setStateType($event->state);
+                $Event->setAcknowledged($event->lastEvent->acknowledged);
+                $Event->setHostDisplayName($host->name);
+                $Event->setDisplayName($host->name);
+                $Event->setCheckCommand($event->triggerid);
+                $Event->setPluginOutput($event->description);
+                $Event->setLastCheck($event->lastEvent->clock);
+                $Event->setLastHardStateChange($event->lastEvent->clock);
+                $Event->setLastHardState($event->lastEvent->clock);
+                $Event->setActiveChecksEnabled($event->status);
+                $Event->setScheduledDowntimeDepth($host->maintenance_status);
+                $Event->setCurrentAttempt($event->value);
+                $Event->setNotificationsEnabled(true);
 
-        foreach ($events as $event) {
-            $Event = new Trigger();
-            $Event->setState($this->getTriggerState($event->priority));
-            $Event->setStateType($event->state);
-            $Event->setAcknowledged($event->lastEvent->acknowledged);
-            $Event->setHostDisplayName($event->hosts[0]->name);
-            $Event->setDisplayName($event->hosts[0]->name);
-            $Event->setCheckCommand($event->triggerid);
-            $Event->setPluginOutput($event->description);
-            $Event->setLastCheck($event->lastchange);
-            $Event->setLastHardStateChange($event->lastchange);
-            $Event->setLastHardState($event->lastEvent->clock);
-            $Event->setActiveChecksEnabled($event->status);
-            $Event->setScheduledDowntimeDepth($this->checkHostMaintenance($event->hosts));
-            $Event->setCurrentAttempt($event->value);
-            $Event->setNotificationsEnabled(true);
+                $this->events[] = $Event;
+            }
+        }
 
-            $this->events[] = $Event;
+        // Obtener los eventos que están OK
+        $params['filter'] = ['value' => 0, 'lastChangeSince' => time() - (Config::getConfig()->getNewItemTime() / 2 )];
+
+        $eventsOk = $this->Zabbix->triggerGet($params);
+
+        foreach ($eventsOk as $event) {
+            foreach ($event->hosts as $host) {
+                $Event = new Trigger();
+                $Event->setState($host->value);
+                $Event->setStateType($event->state);
+                $Event->setAcknowledged($event->lastEvent->acknowledged);
+                $Event->setHostDisplayName($host->name);
+                $Event->setDisplayName($host->name);
+                $Event->setCheckCommand($event->triggerid);
+                $Event->setPluginOutput($event->description);
+                $Event->setLastCheck($event->lastchange);
+                $Event->setLastHardStateChange($event->lastchange);
+                $Event->setLastHardState($event->lastchange);
+                $Event->setActiveChecksEnabled($event->status);
+                $Event->setScheduledDowntimeDepth($host->maintenance_status);
+                $Event->setCurrentAttempt($event->value);
+                $Event->setNotificationsEnabled(true);
+
+                $this->events[] = $Event;
+            }
         }
 
         return $this->events;
