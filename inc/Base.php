@@ -34,7 +34,7 @@ define('MODEL_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'SMD');
 define('LOCALES_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'locales');
 define('CSS_PATH', __DIR__ . DIRECTORY_SEPARATOR . APP_ROOT . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css');
 
-define('DEBUG', true);
+define('DEBUG', false);
 
 // Empezar a calcular el tiempo y memoria utilizados
 $time_start = microtime(true);

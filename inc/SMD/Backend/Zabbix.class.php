@@ -27,11 +27,10 @@ namespace SMD\Backend;
 
 use Exts\Zabbix\ZabbixApiLoader;
 use SMD\Backend\Event\Downtime;
-use SMD\Backend\Event\Event;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Event\Trigger;
+use SMD\Core\Config;
 use SMD\Util\Util;
-use SplFixedArray;
 
 /**
  * Class Zabbix para la gestión de eventos de Zabbix
@@ -40,7 +39,7 @@ use SplFixedArray;
  */
 class Zabbix extends Backend implements BackendInterface
 {
-    /** @var \Exts\Zabbix\V222\ZabbixApi|\Exts\Zabbix\V223\ZabbixApi|\Exts\Zabbix\V242\ZabbixApi|\Exts\Zabbix\V243\ZabbixApi */
+    /** @var \Exts\Zabbix\V223\ZabbixApi|\Exts\Zabbix\V243\ZabbixApi */
     private $Zabbix = null;
     /**
      * URL de la API de Zabbix
@@ -152,103 +151,46 @@ class Zabbix extends Backend implements BackendInterface
         $this->getScheduledDowntimes();
 
         $params = [
-            'output' => ['acknowledged', 'object', 'objectid', 'clock', 'value', 'value_changed'],
-            'value' => 1,
-            'sortfield' => 'clock',
-            'sortorder' => 'DESC'
+            'groupids' => null,
+            'hostids' => null,
+            'monitored' => true,
+            //'maintenance'   => false,
+            'filter' => ['value' => 1],
+            'skipDependent' => true,
+            'expandDescription' => true,
+            'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
+            'selectHosts' => ['hostid', 'name', 'maintenance_status'],
+            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
+            'sortfield' => ['lastchange'],
+            'sortorder' => ['DESC'],
+            'limit' => Config::getConfig()->getMaxDisplayItems()
         ];
 
-        $events = $this->Zabbix->eventGet($params);
+        $events = $this->Zabbix->triggerGet($params);
 
         $this->events = [];
 
         foreach ($events as $event) {
-            $trigger = $this->getTrigger($event->objectid);
-            $state = ((int)$trigger->value === 1) ? $this->getTriggerState($trigger->priority) : $event->value;
-
             $Event = new Trigger();
-            $Event->setState($state);
-            $Event->setStateType($trigger->state);
-            $Event->setAcknowledged($event->acknowledged);
-            $Event->setHostDisplayName($trigger->hostname);
-            $Event->setDisplayName($trigger->host);
-            $Event->setCheckCommand($trigger->triggerid);
-            $Event->setPluginOutput($trigger->description);
-            $Event->setLastCheck($trigger->lastchange);
-            $Event->setLastHardStateChange($trigger->lastchange);
-            $Event->setLastHardState($event->clock);
-            $Event->setActiveChecksEnabled($trigger->status);
-            $Event->setScheduledDowntimeDepth($this->checkHostMaintenance($trigger->hosts));
-            $Event->setCurrentAttempt($trigger->value);
-            $Event->setNotificationsEnabled(1);
+            $Event->setState($this->getTriggerState($event->priority));
+            $Event->setStateType($event->state);
+            $Event->setAcknowledged($event->lastEvent->acknowledged);
+            $Event->setHostDisplayName($event->hosts[0]->name);
+            $Event->setDisplayName($event->hosts[0]->name);
+            $Event->setCheckCommand($event->triggerid);
+            $Event->setPluginOutput($event->description);
+            $Event->setLastCheck($event->lastchange);
+            $Event->setLastHardStateChange($event->lastchange);
+            $Event->setLastHardState($event->lastEvent->clock);
+            $Event->setActiveChecksEnabled($event->status);
+            $Event->setScheduledDowntimeDepth($this->checkHostMaintenance($event->hosts));
+            $Event->setCurrentAttempt($event->value);
+            $Event->setNotificationsEnabled(true);
 
             $this->events[] = $Event;
         }
 
         return $this->events;
-    }
-
-    /**
-     * Obtener los datos de un trigger
-     *
-     * @param $id int El Id del trigger
-     * @return object
-     */
-    private function getTrigger($id)
-    {
-        $params = [
-            'triggerids' => $id,
-            'expandData' => 1,
-            'expandDescription' => 1,
-            'selectHosts' => 'extend',
-            'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value']
-        ];
-
-        $trigger = $this->Zabbix->triggerGet($params);
-        return $trigger[0];
-    }
-
-    /**
-     * Unificar el tipo de estado según prioridad del trigger
-     *
-     * @param $state int El tipo de estado
-     * @return int
-     */
-    private function getTriggerState($state)
-    {
-        switch ($state) {
-            case 0:
-                return SERVICE_UNKNOWN;
-            case 1:
-            case 2:
-            case 3:
-                return SERVICE_WARNING;
-            case 4:
-            case 5:
-                return SERVICE_CRITICAL;
-            default:
-                return SERVICE_UNKNOWN;
-        }
-    }
-
-    /**
-     * Devuelve los eventos de los servicios
-     *
-     * @return array|bool
-     */
-    public function getServicesProblems()
-    {
-        return array();
-    }
-
-    /**
-     * Devuelve los eventos programados agrupados
-     *
-     * @return array|bool
-     */
-    public function getScheduledDowntimesGroupped()
-    {
-        return $this->getScheduledDowntimes();
     }
 
     /**
@@ -353,6 +295,29 @@ class Zabbix extends Backend implements BackendInterface
     }
 
     /**
+     * Unificar el tipo de estado según prioridad del trigger
+     *
+     * @param $state int El tipo de estado
+     * @return int
+     */
+    private function getTriggerState($state)
+    {
+        switch ($state) {
+            case 0:
+                return SERVICE_UNKNOWN;
+            case 1:
+            case 2:
+            case 3:
+                return SERVICE_WARNING;
+            case 4:
+            case 5:
+                return SERVICE_CRITICAL;
+            default:
+                return SERVICE_UNKNOWN;
+        }
+    }
+
+    /**
      * Comprobar si el host del objeto trigger está en mantenimiento
      *
      * @param array $hosts
@@ -361,5 +326,45 @@ class Zabbix extends Backend implements BackendInterface
     private function checkHostMaintenance(array $hosts)
     {
         return ((int)$hosts[0]->maintenance_status === 1) ? 1 : 0;
+    }
+
+    /**
+     * Devuelve los eventos de los servicios
+     *
+     * @return array|bool
+     */
+    public function getServicesProblems()
+    {
+        return array();
+    }
+
+    /**
+     * Devuelve los eventos programados agrupados
+     *
+     * @return array|bool
+     */
+    public function getScheduledDowntimesGroupped()
+    {
+        return $this->getScheduledDowntimes();
+    }
+
+    /**
+     * Obtener los datos de un trigger
+     *
+     * @param $id int El Id del trigger
+     * @return object
+     */
+    private function getTrigger($id)
+    {
+        $params = [
+            'triggerids' => $id,
+            'expandData' => 1,
+            'expandDescription' => 1,
+            'selectHosts' => 'extend',
+            'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value']
+        ];
+
+        $trigger = $this->Zabbix->triggerGet($params);
+        return $trigger[0];
     }
 }

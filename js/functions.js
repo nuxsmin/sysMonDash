@@ -107,6 +107,11 @@ function SMD() {
         }
     }(jQuery));
 
+    jQuery.ajaxSetup({
+        global: false,
+        timeout: Config.getTimeout() / 2
+    });
+
     jQuery().ready(function () {
         updateNagiosData();
         setInterval(function () {

@@ -211,10 +211,10 @@ class sysMonDash
         $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
 
         if ($item->isAcknowledged()
-            || (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#', $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()))
+            || (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()))
             || (Config::getConfig()->getRegexServiceNoShow()
                 && is_array(Config::getConfig()->getCriticalItems())
-                && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#', $item->getDisplayName())
+                && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
                 && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems()))
             || ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts() && $item->getStateType() === 0 && !$item->isIsFlapping())
             || ($item->getHostState() && $item->getState() > SERVICE_WARNING && $item->getHostState() >= HOST_DOWN)

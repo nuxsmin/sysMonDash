@@ -120,6 +120,24 @@ class Util
     }
 
     /**
+     * Devuelve la versión de sysMonDash
+     *
+     * @param bool $retBuild
+     * @return array|int
+     */
+    public static function getVersion($retBuild = false)
+    {
+        $build = 2016020401;
+        $version = [1, 0];
+
+        if ($retBuild) {
+            $version[] = $build;
+        }
+
+        return $version;
+    }
+
+    /**
      * Devuelve el hash del archivo CSS
      *
      * @return string
@@ -142,20 +160,6 @@ class Util
             'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>',
 
         );
-    }
-
-    /**
-     * Devuelve la versión de sysMonDash
-     *
-     * @param bool $retBuild
-     * @return array|int
-     */
-    public static function getVersion($retBuild = false)
-    {
-        $build = 2016020401;
-        $version = [1, 0];
-
-        return ($retBuild) ? array_push($version, $build) : $version;
     }
 
     /**
@@ -182,4 +186,57 @@ class Util
         return (is_writable(XML_CONFIG_FILE));
     }
 
+    /**
+     * Comprobar si se realiza una recarga de la página
+     *
+     * @return bool
+     */
+    public static function checkReload()
+    {
+        return (self::getRequestHeaders('Cache-Control') == 'max-age=0');
+    }
+
+    /**
+     * Devolver las cabeceras enviadas desde el cliente.
+     *
+     * @param string $header nombre de la cabecera a devolver
+     * @return array
+     */
+    public static function getRequestHeaders($header = '')
+    {
+        if (!function_exists('\apache_request_headers')) {
+            $headers = self::getApacheHeaders();
+        } else {
+            $headers = apache_request_headers();
+        }
+
+        if (!empty($header) && array_key_exists($header, $headers)) {
+            return $headers[$header];
+        } elseif (!empty($header)) {
+            return false;
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Función que sustituye a apache_request_headers
+     *
+     * @return array
+     */
+    public static function getApacheHeaders()
+    {
+        $headers = array();
+
+        foreach ($_SERVER as $key => $value) {
+            if (substr($key, 0, 5) == "HTTP_") {
+                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($key, 5)))));
+                $headers[$key] = $value;
+            } else {
+                $headers[$key] = $value;
+            }
+        }
+
+        return $headers;
+    }
 }

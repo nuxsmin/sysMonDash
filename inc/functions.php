@@ -40,11 +40,11 @@ if ($raw) {
     $Backend->setAllHeaders($allHeaders);
 
     echo 'Hosts', PHP_EOL;
-    print_r(Util::arraySortByKey($Backend->getHostsProblems(), 'last_hard_state_change'));
+    print_r(Util::arraySortByProperty($Backend->getHostsProblems(), 'start_time'));
     echo 'Services', PHP_EOL;
-    print_r(Util::arraySortByKey($Backend->getServicesProblems(), 'last_hard_state_change'));
+    print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'start_time'));
     echo 'Downtimes', PHP_EOL;
-    print_r(Util::arraySortByKey($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
+    print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
 
 }
 

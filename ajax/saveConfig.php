@@ -77,7 +77,7 @@ if ($backend === 'status'){
 } elseif ($backend === 'zabbix'){
     if (empty($backendZabbixURL)) {
         Response::printJSON('Es necesaria la URL del backend');
-    } elseif (empty($backendZabbixUser) || empty($backendZabbixPass)) {
+    } elseif (empty($backendZabbixUser) || (empty(Config::getConfig()->getZabbixPass()) && empty($backendZabbixPass))) {
         Response::printJSON('Es necesario el usuario y clave del backend');
     }
 }

@@ -26,6 +26,7 @@
 namespace SMD\Core;
 use ReflectionObject;
 use SMD\Storage\StorageInterface;
+use SMD\Util\Util;
 
 /**
  * Class Config
@@ -57,9 +58,8 @@ class Config
      */
     public static function loadConfig(StorageInterface $Storage)
     {
-        $ConfigData = Session::getConfig();
-
-        if (gettype($ConfigData) !== 'object'
+        if (Util::checkReload()
+            || gettype(Session::getConfig()) !== 'object'
             || time() >= (Session::getConfigTime() + self::TIMEOUT_REFRESH)
         ) {
             Session::setConfig(self::arrayMapper($Storage));
