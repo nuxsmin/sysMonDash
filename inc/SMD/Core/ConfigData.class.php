@@ -38,18 +38,6 @@ class ConfigData
     /** @var array */
     private $backend = [];
     /** @var string */
-    private $statusFile = '/var/lib/icinga/status.dat';
-    /** @var string */
-    private $livestatus_socket_path = '/var/lib/icinga/rw/live';
-    /** @var int */
-    private $zabbix_version = 222;
-    /** @var string */
-    private $zabbix_url = 'http://foo.bar/zabbix/api_jsonrpc.php';
-    /** @var string */
-    private $zabbix_user = 'zabbix';
-    /** @var string */
-    private $zabbix_pass = 'zabbix_pass';
-    /** @var string */
     private $clientURL = '';
     /** @var string */
     private $remoteServer = '';
@@ -82,9 +70,9 @@ class ConfigData
     /** @var string */
     private $dbUserPass = 'nagiosql_pass';
     /** @var string */
-    private $regexHostShow = '/.*/';
+    private $regexHostShow = '.*';
     /** @var string */
-    private $regexServiceNoShow = '//';
+    private $regexServiceNoShow = '';
     /** @var array */
     private $criticalItems = [];
     /** @var string */
@@ -156,102 +144,6 @@ class ConfigData
     public function setBackend($backend)
     {
         $this->backend = $backend;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatusFile()
-    {
-        return $this->statusFile;
-    }
-
-    /**
-     * @param string $statusFile
-     */
-    public function setStatusFile($statusFile)
-    {
-        $this->statusFile = $statusFile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLivestatusSocketPath()
-    {
-        return $this->livestatus_socket_path;
-    }
-
-    /**
-     * @param string $livestatus_socket_path
-     */
-    public function setLivestatusSocketPath($livestatus_socket_path)
-    {
-        $this->livestatus_socket_path = $livestatus_socket_path;
-    }
-
-    /**
-     * @return int
-     */
-    public function getZabbixVersion()
-    {
-        return $this->zabbix_version;
-    }
-
-    /**
-     * @param int $zabbix_version
-     */
-    public function setZabbixVersion($zabbix_version)
-    {
-        $this->zabbix_version = $zabbix_version;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixUrl()
-    {
-        return $this->zabbix_url;
-    }
-
-    /**
-     * @param string $zabbix_url
-     */
-    public function setZabbixUrl($zabbix_url)
-    {
-        $this->zabbix_url = $zabbix_url;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixUser()
-    {
-        return $this->zabbix_user;
-    }
-
-    /**
-     * @param string $zabbix_user
-     */
-    public function setZabbixUser($zabbix_user)
-    {
-        $this->zabbix_user = $zabbix_user;
-    }
-
-    /**
-     * @return string
-     */
-    public function getZabbixPass()
-    {
-        return $this->zabbix_pass;
-    }
-
-    /**
-     * @param string $zabbix_pass
-     */
-    public function setZabbixPass($zabbix_pass)
-    {
-        $this->zabbix_pass = $zabbix_pass;
     }
 
     /**

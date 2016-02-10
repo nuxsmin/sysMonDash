@@ -208,22 +208,83 @@ class sysMonDash
      */
     private static function filterItems(EventInterface $item)
     {
+        return ($item->isAcknowledged()
+            || self::getFilterHosts($item)
+            || self::getFilterServices($item)
+            || self::getFilterIsFlapping($item)
+            || self::getFilterState($item)
+            || self::getFilterUnreachable($item)
+        ) ? false : true;
+    }
+
+    /**
+     * Comprobar si el host se encuentra en la expresión regular
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private static function getFilterHosts(EventInterface $item)
+    {
         $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
 
-        if ($item->isAcknowledged()
-            || (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()))
-            || (Config::getConfig()->getRegexServiceNoShow()
-                && is_array(Config::getConfig()->getCriticalItems())
-                && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
-                && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems()))
-            || ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts() && $item->getStateType() === 0 && !$item->isIsFlapping())
-            || ($item->getHostState() && $item->getState() > SERVICE_WARNING && $item->getHostState() >= HOST_DOWN)
-            || ($item->getStateType() === 1 && $item->getLastTimeUnreachable() > $item->getLastCheck())
-        ) {
-            return false;
-        }
+        //error_log(__FUNCTION__);
 
-        return true;
+        return (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()));
+    }
+
+    /**
+     * Comprobar si el servicio se encuentra en la expresión regular y sies un elemento crítico
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private static function getFilterServices(EventInterface $item)
+    {
+        //error_log(__FUNCTION__);
+
+        return (Config::getConfig()->getRegexServiceNoShow()
+            && is_array(Config::getConfig()->getCriticalItems())
+            && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
+            && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems()));
+    }
+
+    /**
+     * Comprobar si el estado es cambiante
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private static function getFilterIsFlapping(EventInterface $item)
+    {
+        //error_log(__FUNCTION__);
+
+        return ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts() && $item->getStateType() === 0 && !$item->isIsFlapping());
+    }
+
+    /**
+     * Comprobar si el host está caído y el servicio en alerta
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private static function getFilterState(EventInterface $item)
+    {
+        //error_log(__FUNCTION__);
+
+        return ($item->getHostState() && $item->getState() > SERVICE_WARNING && $item->getHostState() >= HOST_DOWN);
+    }
+
+    /**
+     * Comprobar si está inalcanzable
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private static function getFilterUnreachable(EventInterface $item)
+    {
+        //error_log(__FUNCTION__);
+
+        return ($item->getStateType() === 1 && $item->getLastTimeUnreachable() > $item->getLastCheck());
     }
 
     /**
