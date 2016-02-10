@@ -73,13 +73,11 @@ class Config
      */
     public static function saveConfig(StorageInterface $Storage, ConfigData $Config = null)
     {
-        if (is_null($Config)){
-            $Storage->setItems(self::getConfig());
-        } else {
-            $Config->setHash(uniqid());
-            $Storage->setItems($Config);
-        }
+        $ConfigData = (is_null($Config)) ? self::getConfig() : $Config;
+        $Config->setHash();
+        $Config->setConfigHash();
 
+        $Storage->setItems($ConfigData);
         $Storage->save('config');
 
         Session::setConfigTime(0);
@@ -101,7 +99,18 @@ class Config
 
         foreach($Reflection->getProperties() as $property){
             $property->setAccessible(true);
-            $property->setValue($ConfigData, $items[$property->getName()]);
+
+            if ($property->getName() === 'backend') {
+                $Backends = [];
+
+                foreach ($items['backend'] as $backend) {
+                    $Backends[] = unserialize(base64_decode($backend));
+                }
+
+                $property->setValue($ConfigData, $Backends);
+            } else {
+                $property->setValue($ConfigData, @$items[$property->getName()]);
+            }
             $property->setAccessible(false);
         }
 

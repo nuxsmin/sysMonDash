@@ -28,6 +28,7 @@ namespace SMD\Backend;
 use SMD\Backend\Event\Host;
 use SMD\Backend\Event\Service;
 use SMD\Core\Config;
+use SMD\Core\ConfigBackendStatus;
 use SMD\Util\NagiosQL;
 
 /**
@@ -39,13 +40,22 @@ class Status extends Backend implements BackendInterface
     /**
      * @var string
      */
-    protected $_fileData;
+    protected $fileData;
+    /**
+     * @var string
+     */
+    protected $path = '';
 
     /**
      * Status constructor.
+     * @param ConfigBackendStatus $backend
+     * @throws \Exception
      */
-    public function __construct()
+    public function __construct(ConfigBackendStatus $backend)
     {
+        $this->backend = $backend;
+        $this->path = $backend->getPath();
+
         $this->getStatusData();
     }
 
@@ -55,7 +65,7 @@ class Status extends Backend implements BackendInterface
     private function getStatusData()
     {
         // Archivo con información de estado de Icinga
-        if (!$this->_fileData = file_get_contents(Config::getConfig()->getStatusFile())) {
+        if (!$this->fileData = file_get_contents($this->path)) {
             throw new \Exception('Error al obtener los datos de monitorización');
         }
 
@@ -94,7 +104,7 @@ class Status extends Backend implements BackendInterface
     public function getHostsProblems()
     {
         // Obtenemos los bloques que corresponden al estado de los hosts y servicios
-        preg_match_all('/hoststatus {.*}/isU', $this->_fileData, $hostsData);
+        preg_match_all('/hoststatus {.*}/isU', $this->fileData, $hostsData);
 
         $events = [];
 
@@ -214,7 +224,7 @@ class Status extends Backend implements BackendInterface
     public function getServicesProblems()
     {
         // Obtenemos los bloques que corresponden al estado de los servicios
-        preg_match_all('/servicestatus {.*}/isU', $this->_fileData, $servicesData);
+        preg_match_all('/servicestatus {.*}/isU', $this->fileData, $servicesData);
 
         $events = [];
 
@@ -253,5 +263,13 @@ class Status extends Backend implements BackendInterface
     private function clearArrayValues($value)
     {
         return (is_numeric($value)) ? intval($value) : htmlentities($value);
+    }
+
+    /**
+     * @param ConfigBackendStatus $backend
+     */
+    public function setBackend(ConfigBackendStatus $backend)
+    {
+        $this->backend = $backend;
     }
 }

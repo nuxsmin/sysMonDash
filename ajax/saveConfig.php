@@ -25,6 +25,7 @@
 use SMD\Core\Config;
 use SMD\Core\ConfigData;
 use SMD\Core\Session;
+use SMD\Html\Html;
 use SMD\Http\Request;
 use SMD\Http\Response;
 use SMD\Storage\XmlHandler;
@@ -51,36 +52,35 @@ $showColInfo = Request::analyze('col_info', false, false, true);
 $regexHostShow = Request::analyze('regex_host_show');
 $regexServicesNoShow = Request::analyze('regex_services_no_show');
 $criticalItems = Request::analyze('critical_items');
-$backend = Request::analyze('backend');
-$backendStatusFile = Request::analyze('backend_status_file');
-$backendLivestatusFile = Request::analyze('backend_livestatus_file');
-$backendZabbixURL = Request::analyze('backend_zabbix_url');
-$backendZabbixVersion = Request::analyze('backend_zabbix_version');
-$backendZabbixUser = Request::analyze('backend_zabbix_user');
-$backendZabbixPass = Request::analyze('backend_zabbix_pass');
 $specialClientURL = Request::analyze('special_client_url');
 $specialRemoteServerURL = Request::analyze('special_remote_server_url');
 $specialMonitorServerUrl = Request::analyze('special_monitor_server_url');
 
-if ($backend === 'status'){
-    if (empty($backendStatusFile)) {
-        Response::printJSON('Es necesaria la ruta al backend');
-    } elseif (!is_readable($backendStatusFile)) {
-        Response::printJSON('No es posible acceder al archivo del backend');
-    }
-} elseif ($backend === 'livetatus'){
-    if (empty($backendLivestatusFile)) {
-        Response::printJSON('Es necesaria la ruta al backend');
-    } elseif (!is_readable($backendLivestatusFile)) {
-        Response::printJSON('No es posible acceder al archivo del backend');
-    }
-} elseif ($backend === 'zabbix'){
-    if (empty($backendZabbixURL)) {
-        Response::printJSON('Es necesaria la URL del backend');
-    } elseif (empty($backendZabbixUser) || (empty(Config::getConfig()->getZabbixPass()) && empty($backendZabbixPass))) {
-        Response::printJSON('Es necesario el usuario y clave del backend');
-    }
+try {
+    $Backends = Html::processFormBackends(Request::analyze('backend'));
+} catch (Exception $e){
+    Response::printJSON(\SMD\Core\Language::t($e->getMessage()));
 }
+
+//if (isset($backend['status'])){
+//    if (empty($backendStatusFile)) {
+//        Response::printJSON('Es necesaria la ruta al backend');
+//    } elseif (!is_readable($backendStatusFile)) {
+//        Response::printJSON('No es posible acceder al archivo del backend');
+//    }
+//} elseif ($backend === 'livetatus'){
+//    if (empty($backendLivestatusFile)) {
+//        Response::printJSON('Es necesaria la ruta al backend');
+//    } elseif (!is_readable($backendLivestatusFile)) {
+//        Response::printJSON('No es posible acceder al archivo del backend');
+//    }
+//} elseif ($backend === 'zabbix'){
+//    if (empty($backendZabbixURL)) {
+//        Response::printJSON('Es necesaria la URL del backend');
+//    } elseif (empty($backendZabbixUser) || (empty(Config::getConfig()->getZabbixPass()) && empty($backendZabbixPass))) {
+//        Response::printJSON('Es necesario el usuario y clave del backend');
+//    }
+//}
 
 $ConfigData = new ConfigData();
 $ConfigData->setLanguage($siteLanguage);
@@ -94,12 +94,7 @@ $ConfigData->setColService($showColService);
 $ConfigData->setRegexHostShow($regexHostShow);
 $ConfigData->setRegexServiceNoShow($regexServicesNoShow);
 $ConfigData->setCriticalItems(explode(',', $criticalItems));
-$ConfigData->setBackend($backend);
-$ConfigData->setStatusFile($backendStatusFile);
-$ConfigData->setLivestatusSocketPath($backendLivestatusFile);
-$ConfigData->setZabbixVersion($backendZabbixVersion);
-$ConfigData->setZabbixUrl($backendZabbixURL);
-$ConfigData->setZabbixUser($backendZabbixUser);
+$ConfigData->setBackend($Backends);
 $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);
 $ConfigData->setMonitorServerUrl($specialMonitorServerUrl);

@@ -229,23 +229,30 @@ class sysMonDash
     /**
      * Seleccionar el backend
      *
-     * @return Livestatus|Status|Zabbix
+     * @return Livestatus[]|Status[]|Zabbix[]|array
      * @throws \Exception
      */
     public static function getBackend()
     {
-        $backend = strtolower(Config::getConfig()->getBackend());
+        $backends = [];
 
-        switch ($backend) {
-            case 'livestatus':
-                return new Livestatus();
-            case 'status':
-                return new Status();
-            case 'zabbix':
-                return new Zabbix(Config::getConfig()->getZabbixVersion(), Config::getConfig()->getZabbixUrl(), Config::getConfig()->getZabbixUser(), Config::getConfig()->getZabbixPass());
-                break;
-            default:
-                throw new \Exception(sprintf('Backend no soportado (%s)', $backend));
+        foreach (Config::getConfig()->getBackend() as $Backend) {
+            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix */
+            if ($Backend->isActive()) {
+                switch ($Backend->getType()) {
+                    case ConfigBackend::TYPE_LIVESTATUS:
+                        $backends[] = new Livestatus($Backend);
+                        break;
+                    case ConfigBackend::TYPE_STATUS:
+                        $backends[] = new Status($Backend);
+                        break;
+                    case ConfigBackend::TYPE_ZABBIX:
+                        $backends[] = new Zabbix($Backend);
+                        break;
+                }
+            }
         }
+
+        return $backends;
     }
 }

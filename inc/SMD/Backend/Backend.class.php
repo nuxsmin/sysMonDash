@@ -25,10 +25,14 @@
 
 namespace SMD\Backend;
 
+use SMD\Core\ConfigBackend;
+
 class Backend
 {
     /** @var bool */
     protected $allHeaders = false;
+    /** @var  mixed */
+    protected $backend;
 
     /**
      * @return boolean
@@ -44,6 +48,14 @@ class Backend
     public function setAllHeaders($allHeaders)
     {
         $this->allHeaders = $allHeaders;
+    }
+
+    /**
+     * @param mixed $backend
+     */
+    public function setBackend($backend)
+    {
+        $this->backend = $backend;
     }
 
     /**

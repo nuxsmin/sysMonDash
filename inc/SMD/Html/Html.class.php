@@ -25,6 +25,9 @@
 
 namespace SMD\Html;
 
+use SMD\Core\ConfigBackendLivestatus;
+use SMD\Core\ConfigBackendStatus;
+use SMD\Core\ConfigBackendZabbix;
 
 class Html
 {
@@ -41,7 +44,7 @@ class Html
         }
 
         if (is_array($data)) {
-            array_walk_recursive($data, '\SP\Html\Html::sanitize');
+            array_walk_recursive($data, '\SMD\Html\Html::sanitize');
         } else {
             $data = strip_tags($data);
 
@@ -74,5 +77,40 @@ class Html
             } while ($old_data !== $data);
         }
         return $data;
+    }
+
+    /**
+     * Procesar los backends desde el formulario de configuración y guardarlos
+     *
+     * @param array $backends
+     * @return array
+     */
+    public static function processFormBackends(array $backends)
+    {
+        $BackendsConfig = [];
+        $ConfigBackend = null;
+
+        foreach ($backends as $backend => $n) {
+            foreach ($n as $config) {
+                switch ($backend) {
+                    case 'status':
+                        $ConfigBackend = new ConfigBackendStatus($config['path']);
+                        break;
+                    case 'livestatus':
+                        $ConfigBackend = new ConfigBackendLivestatus($config['path']);
+                        break;
+                    case 'zabbix':
+                        $ConfigBackend = new ConfigBackendZabbix($config['version'], $config['url'], $config['user'], $config['pass']);
+                        break;
+                }
+
+                $active = ($config['active'] === 'on') ? true : false;
+                $ConfigBackend->setActive($active);
+            }
+
+            $BackendsConfig[] = $ConfigBackend;
+        }
+
+        return $BackendsConfig;
     }
 }

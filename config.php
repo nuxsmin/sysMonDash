@@ -23,6 +23,7 @@
  */
 
 use SMD\Core\Config;
+use SMD\Core\ConfigBackend;
 use SMD\Core\Language;
 use SMD\Core\Session;
 use SMD\Http\Request;
@@ -139,53 +140,91 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
             </fieldset>
             <fieldset>
                 <legend>Backends</legend>
-                <div class="flex-wrapper">
-                    <div class="pure-control-group">
-                        <label for="backend">Backend</label>
-                        <select id="backend" name="backend"
-                                data-selected="<?php echo Config::getConfig()->getBackend(); ?>">
-                            <option value="status">Status</option>
-                            <option value="livestatus">Livestatus</option>
-                            <option value="zabbix">Zabbix</option>
-                        </select>
+                <div id="backends" class="flex-wrapper">
+                    <div id="btnBackends" style="text-align: center; margin: 1em 0;">
+                        <a class="pure-button" href="#" id="addLivestatusBackend">+ Livestatus</a>
+                        <a class="pure-button" href="#" id="addStatusBackend">+ Status</a>
+                        <a class="pure-button" href="#" id="addZabbixBackend">+ Zabbix</a>
                     </div>
-                    <div class="pure-control-group">
-                        <label for="backend_status_file"><?php echo Language::t('Ruta archivo status.dat'); ?></label>
-                        <input type="text" id="backend_status_file" name="backend_status_file" class="pure-input-1-2"
-                               value="<?php echo Config::getConfig()->getStatusFile(); ?>"
-                               placeholder="/var/lib/icinga/status.dat"/>
-                    </div>
-                    <div class="pure-control-group">
-                        <label
-                            for="backend_livestatus_file"><?php echo Language::t('Ruta socket livestatus'); ?></label>
-                        <input type="text" id="backend_livestatus_file" name="backend_livestatus_file"
-                               class="pure-input-1-2"
-                               value="<?php echo Config::getConfig()->getLivestatusSocketPath(); ?>"
-                               placeholder="/var/lib/icinga/rw/live"/>
-                    </div>
-                    <div class="pure-control-group">
-                        <label for="backend_zabbix_url"><?php echo Language::t('URL API de Zabbix'); ?></label>
-                        <input type="text" id="backend_zabbix_url" name="backend_zabbix_url" class="pure-input-1-2"
-                               value="<?php echo Config::getConfig()->getZabbixUrl(); ?>"
-                               placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
-                    </div>
-                    <div class="pure-control-group">
-                        <label for="backend_zabbix_version"><?php echo Language::t('Versión API de Zabbix'); ?></label>
-                        <select id="backend_zabbix_version" name="backend_zabbix_version"
-                                data-selected="<?php echo Config::getConfig()->getZabbixVersion(); ?>">
-                            <option value="223">2.2</option>
-                            <option value="243">2.4</option>
-                        </select>
-                    </div>
-                    <div class="pure-control-group">
-                        <label for="backend_zabbix_user"><?php echo Language::t('Usuario API de Zabbix'); ?></label>
-                        <input type="text" id="backend_zabbix_user" name="backend_zabbix_user"
-                               value="<?php echo Config::getConfig()->getZabbixUser(); ?>"/>
-                    </div>
-                    <div class="pure-control-group">
-                        <label for="backend_zabbix_pass"><?php echo Language::t('Clave API de Zabbix'); ?></label>
-                        <input type="password" id="backend_zabbix_pass" name="backend_zabbix_pass"/>
-                    </div>
+                    <?php $i = 0; $j = 0; $k = 0; ?>
+                    <?php foreach (Config::getConfig()->getBackend() as $Backend): ?>
+                        <?php if ($Backend->getType() === ConfigBackend::TYPE_STATUS): ?>
+                            <div class="backendStatus">
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_status_file"><?php echo Language::t('Ruta archivo status.dat'); ?></label>
+                                    <input type="text" id="backend_status_file" name="backend[status][<?php echo $i; ?>][path]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getPath(); ?>"
+                                           placeholder="/var/lib/icinga/status.dat"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Activo'); ?></label>
+                                    <input type="checkbox" name="backend[status][<?php echo $i; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                </div>
+                                <a class="pure-button backendDelete" href="#"
+                                   onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+                            </div>
+                            <?php $i++; ?>
+                        <?php elseif ($Backend->getType() === ConfigBackend::TYPE_LIVESTATUS): ?>
+                            <div class="backendLivestatus">
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_livestatus_file"><?php echo Language::t('Ruta socket livestatus'); ?></label>
+                                    <input type="text" id="backend_livestatus_file" name="backend[livestatus][<?php echo $j; ?>][path]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getPath(); ?>"
+                                           placeholder="/var/lib/icinga/rw/live"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Activo'); ?></label>
+                                    <input type="checkbox" name="backend[livestatus][<?php echo $j; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                </div>
+                                <a class="pure-button backendDelete" href="#"
+                                   onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+                            </div>
+                            <?php $j++; ?>
+                        <?php elseif ($Backend->getType() === ConfigBackend::TYPE_ZABBIX): ?>
+                            <div class="backendZabbix">
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_zabbix_url"><?php echo Language::t('URL API de Zabbix'); ?></label>
+                                    <input type="text" id="backend_zabbix_url" name="backend[zabbix][<?php echo $k; ?>][url]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getUrl(); ?>"
+                                           placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_zabbix_version"><?php echo Language::t('Versión API de Zabbix'); ?></label>
+                                    <select id="backend_zabbix_version" name="backend[zabbix][<?php echo $k; ?>][version]"
+                                            data-selected="<?php echo $Backend->getVersion(); ?>">
+                                        <option value="223">2.2.3</option>
+                                        <option value="243">2.4.3</option>
+                                    </select>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_zabbix_user"><?php echo Language::t('Usuario API de Zabbix'); ?></label>
+                                    <input type="text" id="backend_zabbix_user" name="backend[zabbix][<?php echo $k; ?>][user]"
+                                           value="<?php echo $Backend->getUser(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_zabbix_pass"><?php echo Language::t('Clave API de Zabbix'); ?></label>
+                                    <input type="password" id="backend_zabbix_pass" name="backend[zabbix][<?php echo $k; ?>][pass]"
+                                           value="<?php echo $Backend->getPass(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Activo'); ?></label>
+                                    <input type="checkbox" name="backend[zabbix][<?php echo $k; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                </div>
+                                <a class="pure-button backendDelete" href="#"
+                                   onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+                            </div>
+                            <?php $k++; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </fieldset>
             <fieldset>
@@ -223,14 +262,83 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
 
             <input type="hidden" name="hash" value="<?php echo Request::analyze('h'); ?>"/>
         </form>
+
         <div id="result">&nbsp;</div>
+
+        <div class="livestatusTemplate" style="display: none">
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Ruta socket livestatus'); ?></label>
+                <input type="text" name="backend[livestatus][path]"
+                       class="pure-input-1-2" placeholder="/var/lib/icinga/rw/live"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Activo'); ?></label>
+                <input type="checkbox" name="backend[livestatus][active]"/>
+            </div>
+            <a class="pure-button backendDelete" href="#"
+               onclick="return SMD().removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+        </div>
+        <div class="statusTemplate" style="display: none">
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Ruta archivo status.dat'); ?></label>
+                <input type="text" name="backend[status][path]"
+                       class="pure-input-1-2" placeholder="/var/lib/icinga/status.dat"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Activo'); ?></label>
+                <input type="checkbox" name="backend[status][active]"/>
+            </div>
+            <a class="pure-button backendDelete" href="#"
+               onclick="return SMD().removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+        </div>
+        <div class="zabbixTemplate" style="display: none">
+            <div class="pure-control-group">
+                <label><?php echo Language::t('URL API de Zabbix'); ?></label>
+                <input type="text" name="backend[zabbix][url]" class="pure-input-1-2"
+                       placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Versión API de Zabbix'); ?></label>
+                <select name="backend[zabbix][version]">
+                    <option value="223">2.2.3</option>
+                    <option value="243">2.4.3</option>
+                </select>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Usuario API de Zabbix'); ?></label>
+                <input type="text" name="backend[zabbix][user]"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Clave API de Zabbix'); ?></label>
+                <input type="password" name="backend[zabbix][pass]"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Activo'); ?></label>
+                <input type="checkbox" name="backend[zabbix][active]"/>
+            </div>
+            <a class="pure-button backendDelete" href="#"
+               onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+        </div>
+
         <script>
+            function removeBackend(obj) {
+                var $this = jQuery(obj);
+
+                $this.parent().slideUp('slow', function () {
+                        $this.parent().remove();
+                    }
+                );
+
+                return false;
+            }
+
             (function () {
                 var form = jQuery('#frmConfig');
+                var smd = new SMD();
 
                 form.on('submit', function (e) {
                     e.preventDefault();
-                    SMD().saveSMDConfig(form);
+                    smd.saveConfig(form);
                 }).find("select").each(function () {
                     var sel = jQuery(this)
                     var selvalue = sel.data('selected');
@@ -238,7 +346,34 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                 });
 
                 jQuery("#btnBack").click(function () {
-                    location.href = SMD().getRootPath();
+                    location.href = smd.getRootPath();
+                });
+
+                jQuery('#addLivestatusBackend').click(function (e) {
+                    e.preventDefault();
+
+                    jQuery('<div/>', {
+                        'class': 'backendLivestatus',
+                        html: smd.getNewLivestatusBackend()
+                    }).hide().appendTo('#backends').slideDown('slow');
+                });
+
+                jQuery('#addStatusBackend').click(function (e) {
+                    e.preventDefault();
+
+                    jQuery('<div/>', {
+                        'class': 'backendStatus',
+                        html: smd.getNewStatusBackend()
+                    }).hide().appendTo('#backends').slideDown('slow');
+                });
+
+                jQuery('#addZabbixBackend').click(function (e) {
+                    e.preventDefault();
+
+                    jQuery('<div/>', {
+                        'class': 'backendZabbix',
+                        html: smd.getNewZabbixBackend()
+                    }).hide().appendTo('#backends').slideDown('slow');
                 });
             }())
         </script>
