@@ -70,7 +70,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <script type="text/javascript">
     (function () {
             var smd = new SMD();
-            var config = new smd.SMDConfig()
+            var config = new smd.SMDConfig();
             config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
             config.setAjaxFile('<?php echo $ajaxFile; ?>');
             config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
