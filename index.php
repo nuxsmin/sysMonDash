@@ -69,12 +69,16 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <script type="text/javascript" src="js/functions.js"></script>
 <script type="text/javascript">
     (function () {
-        var config = SMD().getSMDConfig;
-        config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
-        config.setAjaxFile('<?php echo $ajaxFile; ?>');
-        config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
-        config.setTimeout(<?php echo $timeout; ?>);
-        config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
+            var smd = new SMD();
+            var config = new smd.SMDConfig();
+            config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
+            config.setAjaxFile('<?php echo $ajaxFile; ?>');
+            config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
+            config.setTimeout(<?php echo $timeout; ?>);
+            config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
+
+            smd.setConfig(config);
+            smd.startSMD();
     }());
 </script>
 </body>

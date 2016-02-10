@@ -31,6 +31,7 @@ use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\Host;
 use SMD\Backend\Event\Service;
 use SMD\Core\Config;
+use SMD\Core\ConfigBackendLivestatus;
 use SMD\Core\Language;
 use SMD\IO\Socket;
 use SMD\Util\Util;
@@ -41,6 +42,21 @@ use SMD\Util\Util;
  */
 class Livestatus extends Backend implements BackendInterface
 {
+    /**
+     * @var string
+     */
+    protected $path = '';
+
+    /**
+     * Livestatus constructor.
+     * @param ConfigBackendLivestatus $backend
+     */
+    public function __construct(ConfigBackendLivestatus $backend)
+    {
+        $this->backend = $backend;
+        $this->path = $backend->getPath();
+    }
+
     /**
      * Obtener el listado de hosts
      *
@@ -271,7 +287,7 @@ class Livestatus extends Backend implements BackendInterface
     {
         try {
             $Socket = new Socket();
-            $Socket->setSocketFile(Config::getConfig()->getLivestatusSocketPath());
+            $Socket->setSocketFile($this->path);
             $data = json_decode($Socket->getDataFromSocket($dataQuery));
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -330,5 +346,13 @@ class Livestatus extends Backend implements BackendInterface
     public function getProblems()
     {
         return array_merge($this->getHostsProblems(), $this->getServicesProblems());
+    }
+
+    /**
+     * @param ConfigBackendLivestatus $backend
+     */
+    public function setBackend(ConfigBackendLivestatus $backend)
+    {
+        $this->backend = $backend;
     }
 }

@@ -35,8 +35,8 @@ class ConfigData
     private $language = 'en_US';
     /** @var string */
     private $pageTitle = 'sysMonDash - Cuadro de Mandos';
-    /** @var string */
-    private $backend = 'livestatus';
+    /** @var array */
+    private $backend = [];
     /** @var string */
     private $statusFile = '/var/lib/icinga/status.dat';
     /** @var string */
@@ -89,6 +89,10 @@ class ConfigData
     private $criticalItems = [];
     /** @var string */
     private $hash = '';
+    /**
+     * @var string
+     */
+    private $configHash = '';
 
     /**
      * @return string
@@ -99,11 +103,11 @@ class ConfigData
     }
 
     /**
-     * @param string $hash
+     * Calcular el hash de la configuración
      */
-    public function setHash($hash)
+    public function setHash()
     {
-        $this->hash = $hash;
+        $this->hash = uniqid();
     }
 
     /**
@@ -139,7 +143,7 @@ class ConfigData
     }
 
     /**
-     * @return string
+     * @return array|ConfigBackendStatus[]|ConfigBackendLivestatus[]|ConfigBackendZabbix[]
      */
     public function getBackend()
     {
@@ -556,5 +560,21 @@ class ConfigData
     public function setCriticalItems($criticalItems)
     {
         $this->criticalItems = $criticalItems;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfigHash()
+    {
+        return $this->configHash;
+    }
+
+    /**
+     * Generar el hash de la configuración
+     */
+    public function setConfigHash()
+    {
+        $this->configHash = md5(serialize($this));
     }
 }

@@ -30,6 +30,7 @@ use SMD\Backend\Event\Downtime;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Event\Trigger;
 use SMD\Core\Config;
+use SMD\Core\ConfigBackendZabbix;
 use SMD\Util\Util;
 
 /**
@@ -72,12 +73,6 @@ class Zabbix extends Backend implements BackendInterface
      */
     private $hostsMaintenance = array();
     /**
-     * Array con los eventos actuales
-     *
-     * @var EventInterface[]
-     */
-    private $events;
-    /**
      * Array con las paradas programadas
      *
      * @var array
@@ -87,27 +82,16 @@ class Zabbix extends Backend implements BackendInterface
     /**
      * Zabbix constructor.
      *
-     * @param $version int Versión de la API
-     * @param $url string URL de la API
-     * @param $user string Usuario de conexión
-     * @param $pass string Clave de conexión
+     * @param ConfigBackendZabbix $backend
      * @throws \Exception
      */
-    public function __construct($version, $url, $user, $pass)
+    public function __construct(ConfigBackendZabbix $backend)
     {
-        if (empty($version)
-            || empty($url)
-            || empty($user)
-            || empty($pass)
-        ) {
-            throw new \Exception('Argumentos inválidos');
-        }
-
-        $this->version = intval($version);
-        $this->url = $url;
-        $this->user = $user;
-        $this->pass = $pass;
-        $this->events = [];
+        $this->backend = $backend;
+        $this->version = $backend->getVersion();
+        $this->url = $backend->getUrl();
+        $this->user = $backend->getUser();
+        $this->pass = $backend->getPass();
 
         $this->connect();
     }
@@ -139,15 +123,15 @@ class Zabbix extends Backend implements BackendInterface
      */
     public function getProblems()
     {
-        return $this->retrieveEvents();
+        return $this->getTriggersError();
     }
 
     /**
      * Obtener los eventos generados
      *
-     * @return array
+     * @return array|Event\EventInterface[]
      */
-    private function retrieveEvents()
+    private function getTriggersError()
     {
         $this->getScheduledDowntimes();
 
@@ -167,9 +151,10 @@ class Zabbix extends Backend implements BackendInterface
             'limit' => Config::getConfig()->getMaxDisplayItems()
         ];
 
-        $eventsError = $this->Zabbix->triggerGet($params);
+        $triggers = $this->Zabbix->triggerGet($params);
+        $events = [];
 
-        foreach ($eventsError as $event) {
+        foreach ($triggers as $event) {
             foreach ($event->hosts as $host) {
                 $Event = new Trigger();
                 $Event->setState($this->getTriggerState($event->priority));
@@ -187,11 +172,11 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
 
-                $this->events[] = $Event;
+                $events[] = $Event;
             }
         }
 
-        return $this->events;
+        return $events;
     }
 
     /**
@@ -339,6 +324,59 @@ class Zabbix extends Backend implements BackendInterface
     }
 
     /**
+     * Obtener los triggers en estado OK
+     * 
+     * @return array|Event\EventInterface[]
+     */
+    protected function getTriggersOk()
+    {
+        $this->getScheduledDowntimes();
+
+        $params = [
+            'groupids' => null,
+            'hostids' => null,
+            'monitored' => true,
+            //'maintenance'   => false,
+            'filter' => ['value' => 0, 'lastChangeSince' => time() - (Config::getConfig()->getNewItemTime() / 2)],
+            'skipDependent' => true,
+            'expandDescription' => true,
+            'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
+            'selectHosts' => ['hostid', 'name', 'maintenance_status'],
+            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
+            'sortfield' => ['lastchange'],
+            'sortorder' => ['DESC'],
+            'limit' => Config::getConfig()->getMaxDisplayItems()
+        ];
+
+        $triggers = $this->Zabbix->triggerGet($params);
+        $events = [];
+
+        foreach ($triggers as $event) {
+            foreach ($event->hosts as $host) {
+                $Event = new Trigger();
+                $Event->setState($host->value);
+                $Event->setStateType($event->state);
+                $Event->setAcknowledged($event->lastEvent->acknowledged);
+                $Event->setHostDisplayName($host->name);
+                $Event->setDisplayName($host->name);
+                $Event->setCheckCommand($event->triggerid);
+                $Event->setPluginOutput($event->description);
+                $Event->setLastCheck($event->lastchange);
+                $Event->setLastHardStateChange($event->lastchange);
+                $Event->setLastHardState($event->lastchange);
+                $Event->setActiveChecksEnabled($event->status);
+                $Event->setScheduledDowntimeDepth($host->maintenance_status);
+                $Event->setCurrentAttempt($event->value);
+                $Event->setNotificationsEnabled(true);
+
+                $events[] = $Event;
+            }
+        }
+
+        return $events;
+    }
+
+    /**
      * Comprobar si el host del objeto trigger está en mantenimiento
      *
      * @param array $hosts
@@ -367,5 +405,13 @@ class Zabbix extends Backend implements BackendInterface
 
         $trigger = $this->Zabbix->triggerGet($params);
         return $trigger[0];
+    }
+
+    /**
+     * @param ConfigBackendZabbix $backend
+     */
+    public function setBackend(ConfigBackendZabbix $backend)
+    {
+        $this->backend = $backend;
     }
 }

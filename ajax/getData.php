@@ -39,16 +39,19 @@ $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 
 try {
-    $Backend = sysMonDash::getBackend();
+    $items = [];
+    $downtimes = [];
 
     // Obtener los avisos desde la monitorización
-    $items = $Backend->getProblems();
+    foreach (sysMonDash::getBackend() as $Backend){
+        $items = array_merge($items, $Backend->getProblems());
+        $downtimes = array_merge($downtimes, $Backend->getScheduledDowntimesGroupped());
+    }
 
     if ($items === false) {
         throw new Exception('No hay datos desde el backend');
     }
 
-    $downtimes = $Backend->getScheduledDowntimesGroupped();
 } catch (Exception $e) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
     exit();
@@ -115,7 +118,7 @@ if ($type !== 1) {
         <?php endif; ?>
         <tr id="total">
             <td colspan="5">
-                <?php printf('%s | %d@%.4fs | auto %ds | %s', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout, Config::getConfig()->getBackend()); ?>
+                <?php printf('%s | %d@%.4fs | auto %ds', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
                 |
                 <?php printf('%d/%d %s %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos'), $showAll); ?>
             </td>

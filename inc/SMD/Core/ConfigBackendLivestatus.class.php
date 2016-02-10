@@ -1,4 +1,5 @@
-/*
+<?php
+/**
  * sysMonDash
  *
  * @author    nuxsmin
@@ -21,41 +22,34 @@
  * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#wrap {
-    width: 60%;
-    margin: 1em auto;
-}
+namespace SMD\Core;
 
-#wrap form label {
-    white-space: nowrap;
-    width: 18em;
-}
+/**
+ * Class ConfigBackendLivestatus
+ * @package SMD\Core
+ */
+class ConfigBackendLivestatus extends ConfigBackend
+{
+    /**
+     * ConfigBackendLivestatus constructor.
+     * @param $path
+     */
+    public function __construct($path)
+    {
+        $this->setType(self::TYPE_LIVESTATUS);
+        $this->setPath($path);
+    }
 
-#wrap #btnBackends {
-    text-align: center;
-    margin: 1em 0;
-}
+    /**
+     * @param string $path
+     * @throws \Exception
+     */
+    public function setPath($path)
+    {
+        if (!file_exists($path) || filetype($path) !== 'socket') {
+            throw new \Exception('Ruta o archivo no válido');
+        }
 
-#wrap .backendStatus,
-#wrap .backendLivestatus,
-#wrap .backendZabbix {
-    margin: .5em 0;
-    border-bottom: 1px solid #e5e5e5;
-}
-
-#wrap #result {
-    width: 70%;
-    margin: 1em auto;
-    padding: .5em;
-    text-align: center;
-    border-radius: 5px;
-    color: #333;
-}
-
-#wrap #result.error {
-    background-color: #ffcdd2;
-}
-
-#wrap #result.ok {
-    background-color: #c8e6c9;
+        $this->path = $path;
+    }
 }
