@@ -116,6 +116,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                name="col_info" <?php echo (Config::getConfig()->isColStatusInfo()) ? 'checked' : ''; ?>/>
                     </div>
                     <div class="pure-control-group">
+                        <label for="col_backend"><?php echo Language::t('Mostrar nombre backend'); ?></label>
+                        <input type="checkbox" id="col_backend"
+                               name="col_backend" <?php echo (Config::getConfig()->isColBackend()) ? 'checked' : ''; ?>/>
+                    </div>
+                    <div class="pure-control-group">
                         <label
                             for="regex_host_show"><?php echo Language::t('REGEX hosts visibles en inicio'); ?></label>
                         <input type="text" id="regex_host_show" name="regex_host_show" class="pure-input-1-2"
@@ -146,21 +151,31 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <a class="pure-button" href="#" id="addStatusBackend">+ Status</a>
                         <a class="pure-button" href="#" id="addZabbixBackend">+ Zabbix</a>
                     </div>
-                    <?php $i = 0; $j = 0; $k = 0; ?>
+                    <?php $i = 0;
+                    $j = 0;
+                    $k = 0; ?>
                     <?php foreach (Config::getConfig()->getBackend() as $Backend): ?>
                         <?php if ($Backend->getType() === ConfigBackend::TYPE_STATUS): ?>
                             <div class="backendStatus">
                                 <div class="pure-control-group">
+                                    <label><?php echo Language::t('Alias'); ?></label>
+                                    <input type="text" name="backend[status][<?php echo $i; ?>][alias]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getAlias(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
                                     <label
                                         for="backend_status_file"><?php echo Language::t('Ruta archivo status.dat'); ?></label>
-                                    <input type="text" id="backend_status_file" name="backend[status][<?php echo $i; ?>][path]"
+                                    <input type="text" id="backend_status_file"
+                                           name="backend[status][<?php echo $i; ?>][path]"
                                            class="pure-input-1-2"
                                            value="<?php echo $Backend->getPath(); ?>"
                                            placeholder="/var/lib/icinga/status.dat"/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label><?php echo Language::t('Activo'); ?></label>
-                                    <input type="checkbox" name="backend[status][<?php echo $i; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                    <input type="checkbox"
+                                           name="backend[status][<?php echo $i; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
                                 </div>
                                 <a class="pure-button backendDelete" href="#"
                                    onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
@@ -169,16 +184,24 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <?php elseif ($Backend->getType() === ConfigBackend::TYPE_LIVESTATUS): ?>
                             <div class="backendLivestatus">
                                 <div class="pure-control-group">
+                                    <label><?php echo Language::t('Alias'); ?></label>
+                                    <input type="text" name="backend[livestatus][<?php echo $j; ?>][alias]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getAlias(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
                                     <label
                                         for="backend_livestatus_file"><?php echo Language::t('Ruta socket livestatus'); ?></label>
-                                    <input type="text" id="backend_livestatus_file" name="backend[livestatus][<?php echo $j; ?>][path]"
+                                    <input type="text" id="backend_livestatus_file"
+                                           name="backend[livestatus][<?php echo $j; ?>][path]"
                                            class="pure-input-1-2"
                                            value="<?php echo $Backend->getPath(); ?>"
                                            placeholder="/var/lib/icinga/rw/live"/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label><?php echo Language::t('Activo'); ?></label>
-                                    <input type="checkbox" name="backend[livestatus][<?php echo $j; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                    <input type="checkbox"
+                                           name="backend[livestatus][<?php echo $j; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
                                 </div>
                                 <a class="pure-button backendDelete" href="#"
                                    onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
@@ -187,9 +210,16 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <?php elseif ($Backend->getType() === ConfigBackend::TYPE_ZABBIX): ?>
                             <div class="backendZabbix">
                                 <div class="pure-control-group">
+                                    <label><?php echo Language::t('Alias'); ?></label>
+                                    <input type="text" name="backend[zabbix][<?php echo $k; ?>][alias]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getAlias(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
                                     <label
                                         for="backend_zabbix_url"><?php echo Language::t('URL API de Zabbix'); ?></label>
-                                    <input type="text" id="backend_zabbix_url" name="backend[zabbix][<?php echo $k; ?>][url]"
+                                    <input type="text" id="backend_zabbix_url"
+                                           name="backend[zabbix][<?php echo $k; ?>][url]"
                                            class="pure-input-1-2"
                                            value="<?php echo $Backend->getUrl(); ?>"
                                            placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
@@ -197,7 +227,8 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                 <div class="pure-control-group">
                                     <label
                                         for="backend_zabbix_version"><?php echo Language::t('Versión API de Zabbix'); ?></label>
-                                    <select id="backend_zabbix_version" name="backend[zabbix][<?php echo $k; ?>][version]"
+                                    <select id="backend_zabbix_version"
+                                            name="backend[zabbix][<?php echo $k; ?>][version]"
                                             data-selected="<?php echo $Backend->getVersion(); ?>">
                                         <option value="223">2.2.3</option>
                                         <option value="243">2.4.3</option>
@@ -206,18 +237,21 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                 <div class="pure-control-group">
                                     <label
                                         for="backend_zabbix_user"><?php echo Language::t('Usuario API de Zabbix'); ?></label>
-                                    <input type="text" id="backend_zabbix_user" name="backend[zabbix][<?php echo $k; ?>][user]"
+                                    <input type="text" id="backend_zabbix_user"
+                                           name="backend[zabbix][<?php echo $k; ?>][user]"
                                            value="<?php echo $Backend->getUser(); ?>"/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label
                                         for="backend_zabbix_pass"><?php echo Language::t('Clave API de Zabbix'); ?></label>
-                                    <input type="password" id="backend_zabbix_pass" name="backend[zabbix][<?php echo $k; ?>][pass]"
+                                    <input type="password" id="backend_zabbix_pass"
+                                           name="backend[zabbix][<?php echo $k; ?>][pass]"
                                            value="<?php echo $Backend->getPass(); ?>"/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label><?php echo Language::t('Activo'); ?></label>
-                                    <input type="checkbox" name="backend[zabbix][<?php echo $k; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                    <input type="checkbox"
+                                           name="backend[zabbix][<?php echo $k; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
                                 </div>
                                 <a class="pure-button backendDelete" href="#"
                                    onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
@@ -267,6 +301,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
 
         <div class="livestatusTemplate" style="display: none">
             <div class="pure-control-group">
+                <label><?php echo Language::t('Alias'); ?></label>
+                <input type="text" name="backend[livestatus][alias]"
+                       class="pure-input-1-2" placeholder=""/>
+            </div>
+            <div class="pure-control-group">
                 <label><?php echo Language::t('Ruta socket livestatus'); ?></label>
                 <input type="text" name="backend[livestatus][path]"
                        class="pure-input-1-2" placeholder="/var/lib/icinga/rw/live"/>
@@ -280,6 +319,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
         </div>
         <div class="statusTemplate" style="display: none">
             <div class="pure-control-group">
+                <label><?php echo Language::t('Alias'); ?></label>
+                <input type="text" name="backend[status][alias]"
+                       class="pure-input-1-2" placeholder=""/>
+            </div>
+            <div class="pure-control-group">
                 <label><?php echo Language::t('Ruta archivo status.dat'); ?></label>
                 <input type="text" name="backend[status][path]"
                        class="pure-input-1-2" placeholder="/var/lib/icinga/status.dat"/>
@@ -292,6 +336,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                onclick="return SMD().removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
         </div>
         <div class="zabbixTemplate" style="display: none">
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Alias'); ?></label>
+                <input type="text" name="backend[zabbix][alias]"
+                       class="pure-input-1-2" placeholder=""/>
+            </div>
             <div class="pure-control-group">
                 <label><?php echo Language::t('URL API de Zabbix'); ?></label>
                 <input type="text" name="backend[zabbix][url]" class="pure-input-1-2"

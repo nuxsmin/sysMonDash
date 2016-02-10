@@ -84,6 +84,9 @@ if ($type !== 1) {
         <?php if (Config::getConfig()->isColService()): ?>
             <th width="20%"><?php echo Language::t('Servicio'); ?></th>
         <?php endif; ?>
+        <?php if (Config::getConfig()->isColBackend()): ?>
+            <th width="20%"><?php echo Language::t('Backend'); ?></th>
+        <?php endif; ?>
         </thead>
 
         <?php if (sysMonDash::$displayedItems === 0): ?>

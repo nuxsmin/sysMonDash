@@ -70,6 +70,10 @@ class Downtime implements DowntimeInterface
      * @var string
      */
     private $hostHash = '';
+    /**
+     * @var string
+     */
+    public $backendAlias = '';
 
     /**
      * @return string
@@ -222,5 +226,21 @@ class Downtime implements DowntimeInterface
     public function getHostHash()
     {
         return $this->hostHash;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBackendAlias()
+    {
+        return $this->backendAlias;
+    }
+
+    /**
+     * @param $alias string
+     */
+    public function setBackendAlias($alias)
+    {
+        $this->backendAlias = $alias;
     }
 }

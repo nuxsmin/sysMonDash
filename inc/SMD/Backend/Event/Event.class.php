@@ -143,6 +143,10 @@ abstract class Event implements EventInterface
      * @var int
      */
     public $hostState = 0;
+    /**
+     * @var string
+     */
+    public $backendAlias = '';
 
     /**
      * Event constructor.
@@ -151,6 +155,22 @@ abstract class Event implements EventInterface
     public function __construct($type)
     {
         $this->type = intval($type);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBackendAlias()
+    {
+        return $this->backendAlias;
+    }
+
+    /**
+     * @param string $alias
+     */
+    public function setBackendAlias($alias)
+    {
+        $this->backendAlias = $alias;
     }
 
     /**

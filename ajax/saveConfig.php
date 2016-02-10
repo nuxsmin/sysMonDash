@@ -49,6 +49,7 @@ $showColLastCheck = Request::analyze('col_last_check', false, false, true);
 $showColHost = Request::analyze('col_host', false, false, true);
 $showColService = Request::analyze('col_service', false, false, true);
 $showColInfo = Request::analyze('col_info', false, false, true);
+$showColBackend = Request::analyze('col_backend', false, false, true);
 $regexHostShow = Request::analyze('regex_host_show');
 $regexServicesNoShow = Request::analyze('regex_services_no_show');
 $criticalItems = Request::analyze('critical_items');
@@ -62,26 +63,6 @@ try {
     Response::printJSON(\SMD\Core\Language::t($e->getMessage()));
 }
 
-//if (isset($backend['status'])){
-//    if (empty($backendStatusFile)) {
-//        Response::printJSON('Es necesaria la ruta al backend');
-//    } elseif (!is_readable($backendStatusFile)) {
-//        Response::printJSON('No es posible acceder al archivo del backend');
-//    }
-//} elseif ($backend === 'livetatus'){
-//    if (empty($backendLivestatusFile)) {
-//        Response::printJSON('Es necesaria la ruta al backend');
-//    } elseif (!is_readable($backendLivestatusFile)) {
-//        Response::printJSON('No es posible acceder al archivo del backend');
-//    }
-//} elseif ($backend === 'zabbix'){
-//    if (empty($backendZabbixURL)) {
-//        Response::printJSON('Es necesaria la URL del backend');
-//    } elseif (empty($backendZabbixUser) || (empty(Config::getConfig()->getZabbixPass()) && empty($backendZabbixPass))) {
-//        Response::printJSON('Es necesario el usuario y clave del backend');
-//    }
-//}
-
 $ConfigData = new ConfigData();
 $ConfigData->setLanguage($siteLanguage);
 $ConfigData->setPageTitle($siteTitle);
@@ -91,6 +72,7 @@ $ConfigData->setMaxDisplayItems($eventMaxItems);
 $ConfigData->setColLastcheck($showColLastCheck);
 $ConfigData->setColHost($showColHost);
 $ConfigData->setColService($showColService);
+$ConfigData->setColBackend($showColBackend);
 $ConfigData->setRegexHostShow($regexHostShow);
 $ConfigData->setRegexServiceNoShow($regexServicesNoShow);
 $ConfigData->setCriticalItems(explode(',', $criticalItems));
@@ -98,9 +80,6 @@ $ConfigData->setBackend($Backends);
 $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);
 $ConfigData->setMonitorServerUrl($specialMonitorServerUrl);
-
-$zabbixPass = (empty($backendZabbixPass)) ? Config::getConfig()->getZabbixPass() : $backendZabbixPass;
-$ConfigData->setZabbixPass($zabbixPass);
 
 try {
     Config::saveConfig(new XmlHandler(XML_CONFIG_FILE), $ConfigData);

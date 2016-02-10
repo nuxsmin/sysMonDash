@@ -125,4 +125,13 @@ interface DowntimeInterface
      */
     public function getEndTime();
 
+    /**
+     * @return string
+     */
+    public function getBackendAlias();
+
+    /**
+     * @param $alias string
+     */
+    public function setBackendAlias($alias);
 }

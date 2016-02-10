@@ -171,6 +171,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setScheduledDowntimeDepth($host->maintenance_status);
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
+                $Event->setBackendAlias($this->backend->getAlias());
 
                 $events[] = $Event;
             }
@@ -212,6 +213,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Downtime->setServiceDisplayName('-');
                 $Downtime->setStartTime($period['start']);
                 $Downtime->setEndTime($period['end']);
+                $Downtime->setBackendAlias($this->backend->getAlias());
 
                 $this->downtimes[] = $Downtime;
             }
@@ -368,6 +370,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setScheduledDowntimeDepth($host->maintenance_status);
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
+                $Event->setBackendAlias($this->backend->getAlias());
 
                 $events[] = $Event;
             }

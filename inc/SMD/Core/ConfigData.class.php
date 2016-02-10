@@ -55,6 +55,8 @@ class ConfigData
     private $colStatusInfo = true;
     /** @var bool */
     private $colService = true;
+    /** @var bool */
+    private $colBackend = true;
     /** @var int */
     private $newItemTime = 900;
     /** @var int */
@@ -77,6 +79,7 @@ class ConfigData
     private $criticalItems = [];
     /** @var string */
     private $hash = '';
+
     /**
      * @var string
      */
@@ -468,5 +471,21 @@ class ConfigData
     public function setConfigHash()
     {
         $this->configHash = md5(serialize($this));
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isColBackend()
+    {
+        return $this->colBackend;
+    }
+
+    /**
+     * @param boolean $colBackend
+     */
+    public function setColBackend($colBackend)
+    {
+        $this->colBackend = $colBackend;
     }
 }

@@ -130,6 +130,7 @@ class Status extends Backend implements BackendInterface
             $Event->setScheduledDowntimeDepth($event['scheduled_downtime_depth']);
             $Event->setMaxCheckAttempts($event['max_attempts']);
             $Event->setNotificationsEnabled($event['notifications_enabled']);
+            $Event->setBackendAlias($this->backend->getAlias());
 
             $events[] = $Event;
         }
@@ -247,6 +248,7 @@ class Status extends Backend implements BackendInterface
             $Event->setScheduledDowntimeDepth($event['scheduled_downtime_depth']);
             $Event->setMaxCheckAttempts($event['max_attempts']);
             $Event->setNotificationsEnabled($event['notifications_enabled']);
+            $Event->setBackendAlias($this->backend->getAlias());
 
             $events[] = $Event;
         }

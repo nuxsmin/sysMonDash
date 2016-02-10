@@ -193,6 +193,10 @@ class sysMonDash
             $line .= '<td class="center">' . $serviceDesc . $actionServiceLink . '</td>' . PHP_EOL;
         }
 
+        if (Config::getConfig()->isColBackend()) {
+            $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
+        }
+
         $line .= '</tr>' . PHP_EOL;
 
         self::$_outData[] = $line;

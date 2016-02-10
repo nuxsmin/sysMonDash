@@ -299,4 +299,14 @@ interface EventInterface
      * @param $state int
      */
     public function setHostState($state);
+
+    /**
+     * @return string
+     */
+    public function getBackendAlias();
+
+    /**
+     * @param $alias string
+     */
+    public function setBackendAlias($alias);
 }

@@ -51,6 +51,10 @@ abstract class ConfigBackend
      * @var bool
      */
     protected $active = true;
+    /**
+     * @var string
+     */
+    protected $alias = '';
 
     /**
      * @return int
@@ -114,5 +118,21 @@ abstract class ConfigBackend
     public function setActive($active)
     {
         $this->active = $active;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * @param string $alias
+     */
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
     }
 }

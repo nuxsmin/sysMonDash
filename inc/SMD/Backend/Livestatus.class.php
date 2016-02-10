@@ -129,6 +129,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setLastTimeUp($event[16]);
             $Event->setHostAlias($event[17]);
             $Event->setStateType($event[18]);
+            $Event->setBackendAlias($this->backend->getAlias());
 
             $events[] = $Event;
         }
@@ -217,6 +218,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setStateType($event[20]);
             $Event->setScheduledDowntimeDepth($event[21]);
             $Event->setMaxCheckAttempts($event[22]);
+            $Event->setBackendAlias($this->backend->getAlias());
 
             $events[] = $Event;
         }

@@ -106,6 +106,7 @@ class Html
 
                 $active = ($config['active'] === 'on') ? true : false;
                 $ConfigBackend->setActive($active);
+                $ConfigBackend->setAlias($config['alias']);
             }
 
             $BackendsConfig[] = $ConfigBackend;

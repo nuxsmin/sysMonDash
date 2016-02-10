@@ -231,6 +231,7 @@ function SMD() {
         var len = jQuery('.backendLivestatus').length;
         var $html = jQuery('.livestatusTemplate').clone();
 
+        $html.find('[name=\'backend[livestatus][alias]\']')[0].name = "backend[livestatus][" + len + "][alias]]";
         $html.find('[name=\'backend[livestatus][path]\']')[0].name = "backend[livestatus][" + len + "][path]]";
         $html.find('[name=\'backend[livestatus][active]\']')[0].name = "backend[livestatus][" + len + "][active]]";
 
@@ -241,6 +242,7 @@ function SMD() {
         var len = jQuery('.backendStatus').length;
         var $html = jQuery('.statusTemplate').clone();
 
+        $html.find('[name=\'backend[status][alias]\']')[0].name = "backend[status][" + len + "][alias]]";
         $html.find('[name=\'backend[status][path]\']')[0].name = "backend[status][" + len + "][path]]";
         $html.find('[name=\'backend[status][active]\']')[0].name = "backend[status][" + len + "][active]]";
 
@@ -251,6 +253,7 @@ function SMD() {
         var len = jQuery('.backendZabbix').length;
         var $html = jQuery('.zabbixTemplate').clone();
 
+        $html.find('[name=\'backend[zabbix][alias]\']')[0].name = "backend[zabbix][" + len + "][alias]";
         $html.find('[name=\'backend[zabbix][url]\']')[0].name = "backend[zabbix][" + len + "][url]";
         $html.find('[name=\'backend[zabbix][version]\']')[0].name = "backend[zabbix][" + len + "][version]";
         $html.find('[name=\'backend[zabbix][user]\']')[0].name = "backend[zabbix][" + len + "][user]";

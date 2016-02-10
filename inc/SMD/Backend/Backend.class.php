@@ -25,8 +25,6 @@
 
 namespace SMD\Backend;
 
-use SMD\Core\ConfigBackend;
-
 class Backend
 {
     /** @var bool */
