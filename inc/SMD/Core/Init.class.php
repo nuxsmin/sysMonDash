@@ -39,12 +39,16 @@ class Init
 {
     /**
      * Inicializar
+     * @param bool $loadConfig
      */
-    public static function start()
+    public static function start($loadConfig = true)
     {
         try {
             self::loadSession();
-            self::loadCOnfig();
+
+            if ($loadConfig) {
+                self::loadConfig();
+            }
         } catch (\Exception $e) {
             die(self::showError($e));
         }
@@ -65,7 +69,7 @@ class Init
     /**
      * Cargar la configuración
      */
-    private static function loadCOnfig()
+    private static function loadConfig()
     {
         try {
             Config::loadConfig(new XmlHandler(XML_CONFIG_FILE));

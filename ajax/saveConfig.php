@@ -24,6 +24,7 @@
 
 use SMD\Core\Config;
 use SMD\Core\ConfigData;
+use SMD\Core\Init;
 use SMD\Core\Session;
 use SMD\Html\Html;
 use SMD\Http\Request;
@@ -33,6 +34,8 @@ use SMD\Storage\XmlHandler;
 define('APP_ROOT', '..');
 
 require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php';
+
+Init::start(false);
 
 $hash = Request::analyze('hash');
 

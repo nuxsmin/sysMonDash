@@ -24,12 +24,15 @@
  */
 
 use SMD\Core\Config;
+use SMD\Core\Init;
 use SMD\Core\Language;
 use SMD\Http\Request;
 
 define('APP_ROOT', '.');
 
 require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php';
+
+Init::start();
 
 $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());

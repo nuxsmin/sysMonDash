@@ -24,6 +24,7 @@
 
 use SMD\Core\Config;
 use SMD\Core\ConfigBackend;
+use SMD\Core\Init;
 use SMD\Core\Language;
 use SMD\Core\Session;
 use SMD\Http\Request;
@@ -32,6 +33,8 @@ use SMD\Util\Util;
 define('APP_ROOT', '.');
 
 require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php';
+
+Init::start();
 
 $hash = Request::analyze('h');
 $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig()->getHash()));

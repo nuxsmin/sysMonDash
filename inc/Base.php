@@ -46,5 +46,3 @@ require 'SplClassLoader.php';
 $ClassLoader = new SplClassLoader();
 $ClassLoader->setFileExtension('.class.php');
 $ClassLoader->register();
-
-Init::start();
