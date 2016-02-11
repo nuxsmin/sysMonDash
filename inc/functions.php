@@ -36,16 +36,18 @@ $allHeaders = \SMD\Http\Request::analyze('allheaders', false, false, true);
 echo '<pre>';
 
 if ($raw) {
-    $Backend = sysMonDash::getBackend();
-    $Backend->setAllHeaders($allHeaders);
+    foreach (sysMonDash::getBackend() as $Backend) {
+        /** @var \SMD\Backend\BackendInterface $Backend */
+        $Backend->setAllHeaders($allHeaders);
 
-    echo 'Hosts', PHP_EOL;
-    print_r(Util::arraySortByProperty($Backend->getHostsProblems(), 'start_time'));
-    echo 'Services', PHP_EOL;
-    print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'start_time'));
-    echo 'Downtimes', PHP_EOL;
-    print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
-
+        echo 'Backend: ', $Backend->getBackend()->getAlias(), PHP_EOL;
+        echo 'Hosts', PHP_EOL;
+        print_r(Util::arraySortByProperty($Backend->getHostsProblems(), 'start_time'));
+        echo 'Services', PHP_EOL;
+        print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'start_time'));
+        echo 'Downtimes', PHP_EOL;
+        print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
+    }
 }
 
 echo '</pre>';

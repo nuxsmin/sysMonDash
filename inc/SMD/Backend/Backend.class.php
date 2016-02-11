@@ -57,6 +57,14 @@ class Backend
     }
 
     /**
+     * @return mixed
+     */
+    public function getBackend()
+    {
+        return $this->backend;
+    }
+
+    /**
      * Mapear los nombres de los campos con sus valores
      *
      * @param array $fields Los campos

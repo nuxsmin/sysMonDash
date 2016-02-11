@@ -144,7 +144,7 @@ class sysMonDash
             $statusName = Language::t('PROGRAMADO');
         }
 
-        if ($newItem === true && $ack === 0 && !$scheduled && !$newItemUp) {
+        if ($newItem === true && $ack === false && !$scheduled && !$newItemUp) {
             $tdClass = "new";
         } elseif ($newItemUp
             && time() - $item->getLastHardStateChange() <= Config::getConfig()->getNewItemTime() / 2
@@ -156,7 +156,7 @@ class sysMonDash
 //            $trTitle = Language::t("CAMBIANTE - Frecuente cambio entre estados");
             $trClass = "flapping";
             $statusName = Language::t('CAMBIANTE');
-        } elseif ($ack === 1) {
+        } elseif ($ack === true) {
 //            $trTitle = Language::t("RECONOCIDO - Error conocido");
             $trClass = "acknowledged";
             $statusName = Language::t('RECONOCIDO');

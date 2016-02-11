@@ -25,6 +25,8 @@
 
 namespace SMD\Backend;
 
+use SMD\Core\ConfigBackend;
+
 interface BackendInterface
 {
     /**
@@ -75,4 +77,9 @@ interface BackendInterface
      * @param $allHeaders
      */
     public function setAllHeaders($allHeaders);
+
+    /**
+     * @return ConfigBackend
+     */
+    public function getBackend();
 }

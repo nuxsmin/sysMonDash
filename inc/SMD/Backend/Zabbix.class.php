@@ -343,7 +343,7 @@ class Zabbix extends Backend implements BackendInterface
             'skipDependent' => true,
             'expandDescription' => true,
             'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
-            'selectHosts' => ['hostid', 'name', 'maintenance_status'],
+            'selectHosts' => ['hostid', 'name', 'maintenance_status', 'errors_from'],
             'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
             'sortfield' => ['lastchange'],
             'sortorder' => ['DESC'],
@@ -358,12 +358,13 @@ class Zabbix extends Backend implements BackendInterface
                 $Event = new Trigger();
                 $Event->setState($host->value);
                 $Event->setStateType($event->state);
-                $Event->setAcknowledged($event->lastEvent->acknowledged);
+                $Event->setAcknowledged(intval($event->lastEvent->acknowledged));
                 $Event->setHostDisplayName($host->name);
                 $Event->setDisplayName($host->name);
                 $Event->setCheckCommand($event->triggerid);
                 $Event->setPluginOutput($event->description);
                 $Event->setLastCheck($event->lastchange);
+                $Event->setLastTimeUnreachable($host->errors_from);
                 $Event->setLastHardStateChange($event->lastchange);
                 $Event->setLastHardState($event->lastchange);
                 $Event->setActiveChecksEnabled($event->status);
