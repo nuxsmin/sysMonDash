@@ -315,7 +315,7 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                 <input type="checkbox" name="backend[livestatus][active]"/>
             </div>
             <a class="pure-button backendDelete" href="#"
-               onclick="return SMD().removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+               onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
         </div>
         <div class="statusTemplate" style="display: none">
             <div class="pure-control-group">
@@ -333,7 +333,7 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                 <input type="checkbox" name="backend[status][active]"/>
             </div>
             <a class="pure-button backendDelete" href="#"
-               onclick="return SMD().removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+               onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
         </div>
         <div class="zabbixTemplate" style="display: none">
             <div class="pure-control-group">
