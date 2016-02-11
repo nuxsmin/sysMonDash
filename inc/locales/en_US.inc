@@ -82,3 +82,7 @@ $LANG['URL del servidor de monitorización'] = 'Monitoring server URL';
 $LANG['Aplicación'] = 'Application';
 $LANG['No es posible leer/escribir el archivo: %s'] = 'Unable to read/write to the file: %s';
 $LANG['No hay elementos para guardar'] = 'There aren\'t items to save';
+$LANG['No es posible inicializar la sesión'] = 'Unable to perform the session initialization';
+$LANG['Mostrar nombre backend'] = 'Show backend name';
+$LANG['Activo'] = 'Active';
+$LANG['Eliminar'] = 'Remove';

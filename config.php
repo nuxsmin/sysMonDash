@@ -394,10 +394,6 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                     sel.val(selvalue);
                 });
 
-                jQuery("#btnBack").click(function () {
-                    location.href = smd.getRootPath();
-                });
-
                 jQuery('#addLivestatusBackend').click(function (e) {
                     e.preventDefault();
 
@@ -440,6 +436,8 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                 <input type="text" id="hash" name="h" class="pure-input-1-2" required/>
                 <button type="submit"
                         class="pure-button pure-button-primary"><?php echo Language::t('Comprobar'); ?></button>
+                <button type="button" id="btnBack"
+                        class="pure-button pure-button-primary"><?php echo Language::t('Volver'); ?></button>
             </fieldset>
         </form>
     <?php endif; ?>
@@ -448,5 +446,17 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
 <footer>
     <div id="project"><?php echo implode(' :: ', Util::getAppInfo()); ?></div>
 </footer>
+
+<script>
+    (function(){
+        if (typeof smd === "undefined") {
+            var smd = new SMD();
+        }
+
+        jQuery("#btnBack").click(function () {
+            location.href = smd.getRootPath();
+        });
+    }());
+</script>
 </body>
 </html>

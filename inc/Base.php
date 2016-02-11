@@ -23,8 +23,7 @@
  *
  */
 
-use SMD\Core\Config;
-use SMD\Storage\XmlHandler;
+use SMD\Core\Init;
 
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
 
@@ -39,7 +38,6 @@ define('DEBUG', false);
 // Empezar a calcular el tiempo y memoria utilizados
 $time_start = microtime(true);
 $memInit = memory_get_usage();
-$file = substr($_SERVER['SCRIPT_FILENAME'], strrpos($_SERVER['SCRIPT_FILENAME'], '/') + 1);
 
 require CONSTANTS_FILE;
 
@@ -49,16 +47,4 @@ $ClassLoader = new SplClassLoader();
 $ClassLoader->setFileExtension('.class.php');
 $ClassLoader->register();
 
-session_start();
-
-try {
-    Config::loadConfig(new XmlHandler(XML_CONFIG_FILE));
-} catch (\Exception $e) {
-    error_log(\SMD\Core\Language::t($e->getMessage()));
-
-    \SMD\Core\Session::setConfig(new \SMD\Core\ConfigData());
-
-    if ($file !== 'config.php') {
-        header('Location: config.php');
-    }
-}
+Init::start();
