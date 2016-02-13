@@ -92,9 +92,6 @@ tr.item-data > td, thead > th {
     font-size: .7em;
     color: #777;
     text-align: right;
-}
-
-tr#total > td {
     padding: .3em 1em;
 }
 
