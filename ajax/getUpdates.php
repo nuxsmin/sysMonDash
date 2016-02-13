@@ -35,7 +35,7 @@ Init::start();
 $updates = Util::checkUpdates();
 
 if (is_array($updates)):
-    echo '<a href="', $updates['url'] ,'" target="blank" ', 'title="', sprintf(Language::t('Nueva Versión %s'), $updates['version']), '" >';
+    echo '<a href="', $updates['url'] ,'" target="_blank" ', 'title="', sprintf(Language::t('Nueva Versión %s'), $updates['version']), '" >';
 ?>
     <svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 0h24v24H0z" fill="none"/>
