@@ -447,7 +447,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
 </div>
 
 <footer>
-    <div id="project"><?php echo implode(' :: ', Util::getAppInfo()); ?></div>
+    <div id="project">
+        <span id="updates"></span>
+        <?php echo Util::getAppInfo('appVersion'), ' :: ', Util::getAppInfo('appCode'), ' :: ', Util::getAppInfo('appAuthor'); ?>
+    </div>
+
 </footer>
 
 <script>

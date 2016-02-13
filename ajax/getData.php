@@ -41,29 +41,13 @@ Request::checkCORS();
 $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 
-try {
-    $items = [];
-    $downtimes = [];
-
-    // Obtener los avisos desde la monitorización
-    foreach (sysMonDash::getBackend() as $Backend){
-        $items = array_merge($items, $Backend->getProblems());
-        $downtimes = array_merge($downtimes, $Backend->getScheduledDowntimesGroupped());
-    }
-
-    if ($items === false) {
-        throw new Exception('No hay datos desde el backend');
-    }
-
-} catch (Exception $e) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
-    exit();
-}
+$SMD = new sysMonDash();
+$SMD->setType($type);
 
 ob_start();
 
 // Array con los avisos filtrados
-$res = sysMonDash::getItems($items);
+$res = $SMD->getItems();
 
 if ($type !== 1) {
     $showAll = '<a href="index.php?t=' . VIEW_ALL . '" title="' . Language::t('Mostrar los avisos ocultos') . '">' . Language::t('Mostrar Todos') . '</a>';
@@ -92,7 +76,7 @@ if ($type !== 1) {
         <?php endif; ?>
         </thead>
 
-        <?php if (sysMonDash::$displayedItems === 0): ?>
+        <?php if ($SMD->getDisplayedItems() === 0): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages">
@@ -103,13 +87,13 @@ if ($type !== 1) {
                 </td>
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
-        <?php elseif (sysMonDash::$displayedItems > Config::getConfig()->getMaxDisplayItems()): ?>
+        <?php elseif ($SMD->getDisplayedItems() > Config::getConfig()->getMaxDisplayItems()): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages" class="error">
                         <?php echo Language::t('Upss...parece que hay problemas'); ?>
                         <br>
-                        <?php echo Language::t('Demasiados avisos'); ?> (<?php echo sysMonDash::$displayedItems; ?>)
+                        <?php echo Language::t('Demasiados avisos'); ?> (<?php echo $SMD->getDisplayedItems(); ?>)
                         <br>
                         <a href="<?php echo Config::getConfig()->getMonitorServerUrl(); ?>"><?php echo Language::t('Revisar incidencias en web de monitorización'); ?></a>
                     </div>
@@ -117,21 +101,21 @@ if ($type !== 1) {
             </tr>
             <script>jQuery("#tblBoard thead").hide()</script>
         <?php else: ?>
-            <?php foreach ($res as $line): ?>
-                <?php echo $line; ?>
-            <?php endforeach; ?>
+        <?php foreach ($res as $line): ?>
+            <?php echo $line; ?>
+        <?php endforeach; ?>
             <script>jQuery("#tblBoard thead").show()</script>
         <?php endif; ?>
-        <tr id="total">
-            <td colspan="5">
-                <?php printf('%s | %d@%.4fs | auto %ds', date('H:i:s', time()), sysMonDash::$displayedItems, microtime(true) - $time_start, $timeout); ?>
-                |
-                <?php printf('%d/%d %s %s', sysMonDash::$displayedItems, sysMonDash::$totalItems, Language::t('avisos'), $showAll); ?>
-            </td>
-        </tr>
+
     </table>
 
-<?php if (count($downtimes) > 0): ?>
+    <div id="total">
+        <?php printf('%s | %d@%.4fs | auto %ds', date('H:i:s', time()), $SMD->getDisplayedItems(), microtime(true) - $time_start, $timeout); ?>
+        |
+        <?php printf('%d/%d %s %s', $SMD->getDisplayedItems(), $SMD->getTotalItems(), Language::t('avisos'), $showAll); ?>
+    </div>
+
+<?php if (count($SMD->getDowntimes()) > 0): ?>
     <div class="title"><?php echo Language::t('Apagados Programados'); ?></div>
 
     <table id="tblDowntime" border="0" align="center">
@@ -147,7 +131,7 @@ if ($type !== 1) {
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($downtimes as $downtime): ?>
+        <?php foreach ($SMD->getDowntimes() as $downtime): ?>
             <?php /** @var $downtime \SMD\Backend\Event\DowntimeInterface */ ?>
             <?php $tiempoRestante = $downtime->getStartTime() - time(); ?>
             <tr>

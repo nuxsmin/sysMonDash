@@ -117,7 +117,7 @@ class Status extends Backend implements BackendInterface
             $Event->setDisplayName($event['host_name']);
             $Event->setHostAlias($event['host_name']);
             $Event->setHostDisplayName($event['host_name']);
-            $Event->setIsFlapping($event['is_flapping']);
+            $Event->setFlapping($event['is_flapping']);
             $Event->setLastCheck($event['last_check']);
             $Event->setLastHardState($event['last_hard_state']);
             $Event->setLastHardStateChange($event['last_hard_state_change']);
@@ -131,6 +131,7 @@ class Status extends Backend implements BackendInterface
             $Event->setMaxCheckAttempts($event['max_attempts']);
             $Event->setNotificationsEnabled($event['notifications_enabled']);
             $Event->setBackendAlias($this->backend->getAlias());
+            $Event->setBackendUrl($this->backend->getUrl());
 
             $events[] = $Event;
         }
@@ -207,7 +208,7 @@ class Status extends Backend implements BackendInterface
     }
 
     /**
-     * Filtro para determinar qué items devolver
+     * Filtro para determinar qué rawItems devolver
      *
      * @param $item
      * @return bool
@@ -238,7 +239,7 @@ class Status extends Backend implements BackendInterface
             $Event->setDisplayName($event['service_description']);
             $Event->setHostAlias($event['host_name']);
             $Event->setHostDisplayName($event['host_name']);
-            $Event->setIsFlapping($event['is_flapping']);
+            $Event->setFlapping($event['is_flapping']);
             $Event->setLastCheck($event['last_check']);
             $Event->setLastHardState($event['last_hard_state']);
             $Event->setLastHardStateChange($event['last_hard_state_change']);
@@ -249,6 +250,7 @@ class Status extends Backend implements BackendInterface
             $Event->setMaxCheckAttempts($event['max_attempts']);
             $Event->setNotificationsEnabled($event['notifications_enabled']);
             $Event->setBackendAlias($this->backend->getAlias());
+            $Event->setBackendUrl($this->backend->getUrl());
 
             $events[] = $Event;
         }

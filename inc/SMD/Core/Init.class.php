@@ -44,6 +44,7 @@ class Init
     public static function start($loadConfig = true)
     {
         try {
+            self::checkPhpVersion();
             self::loadSession();
 
             if ($loadConfig) {
@@ -102,9 +103,18 @@ class Init
     {
         error_log(Language::t($e->getMessage()));
 
-        $msg = <<<EOD
-<div id="result" class="error">{Language::t($e->getMessage())}</div>
-EOD;
-        return $msg;
+        return '<div id="result" class="error">' . Language::t($e->getMessage()) . '</div>';
+    }
+
+    /**
+     * Comprobar la versión de PHP
+     *
+     * @throws \Exception
+     */
+    public function checkPhpVersion()
+    {
+        if (version_compare(PHP_VERSION, '5.4.0') === -1) {
+            throw new \Exception('Versión de PHP necesaria >= 5.4');
+        }
     }
 }

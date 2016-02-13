@@ -137,7 +137,7 @@ function SMD() {
                     }
                 }
 
-                jQuery('.new').blink({bgcolor_on: self.hex2rgb('#F7FE2E'), fgcolor_on: self.hex2rgb('#333333')});
+                jQuery('.new').blink({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
             },
             error: function (xhr, textStatus, errorThrown) {
                 placeHolder.html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");
@@ -263,6 +263,10 @@ function SMD() {
         return $html.html();
     };
 
+    this.getUpdates = function () {
+        jQuery('#updates').load(this.getRootPath() + '/ajax/getUpdates.php');
+    };
+
     this.startSMD = function () {
         jQuery.ajaxSetup({
             global: false,
@@ -275,7 +279,10 @@ function SMD() {
         }, Config.getTimeout());
     };
 
-    this.setConfig = function(c) {
+    this.setConfig = function (c) {
         Config = c;
     }
 }
+
+var smd = new SMD();
+var config = new smd.SMDConfig();

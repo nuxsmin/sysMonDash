@@ -224,12 +224,12 @@ interface EventInterface
     /**
      * @return boolean
      */
-    public function isIsFlapping();
+    public function isFlapping();
 
     /**
      * @param boolean $is_flapping
      */
-    public function setIsFlapping($is_flapping);
+    public function setFlapping($is_flapping);
 
     /**
      * @return boolean
@@ -309,4 +309,24 @@ interface EventInterface
      * @param $alias string
      */
     public function setBackendAlias($alias);
+
+    /**
+     * @return string
+     */
+    public function getBackendUrl();
+
+    /**
+     * @param string $backendUrl
+     */
+    public function setBackendUrl($backendUrl);
+
+    /**
+     * @param $status string
+     */
+    public function setFilterStatus($status);
+
+    /**
+     * @return string
+     */
+    public function getFilterStatus();
 }

@@ -114,7 +114,7 @@ abstract class Event implements EventInterface
     /**
      * @var bool
      */
-    public $isFlapping = false;
+    public $flapping = false;
     /**
      * @var bool
      */
@@ -147,6 +147,14 @@ abstract class Event implements EventInterface
      * @var string
      */
     public $backendAlias = '';
+    /**
+     * @var string
+     */
+    public $backendUrl = '';
+    /**
+     * @var string
+     */
+    public $filterStatus = '';
 
     /**
      * Event constructor.
@@ -512,17 +520,17 @@ abstract class Event implements EventInterface
     /**
      * @return boolean
      */
-    public function isIsFlapping()
+    public function isFlapping()
     {
-        return $this->isFlapping;
+        return $this->flapping;
     }
 
     /**
-     * @param boolean $isFlapping
+     * @param boolean $flapping
      */
-    public function setIsFlapping($isFlapping)
+    public function setFlapping($flapping)
     {
-        $this->isFlapping = (bool)$isFlapping;
+        $this->flapping = (bool)$flapping;
     }
 
     /**
@@ -603,5 +611,37 @@ abstract class Event implements EventInterface
     public function setHostState($state)
     {
         $this->hostState = intval($state);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBackendUrl()
+    {
+        return $this->backendUrl;
+    }
+
+    /**
+     * @param string $backendUrl
+     */
+    public function setBackendUrl($backendUrl)
+    {
+        $this->backendUrl = $backendUrl;
+    }
+
+    /**
+     * @param $status string
+     */
+    public function setFilterStatus($status)
+    {
+        $this->filterStatus = $status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilterStatus()
+    {
+        return $this->filterStatus;
     }
 }

@@ -116,7 +116,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setDisplayName($event[3]);
             $Event->setCurrentAttempt($event[4]);
             $Event->setMaxCheckAttempts($event[5]);
-            $Event->setIsFlapping($event[6]);
+            $Event->setFlapping($event[6]);
             $Event->setPluginOutput($event[7]);
             $Event->setAcknowledged($event[8]);
             $Event->setActiveChecksEnabled($event[9]);
@@ -130,6 +130,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setHostAlias($event[17]);
             $Event->setStateType($event[18]);
             $Event->setBackendAlias($this->backend->getAlias());
+            $Event->setBackendUrl($this->backend->getUrl());
 
             $events[] = $Event;
         }
@@ -206,7 +207,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setHostState($event[8]);
             $Event->setHostDisplayName($event[9]);
             $Event->setHostScheduledDowntimeDepth($event[10]);
-            $Event->setIsFlapping($event[11]);
+            $Event->setFlapping($event[11]);
             $Event->setLastCheck($event[12]);
             $Event->setLastHardState($event[13]);
             $Event->setLastHardStateChange($event[14]);
@@ -219,6 +220,7 @@ class Livestatus extends Backend implements BackendInterface
             $Event->setScheduledDowntimeDepth($event[21]);
             $Event->setMaxCheckAttempts($event[22]);
             $Event->setBackendAlias($this->backend->getAlias());
+            $Event->setBackendUrl($this->backend->getUrl());
 
             $events[] = $Event;
         }

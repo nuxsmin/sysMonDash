@@ -112,6 +112,7 @@ class Util
                 $_SESSION['VERSION'] = $version;
                 Session::setCssHash(self::getCssHash());
             } elseif ($_SESSION['VERSION'] < $version) {
+                $_SESSION['VERSION'] = $version;
                 return true;
             }
         }
@@ -127,7 +128,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2016020401;
+        $build = 2016021301;
         $version = [1, 0];
 
         if ($retBuild) {
@@ -145,21 +146,6 @@ class Util
     public static function getCssHash()
     {
         return hash_file('md5', APP_ROOT . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css');
-    }
-
-    /**
-     * Info de la aplicación
-     *
-     * @return array
-     */
-    public static function getAppInfo()
-    {
-        return array(
-            'appVersion' => 'v' . implode('.', self::getVersion()),
-            'appCode' => '<a href="https://github.com/nuxsmin/sysMonDash" target="_blank" title="sysMonDash - GitHub">sysMonDash</a>',
-            'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>',
-
-        );
     }
 
     /**
@@ -238,5 +224,127 @@ class Util
         }
 
         return $headers;
+    }
+
+    /**
+     * Comprobar si hay actualizaciones de sysPass disponibles desde internet (github.com)
+     * Esta función hace una petición a GitHub y parsea el JSON devuelto para verificar
+     * si la aplicación está actualizada
+     *
+     * @return array|bool
+     */
+    public static function checkUpdates()
+    {
+        try {
+            $data = self::getDataFromUrl(self::getAppInfo('appupdates'));
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $updateInfo = json_decode($data);
+
+        // $updateInfo[0]->tag_name
+        // $updateInfo[0]->name
+        // $updateInfo[0]->body
+        // $updateInfo[0]->tarball_url
+        // $updateInfo[0]->zipball_url
+        // $updateInfo[0]->published_at
+        // $updateInfo[0]->html_url
+
+        $version = $updateInfo->tag_name;
+        $url = $updateInfo->html_url;
+        $title = $updateInfo->name;
+        $description = $updateInfo->body;
+        $date = $updateInfo->published_at;
+
+//        preg_match('/v?(\d+)\.(\d+)\.(\d+)\.(\d+)(\-[a-z0-9.]+)?$/', $version, $realVer);
+        preg_match('/v?(\d+)\.(\d+)\.(\d+)(\-[a-z0-9.]+)?$/', $version, $realVer);
+
+        if (is_array($realVer)) {
+            $appVersion = implode('', self::getVersion(true));
+            $pubVersion = $realVer[1] . $realVer[2] . $realVer[3];
+
+            if ($pubVersion > $appVersion) {
+                return array(
+                    'version' => $version,
+                    'url' => $url,
+                    'title' => $title,
+                    'description' => $description,
+                    'date' => $date);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Obtener datos desde una URL usando CURL
+     *
+     * @param           $url string La URL
+     * @param array $data
+     * @return bool|string
+     * @throws \Exception
+     */
+    public static function getDataFromUrl($url, array $data = null)
+    {
+        if (!self::curlIsAvailable()) {
+            return false;
+        }
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, "sysMonDash-App");
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+
+        if (!is_null($data)) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $data['type']);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data['data']);
+        }
+
+        $data = curl_exec($ch);
+
+        if ($data === false) {
+            error_log(curl_error($ch));
+
+            throw new \Exception(curl_error($ch));
+        }
+
+        return $data;
+    }
+
+    /**
+     * Info de la aplicación
+     *
+     * @param $index
+     * @return array
+     */
+    public static function getAppInfo($index)
+    {
+        $appInfo = [
+            'appupdates' => 'https://api.github.com/repos/nuxsmin/sysMonDash/releases/latest',
+            'appVersion' => 'v' . implode('.', self::getVersion()),
+            'appCode' => '<a href="https://github.com/nuxsmin/sysMonDash" target="_blank" title="sysMonDash - GitHub">sysMonDash</a>',
+            'appAuthor' => '<a href="http://cygnux.org" target="_blank" title="' . Language::t('Un proyecto de cygnux.org') . '">cygnux.org</a>',
+
+        ];
+
+        return (isset($appInfo[$index])) ? $appInfo[$index] : '';
+    }
+
+    /**
+     * Comprobar si el módulo CURL está instalado.
+     *
+     * @return bool
+     */
+    public static function curlIsAvailable()
+    {
+        return (function_exists('curl_init'));
     }
 }

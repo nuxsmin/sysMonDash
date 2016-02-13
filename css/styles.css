@@ -53,7 +53,7 @@ tr.item-data > td, thead > th {
 }
 
 .warning {
-    background-color: #ffca28;
+    background-color: #ffa726;
 }
 
 .unknown {
@@ -152,10 +152,14 @@ footer a, footer a:visited {
 footer #project {
     margin-right: 2em;
 }
+footer #project a {
+    vertical-align: baseline;
+}
 
 .action-link, .action-link img {
     font-size: 10px;
     vertical-align: middle;
+    padding: 0;
 }
 
 .action-link img {
@@ -263,4 +267,9 @@ div.title {
 
 .center {
     text-align: center;
+}
+
+footer #updates {
+    display: inline-block;
+    margin-right: .5em;
 }

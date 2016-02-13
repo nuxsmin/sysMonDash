@@ -146,6 +146,7 @@ class Zabbix extends Backend implements BackendInterface
             'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
             'selectHosts' => ['hostid', 'name', 'maintenance_status'],
             'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
+            'selectItems' => ['name'],
             'sortfield' => ['lastchange'],
             'sortorder' => ['DESC'],
             'limit' => Config::getConfig()->getMaxDisplayItems()
@@ -161,7 +162,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setStateType($event->state);
                 $Event->setAcknowledged($event->lastEvent->acknowledged);
                 $Event->setHostDisplayName($host->name);
-                $Event->setDisplayName($host->name);
+                $Event->setDisplayName($this->getItemsNames($event->items));
                 $Event->setCheckCommand($event->triggerid);
                 $Event->setPluginOutput($event->description);
                 $Event->setLastCheck($event->lastEvent->clock);
@@ -172,6 +173,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
                 $Event->setBackendAlias($this->backend->getAlias());
+                $Event->setBackendUrl($this->backend->getUrl());
 
                 $events[] = $Event;
             }
@@ -306,6 +308,23 @@ class Zabbix extends Backend implements BackendInterface
     }
 
     /**
+     * Devolver el nombre de los items
+     *
+     * @param array $items
+     * @return string
+     */
+    protected static function getItemsNames(array $items)
+    {
+        $names = '';
+
+        foreach ($items as $item) {
+            $names .= $item->name . ';';
+        }
+
+        return trim($names, ';');
+    }
+
+    /**
      * Devuelve los eventos de los servicios
      *
      * @return array|bool
@@ -326,8 +345,16 @@ class Zabbix extends Backend implements BackendInterface
     }
 
     /**
+     * @param ConfigBackendZabbix $backend
+     */
+    public function setBackend(ConfigBackendZabbix $backend)
+    {
+        $this->backend = $backend;
+    }
+
+    /**
      * Obtener los triggers en estado OK
-     * 
+     *
      * @return array|Event\EventInterface[]
      */
     protected function getTriggersOk()
@@ -372,6 +399,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
                 $Event->setBackendAlias($this->backend->getAlias());
+                $Event->setBackendUrl($this->backend->getUrl());
 
                 $events[] = $Event;
             }
@@ -409,13 +437,5 @@ class Zabbix extends Backend implements BackendInterface
 
         $trigger = $this->Zabbix->triggerGet($params);
         return $trigger[0];
-    }
-
-    /**
-     * @param ConfigBackendZabbix $backend
-     */
-    public function setBackend(ConfigBackendZabbix $backend)
-    {
-        $this->backend = $backend;
     }
 }

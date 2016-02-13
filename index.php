@@ -26,7 +26,9 @@
 use SMD\Core\Config;
 use SMD\Core\Init;
 use SMD\Core\Language;
+use SMD\Core\Session;
 use SMD\Http\Request;
+use SMD\Util\Util;
 
 define('APP_ROOT', '.');
 
@@ -40,25 +42,25 @@ $scroll = Request::analyze('scroll', ($type === VIEW_FRONTLINE || $type === VIEW
 
 $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 
-\SMD\Core\Session::setCssHash(\SMD\Util\Util::getCssHash());
+Session::setCssHash(Util::getCssHash());
 ?>
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
-    <title><?php echo Language::t(Config::getConfig()->getPageTitle()); ?></title>
+    <title>sysMonDash :: <?php echo Config::getConfig()->getPageTitle(); ?></title>
     <meta name="author" content="Rubén Domínguez">
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/pure-min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?v=<?php echo \SMD\Core\Session::getCssHash(); ?>">
+    <link rel="stylesheet" type="text/css" href="css/styles.css?v=<?php echo Session::getCssHash(); ?>">
 </head>
 <body>
 <div id="logo">
     <img src="imgs/logo.png"/>
     <div id="hora"><h1></h1></div>
     <div id="titulo">
-        <h1><?php echo Language::t('Panel Monitorización'); ?></h1>
+        <h1><?php echo Config::getConfig()->getPageTitle(); ?></h1>
         <h2><?php echo Language::t('Dpto. Sistemas'); ?></h2>
     </div>
 </div>
@@ -66,22 +68,24 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 <div id="monitor-data"></div>
 
 <footer>
-    <div id="project"><?php echo implode(' :: ', \SMD\Util\Util::getAppInfo()); ?></div>
+    <div id="project">
+        <span id="updates"></span>
+        <?php echo Util::getAppInfo('appVersion'), ' :: ', Util::getAppInfo('appCode'), ' :: ', Util::getAppInfo('appAuthor'); ?>
+    </div>
 </footer>
 
 <script type="text/javascript" src="js/functions.js"></script>
 <script type="text/javascript">
     (function () {
-            var smd = new SMD();
-            var config = new smd.SMDConfig();
-            config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
-            config.setAjaxFile('<?php echo $ajaxFile; ?>');
-            config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
-            config.setTimeout(<?php echo $timeout; ?>);
-            config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
+        config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
+        config.setAjaxFile('<?php echo $ajaxFile; ?>');
+        config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
+        config.setTimeout(<?php echo $timeout; ?>);
+        config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
 
-            smd.setConfig(config);
-            smd.startSMD();
+        smd.setConfig(config);
+        smd.startSMD();
+        smd.getUpdates();
     }());
 </script>
 </body>

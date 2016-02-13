@@ -25,57 +25,237 @@
 
 namespace SMD\Core;
 
+use SMD\Backend\BackendInterface;
+use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Livestatus;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
 use SMD\Util\Util;
 
+/**
+ * Class sysMonDash
+ * @package SMD\Core
+ */
 class sysMonDash
 {
-    public static $totalItems;
-    public static $displayedItems;
     /**
-     * @var array Los eventos a mostrar
+     * @var int
      */
-    private static $_outData;
+    private $totalItems = 0;
+    /**
+     * @var int
+     */
+    private $displayedItems = 0;
+    /**
+     * @var DowntimeInterface[]
+     */
+    private $downtimes = [];
+    /**
+     * @var int
+     */
+    private $type = 0;
 
     /**
-     * Función para mostrar los avisos
+     * Función para obtener los eventos de los backends y devolver los avisos en formato HTML
      *
-     * @param array $items Los elementos obtenidos desde Nagios/Icinga
-     * @return array Con el número total de elementos y mostrados
+     * @return array
      */
-    public static function getItems(&$items)
+    public function getItems()
     {
-        // Ordenar los items por tiempo de último cambio
-        Util::arraySortByProperty($items, 'lastHardStateChange');
+        try {
+            $rawItems = [];
 
-        $newItemTime = Config::getConfig()->getNewItemTime();
-
-        // Contador del no. de elementos
-        self::$totalItems = 0;
-        // Contador de elementos mostrados
-        self::$displayedItems = 0;
-
-        // Recorremos el array y mostramos los elementos
-        foreach ($items as $item) {
-            /** @var $item EventInterface */
-
-            $newItemUp = ($item->getState() === 0 && ($item->getLastTimeUp() || $item->getLastTimeOk())) ? (abs(time() - $item->getLastHardStateChange()) < $newItemTime / 2) : false;
-
-            // Detectar si es un elemento nuevo, no se trata de un "RECOVERY" y no está "ACKNOWLEDGED"
-            $newItem = (time() - $item->getLastHardState() <= $newItemTime && !$newItemUp && !$item->isAcknowledged());
-
-            // Mostrar elemento
-            if (self::dashDisplay($item, $newItem, $newItemUp)) {
-                self::$displayedItems++;
+            // Obtener los avisos desde la monitorización
+            foreach ($this->getBackends() as $Backend) {
+                $rawItems = array_merge($rawItems, $Backend->getProblems());
+                $this->downtimes = array_merge($this->downtimes, $Backend->getScheduledDowntimesGroupped());
             }
 
-            self::$totalItems++;
+            if ($rawItems === false) {
+                throw new \Exception('No hay datos desde el backend');
+            }
+
+            // Ordenar los rawItems por tiempo de último cambio
+            Util::arraySortByProperty($rawItems, 'lastHardStateChange');
+
+            $newItemTime = Config::getConfig()->getNewItemTime();
+            $htmlItems = [];
+
+            // Recorremos el array y mostramos los elementos
+            foreach ($rawItems as $item) {
+                /** @var $item EventInterface */
+
+                // Detectar si es un evento de recuperación
+                $newItemUp = ($item->getState() === 0 && ($item->getLastTimeUp() || $item->getLastTimeOk())) ? (abs(time() - $item->getLastHardStateChange()) < $newItemTime / 2) : false;
+
+                // Detectar si es un elemento nuevo, no se trata de un "RECOVERY" y no está "ACKNOWLEDGED"
+                $newItem = (time() - $item->getLastHardState() <= $newItemTime && !$newItemUp && !$item->isAcknowledged());
+
+                // Calcular los filtros de cada evento
+                $runFilters = $this->filterItems($item);
+
+                // Filtrar los eventos a mostrar
+                if (($this->type !== VIEW_FRONTLINE && $this->type !== VIEW_DISPLAY)
+                    || ($newItem === true
+                        || $newItemUp === true
+                        || $runFilters === false)
+                ) {
+                    $htmlItems[] = $this->getHtmlItems($item, $newItem, $newItemUp);
+                    $this->displayedItems++;
+                }
+
+                // Contador del no. de elementos
+                $this->totalItems++;
+            }
+        } catch (\Exception $e) {
+            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
+            exit();
         }
 
-        return self::$_outData;
+        return $htmlItems;
+    }
+
+    /**
+     * Seleccionar el backend
+     *
+     * @return BackendInterface[]
+     */
+    private function getBackends()
+    {
+        $backends = [];
+
+        foreach (Config::getConfig()->getBackend() as $Backend) {
+            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix */
+            if ($Backend->isActive()) {
+                switch ($Backend->getType()) {
+                    case ConfigBackend::TYPE_LIVESTATUS:
+                        $backends[] = new Livestatus($Backend);
+                        break;
+                    case ConfigBackend::TYPE_STATUS:
+                        $backends[] = new Status($Backend);
+                        break;
+                    case ConfigBackend::TYPE_ZABBIX:
+                        $backends[] = new Zabbix($Backend);
+                        break;
+                }
+            }
+        }
+
+        return $backends;
+    }
+
+    /**
+     * Función para filtrar los avisos a mostrar
+     *
+     * @param EventInterface $item El elemento a verificar
+     * @return bool
+     */
+    private function filterItems(EventInterface $item)
+    {
+        return ($item->isAcknowledged()
+            || $this->getFilterHosts($item)
+            || $this->getFilterServices($item)
+            || $this->getFilterIsFlapping($item)
+            || $this->getFilterState($item)
+            || $this->getFilterUnreachable($item)
+        );
+    }
+
+    /**
+     * Comprobar si el host se encuentra en la expresión regular
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterHosts(EventInterface $item)
+    {
+        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
+
+        if (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname)
+            && !in_array($hostname, Config::getConfig()->getCriticalItems())
+        ) {
+            $item->setFilterStatus('No Regex Host & No Critical');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Comprobar si el servicio se encuentra en la expresión regular y si es un elemento crítico
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterServices(EventInterface $item)
+    {
+
+        if (!empty(Config::getConfig()->getRegexServiceNoShow())
+            && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
+            && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems())
+        ) {
+            $item->setFilterStatus('Regex Service & No Critical');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Comprobar si el estado es cambiante
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterIsFlapping(EventInterface $item)
+    {
+        if ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts()
+            && $item->getStateType() === 0
+            && !$item->isFlapping()
+        ) {
+            $item->setFilterStatus('OK & No Flapping');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Comprobar si el host está caído y el servicio en alerta
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterState(EventInterface $item)
+    {
+        if ($item->getHostState()
+            && $item->getState() > SERVICE_WARNING
+            && $item->getHostState() >= HOST_DOWN
+        ) {
+            $item->setFilterStatus('Host Status');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Comprobar si está inalcanzable
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterUnreachable(EventInterface $item)
+    {
+        if ($item->getStateType() === 1
+            && $item->getLastTimeUnreachable() > $item->getLastCheck()
+        ) {
+            $item->setFilterStatus('Unreachable');
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -84,12 +264,10 @@ class sysMonDash
      * @param EventInterface $item El elemento que contiene los datos.
      * @param bool $newItem Si es un nuevo elemento
      * @param bool $newItemUp Si es un nuevo elemento recuperado
-     * @return bool
+     * @return EventInterface
      */
-    private static function dashDisplay(EventInterface $item, $newItem = false, $newItemUp = false)
+    private function getHtmlItems(EventInterface $item, $newItem = false, $newItemUp = false)
     {
-        global $type;
-
         $statusId = $item->getState();
         $ack = $item->isAcknowledged();
         $lastStateTime = date("m-d-Y H:i:s", $item->getLastHardStateChange());
@@ -100,16 +278,9 @@ class sysMonDash
         $hostAlias = ($item->getHostAlias()) ? $item->getHostAlias() : (($item->getAlias()) ? $item->getAlias() : $hostname);
         $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || ($item->getHostScheduledDowntimeDepth() >= 1));
         $tdClass = '';
+        $trClass = '';
         $statusName = '';
-
-
-        if (($type === VIEW_FRONTLINE || $type === VIEW_DISPLAY)
-            && $newItem === false
-            && $newItemUp === false
-            && self::filterItems($item) === false
-        ) {
-            return false;
-        }
+        $link = null;
 
         switch ($statusId) {
             case 0:
@@ -133,45 +304,28 @@ class sysMonDash
         if (($item->getHostLastTimeUnreachable() > $item->getHostLastTimeUp() && !$newItemUp) ||
             ($item->getLastTimeUnreachable() > $item->getLastCheck() && $item->getStateType() === 1)
         ) {
-//            $trTitle = Language::t("INALCANZABLE - Verificar objeto padre");
             $trClass = "unknown";
             $statusName = Language::t('INALCANZABLE');
         }
 
         if ($scheduled) {
-//            $trTitle = Language::t("PROGRAMADO - Parada programada");
             $trClass = "downtime";
             $statusName = Language::t('PROGRAMADO');
         }
 
-        if ($newItem === true && $ack === false && !$scheduled && !$newItemUp) {
+        if ($newItem && !$ack && !$scheduled && !$newItemUp) {
             $tdClass = "new";
         } elseif ($newItemUp
             && time() - $item->getLastHardStateChange() <= Config::getConfig()->getNewItemTime() / 2
         ) {
-//            $trTitle = Language::t("OK - Recuperado");
             $trClass = "new-up";
             $statusName = Language::t('RECUPERADO');
-        } elseif ($item->isIsFlapping()) {
-//            $trTitle = Language::t("CAMBIANTE - Frecuente cambio entre estados");
+        } elseif ($item->isFlapping()) {
             $trClass = "flapping";
             $statusName = Language::t('CAMBIANTE');
-        } elseif ($ack === true) {
-//            $trTitle = Language::t("RECONOCIDO - Error conocido");
+        } elseif ($ack) {
             $trClass = "acknowledged";
             $statusName = Language::t('RECONOCIDO');
-        }
-
-//        $actionHostLink = (isset($item['pnpgraph_present']) && $item['pnpgraph_present'] !== -1) ? '<a href="/pnp4nagios/index.php/graph?host=' . $hostname . '&srv=_HOST_" rel="/pnp4nagios/index.php/popup?host=' . $hostname . '&srv=_HOST_" class="action-link" target="blank"><img src="imgs/graph.png" /></a>' : '';
-        $actionHostLink = '';
-
-        // Si 'host_display_name' está presente, el item es un servicio
-        if (!empty($item->getHostDisplayName())) {
-            $link = Config::getConfig()->getCgiURL() . '/extinfo.cgi?type=1&host=' . $hostname;
-            $actionServiceLink = '';
-        } else {
-            $link = Config::getConfig()->getCgiURL() . '/extinfo.cgi?type=2&host=' . $hostname . '&service=' . urlencode($serviceDesc);
-            $actionServiceLink = '';
         }
 
         $line = '<tr class="item-data ' . $trClass . '" title="' . sprintf(Language::t('Estado %s desde %s'), $statusName, $lastStateTime) . '">' . PHP_EOL;
@@ -182,15 +336,23 @@ class sysMonDash
         }
 
         if (Config::getConfig()->isColHost()) {
-            $line .= '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a>' . $actionHostLink . '</td>' . PHP_EOL;
+            if (!is_null($link)) {
+                $line .= '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a></td>' . PHP_EOL;
+            } else {
+                $line .= '<td>' . $hostAlias . '</td>' . PHP_EOL;
+            }
         }
 
         if (Config::getConfig()->isColStatusInfo()) {
-            $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
+            if (empty($item->getFilterStatus())){
+                $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
+            } else {
+                $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '<br>Filter: ' . $item->getFilterStatus() .'</td>' . PHP_EOL;
+            }
         }
 
         if (Config::getConfig()->isColService()) {
-            $line .= '<td class="center">' . $serviceDesc . $actionServiceLink . '</td>' . PHP_EOL;
+            $line .= '<td class="center">' . $serviceDesc . '</td>' . PHP_EOL;
         }
 
         if (Config::getConfig()->isColBackend()) {
@@ -199,125 +361,38 @@ class sysMonDash
 
         $line .= '</tr>' . PHP_EOL;
 
-        self::$_outData[] = $line;
-
-        return true;
+        return $line;
     }
 
     /**
-     * Función para filtrar los avisos a mostrar
-     *
-     * @param EventInterface $item El elemento a verificar
-     * @return bool
+     * @return \SMD\Backend\Event\DowntimeInterface[]
      */
-    private static function filterItems(EventInterface $item)
+    public function getDowntimes()
     {
-        return ($item->isAcknowledged()
-            || self::getFilterHosts($item)
-            || self::getFilterServices($item)
-            || self::getFilterIsFlapping($item)
-            || self::getFilterState($item)
-            || self::getFilterUnreachable($item)
-        ) ? false : true;
+        return $this->downtimes;
     }
 
     /**
-     * Comprobar si el host se encuentra en la expresión regular
-     *
-     * @param EventInterface $item
-     * @return bool
+     * @return int
      */
-    private static function getFilterHosts(EventInterface $item)
+    public function getTotalItems()
     {
-        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
-
-        //error_log(__FUNCTION__);
-
-        return (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname) && !in_array($hostname, Config::getConfig()->getCriticalItems()));
+        return $this->totalItems;
     }
 
     /**
-     * Comprobar si el servicio se encuentra en la expresión regular y sies un elemento crítico
-     *
-     * @param EventInterface $item
-     * @return bool
+     * @return int
      */
-    private static function getFilterServices(EventInterface $item)
+    public function getDisplayedItems()
     {
-        //error_log(__FUNCTION__);
-
-        return (Config::getConfig()->getRegexServiceNoShow()
-            && is_array(Config::getConfig()->getCriticalItems())
-            && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
-            && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems()));
+        return $this->displayedItems;
     }
 
     /**
-     * Comprobar si el estado es cambiante
-     *
-     * @param EventInterface $item
-     * @return bool
+     * @param int $type
      */
-    private static function getFilterIsFlapping(EventInterface $item)
+    public function setType($type)
     {
-        //error_log(__FUNCTION__);
-
-        return ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts() && $item->getStateType() === 0 && !$item->isIsFlapping());
-    }
-
-    /**
-     * Comprobar si el host está caído y el servicio en alerta
-     *
-     * @param EventInterface $item
-     * @return bool
-     */
-    private static function getFilterState(EventInterface $item)
-    {
-        //error_log(__FUNCTION__);
-
-        return ($item->getHostState() && $item->getState() > SERVICE_WARNING && $item->getHostState() >= HOST_DOWN);
-    }
-
-    /**
-     * Comprobar si está inalcanzable
-     *
-     * @param EventInterface $item
-     * @return bool
-     */
-    private static function getFilterUnreachable(EventInterface $item)
-    {
-        //error_log(__FUNCTION__);
-
-        return ($item->getStateType() === 1 && $item->getLastTimeUnreachable() > $item->getLastCheck());
-    }
-
-    /**
-     * Seleccionar el backend
-     *
-     * @return Livestatus[]|Status[]|Zabbix[]|array
-     * @throws \Exception
-     */
-    public static function getBackend()
-    {
-        $backends = [];
-
-        foreach (Config::getConfig()->getBackend() as $Backend) {
-            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix */
-            if ($Backend->isActive()) {
-                switch ($Backend->getType()) {
-                    case ConfigBackend::TYPE_LIVESTATUS:
-                        $backends[] = new Livestatus($Backend);
-                        break;
-                    case ConfigBackend::TYPE_STATUS:
-                        $backends[] = new Status($Backend);
-                        break;
-                    case ConfigBackend::TYPE_ZABBIX:
-                        $backends[] = new Zabbix($Backend);
-                        break;
-                }
-            }
-        }
-
-        return $backends;
+        $this->type = $type;
     }
 }
