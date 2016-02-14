@@ -34,6 +34,8 @@ function SMD() {
     var totalHeight;
     var Config;
     var self = this;
+    var newItemsCount = 0;
+    var audioEventAttached = false;
 
     /**
      * Objeto que contiene las variables de configuración de PHP
@@ -42,7 +44,8 @@ function SMD() {
         var timeout = 10000,
             scroll = 0,
             ajaxfile = '/ajax/getData.php',
-            remoteServer = '';
+            remoteServer = '',
+            audio = false;
         var LANG = [];
 
         this.setTimeout = function (t) {
@@ -79,6 +82,12 @@ function SMD() {
         this.getRemoteServer = function () {
             return remoteServer;
         };
+        this.setAudioEnabled = function (bool) {
+            audio = bool;
+        };
+        this.getAudioEnabled = function () {
+            return audio;
+        }
     };
 
     /**
@@ -137,7 +146,14 @@ function SMD() {
                     }
                 }
 
-                jQuery('.new').blink({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
+                var newItems = jQuery('.new');
+
+                if (newItemsCount < newItems.length) {
+                    newItemsCount = newItems.length;
+                    playBeep();
+                }
+
+                newItems.blink({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
             },
             error: function (xhr, textStatus, errorThrown) {
                 placeHolder.html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");
@@ -281,6 +297,29 @@ function SMD() {
 
     this.setConfig = function (c) {
         Config = c;
+    };
+
+    // Reproducir sonido
+    var playBeep = function playBeep() {
+        //console.info('BEEP');
+        if (Config.getAudioEnabled()) {
+            var audio = document.getElementById('audio-alarm');
+            var timeout = Config.getTimeout() / 1000;
+
+            // Detectar si la duración del sonido es mayor a la duración del timeout de refresco
+            if (audio.duration >= timeout && audioEventAttached === false) {
+                audio.addEventListener('timeupdate', function () {
+                    audioEventAttached = true;
+
+                    if (audio.currentTime >= timeout - 2) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                });
+            }
+
+            audio.play();
+        }
     }
 }
 

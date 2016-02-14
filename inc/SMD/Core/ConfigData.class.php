@@ -79,6 +79,8 @@ class ConfigData
     private $criticalItems = [];
     /** @var string */
     private $hash = '';
+    /** @var bool */
+    private $newItemAudioEnabled = false;
 
     /**
      * @var string
@@ -487,5 +489,21 @@ class ConfigData
     public function setColBackend($colBackend)
     {
         $this->colBackend = $colBackend;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNewItemAudioEnabled()
+    {
+        return $this->newItemAudioEnabled;
+    }
+
+    /**
+     * @param boolean $newItemAudioEnabled
+     */
+    public function setNewItemAudioEnabled($newItemAudioEnabled)
+    {
+        $this->newItemAudioEnabled = $newItemAudioEnabled;
     }
 }

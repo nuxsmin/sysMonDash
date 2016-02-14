@@ -99,6 +99,11 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                value="<?php echo Config::getConfig()->getMaxDisplayItems(); ?>"/>
                     </div>
                     <div class="pure-control-group">
+                        <label for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
+                        <input type="checkbox" id="event_new_item_audio"
+                               name="event_new_item_audio" <?php echo (Config::getConfig()->isNewItemAudioEnabled()) ? 'checked' : ''; ?>/>
+                    </div>
+                    <div class="pure-control-group">
                         <label for="col_last_check"><?php echo Language::t('Mostrar hora de eventos'); ?></label>
                         <input type="checkbox" id="col_last_check"
                                name="col_last_check" <?php echo (Config::getConfig()->isColLastcheck()) ? 'checked' : ''; ?>/>

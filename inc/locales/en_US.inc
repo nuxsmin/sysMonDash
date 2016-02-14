@@ -88,3 +88,4 @@ $LANG['Activo'] = 'Active';
 $LANG['Eliminar'] = 'Remove';
 $LANG['Versión de PHP necesaria >= 5.4'] = 'PHP version needed >= 5.4';
 $LANG['Nueva Versión %s'] = 'New %s Version';
+$LANG['Habilitar sonido en nuevos eventos'] = 'Enable sound on new events';

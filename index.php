@@ -74,6 +74,10 @@ Session::setCssHash(Util::getCssHash());
     </div>
 </footer>
 
+<?php if (Config::getConfig()->isNewItemAudioEnabled()): ?>
+    <audio id="audio-alarm" src="audio/beep.mp3" preload></audio>
+<?php endif; ?>
+
 <script type="text/javascript" src="js/functions.js"></script>
 <script type="text/javascript">
     (function () {
@@ -82,6 +86,7 @@ Session::setCssHash(Util::getCssHash());
         config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
         config.setTimeout(<?php echo $timeout; ?>);
         config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
+        config.setAudioEnabled(<?php echo (Config::getConfig()->isNewItemAudioEnabled()) ? 'true' : 'false'; ?>);
 
         smd.setConfig(config);
         smd.startSMD();
