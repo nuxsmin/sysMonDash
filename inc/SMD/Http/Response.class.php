@@ -26,6 +26,7 @@
 namespace SMD\Http;
 
 use SMD\Core\Language;
+use SMD\Util\Json;
 
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
 
@@ -73,25 +74,16 @@ class Response
             return false;
         }
 
-        $arrStrFrom = array("\\", '"', "'");
-        $arrStrTo = array("\\", '\"', "\'");
-
         if (!is_array($data)) {
-            $json = array(
+            $json = [
                 'status' => $status,
-                'description' => Language::t(str_replace($arrStrFrom, $arrStrTo, $data)),
+                'description' => Language::t(Json::safeJsonString($data)),
                 'action' => $action
-            );
+            ];
         } else {
-            array_walk($data,
-                function (&$value, &$key) use ($arrStrFrom, $arrStrTo) {
-                    return str_replace($arrStrFrom, $arrStrTo, $value);
-                }
-            );
-
             $data['status'] = $status;
             $data['action'] = $action;
-            $json = $data;
+            $json = Json::safeJson($data);
         }
 
         header('Content-type: application/json');

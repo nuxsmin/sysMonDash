@@ -26,6 +26,7 @@
 namespace SMD\Html;
 
 use SMD\Core\ConfigBackendLivestatus;
+use SMD\Core\ConfigBackendSMD;
 use SMD\Core\ConfigBackendStatus;
 use SMD\Core\ConfigBackendZabbix;
 
@@ -101,6 +102,9 @@ class Html
                         break;
                     case 'zabbix':
                         $ConfigBackend = new ConfigBackendZabbix($config['version'], $config['url'], $config['user'], $config['pass']);
+                        break;
+                    case 'smd':
+                        $ConfigBackend = new ConfigBackendSMD($config['url'], $config['token']);
                         break;
                 }
 

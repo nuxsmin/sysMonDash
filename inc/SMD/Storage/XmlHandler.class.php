@@ -101,7 +101,7 @@ class XmlHandler implements StorageInterface
      */
     protected function checkSourceFile()
     {
-        return is_writable($this->file);
+        return (is_writable($this->file) && filesize($this->file) > 0);
     }
 
     /**

@@ -34,6 +34,7 @@ abstract class ConfigBackend
     const TYPE_LIVESTATUS = 1;
     const TYPE_STATUS = 2;
     const TYPE_ZABBIX = 3;
+    const TYPE_SMD = 4;
 
     /**
      * @var int

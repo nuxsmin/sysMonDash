@@ -38,6 +38,11 @@ Init::start();
 
 $hash = Request::analyze('h');
 $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig()->getHash()));
+
+$i = 0;
+$j = 0;
+$k = 0;
+$l = 0;
 ?>
 <!DOCTYPE html>
 <head xmlns="http://www.w3.org/1999/html">
@@ -99,7 +104,8 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                value="<?php echo Config::getConfig()->getMaxDisplayItems(); ?>"/>
                     </div>
                     <div class="pure-control-group">
-                        <label for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
+                        <label
+                            for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
                         <input type="checkbox" id="event_new_item_audio"
                                name="event_new_item_audio" <?php echo (Config::getConfig()->isNewItemAudioEnabled()) ? 'checked' : ''; ?>/>
                     </div>
@@ -158,10 +164,8 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <a class="pure-button" href="#" id="addLivestatusBackend">+ Livestatus</a>
                         <a class="pure-button" href="#" id="addStatusBackend">+ Status</a>
                         <a class="pure-button" href="#" id="addZabbixBackend">+ Zabbix</a>
+                        <a class="pure-button" href="#" id="addSMDBackend">+ sysMonDash</a>
                     </div>
-                    <?php $i = 0;
-                    $j = 0;
-                    $k = 0; ?>
                     <?php foreach (Config::getConfig()->getBackend() as $Backend): ?>
                         <?php if ($Backend->getType() === ConfigBackend::TYPE_STATUS): ?>
                             <div class="backendStatus">
@@ -265,6 +269,38 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                                    onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
                             </div>
                             <?php $k++; ?>
+                        <?php elseif ($Backend->getType() === ConfigBackend::TYPE_SMD): ?>
+                            <div class="backendSMD">
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Alias'); ?></label>
+                                    <input type="text" name="backend[smd][<?php echo $l; ?>][alias]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getAlias(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label
+                                        for="backend_smd_url"><?php echo Language::t('URL API sysMonDash'); ?></label>
+                                    <input type="text" id="backend_smd_url"
+                                           name="backend[smd][<?php echo $l; ?>][url]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getUrl(); ?>"
+                                           placeholder="http://foo.bar/sysMonDash/api.php"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Token'); ?></label>
+                                    <input type="text" name="backend[smd][<?php echo $l; ?>][token]"
+                                           class="pure-input-1-2"
+                                           value="<?php echo $Backend->getToken(); ?>"/>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label><?php echo Language::t('Activo'); ?></label>
+                                    <input type="checkbox"
+                                           name="backend[smd][<?php echo $l; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                </div>
+                                <a class="pure-button backendDelete" href="#"
+                                   onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+                            </div>
+                            <?php $l++; ?>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
@@ -291,6 +327,13 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         <input type="text" id="special_monitor_server_url" name="special_monitor_server_url"
                                value="<?php echo Config::getConfig()->getMonitorServerUrl(); ?>"
                                placeholder="http://cloud.foo.bar/icinga"/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label
+                            for="special_api_token"><?php echo Language::t('Token API'); ?></label>
+                        <input type="text" id="special_api_token" name="special_api_token"
+                               value="<?php echo Config::getConfig()->getAPIToken(); ?>"
+                               placeholder=""/>
                     </div>
                 </div>
             </fieldset>
@@ -376,6 +419,29 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
             <a class="pure-button backendDelete" href="#"
                onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
         </div>
+        <div class="SMDTemplate" style="display: none">
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Alias'); ?></label>
+                <input type="text" name="backend[smd][alias]"
+                       class="pure-input-1-2" placeholder=""/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('URL API sysMonDash'); ?></label>
+                <input type="text" name="backend[smd][url]"
+                       class="pure-input-1-2" placeholder="http://foo.bar/sysMonDash/api.php"/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Token'); ?></label>
+                <input type="text" name="backend[smd][token]"
+                       class="pure-input-1-2" placeholder=""/>
+            </div>
+            <div class="pure-control-group">
+                <label><?php echo Language::t('Activo'); ?></label>
+                <input type="checkbox" name="backend[smd][active]"/>
+            </div>
+            <a class="pure-button backendDelete" href="#"
+               onclick="return removeBackend(this)"><?php echo Language::t('Eliminar'); ?></a>
+        </div>
 
         <script>
             function removeBackend(obj) {
@@ -428,6 +494,15 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
                         html: smd.getNewZabbixBackend()
                     }).hide().appendTo('#backends').slideDown('slow');
                 });
+
+                jQuery('#addSMDBackend').click(function (e) {
+                    e.preventDefault();
+
+                    jQuery('<div/>', {
+                        'class': 'backendSMD',
+                        html: smd.getNewSMDBackend()
+                    }).hide().appendTo('#backends').slideDown('slow');
+                });
             }())
         </script>
     <?php else: ?>
@@ -460,7 +535,7 @@ $hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig
 </footer>
 
 <script>
-    (function(){
+    (function () {
         if (typeof smd === "undefined") {
             var smd = new SMD();
         }

@@ -279,6 +279,18 @@ function SMD() {
         return $html.html();
     };
 
+    this.getNewSMDBackend = function () {
+        var len = jQuery('.backendSMD').length;
+        var $html = jQuery('.SMDTemplate').clone();
+
+        $html.find('[name=\'backend[smd][alias]\']')[0].name = "backend[smd][" + len + "][alias]";
+        $html.find('[name=\'backend[smd][url]\']')[0].name = "backend[smd][" + len + "][url]";
+        $html.find('[name=\'backend[smd][token]\']')[0].name = "backend[smd][" + len + "][token]";
+        $html.find('[name=\'backend[smd][active]\']')[0].name = "backend[smd][" + len + "][active]";
+
+        return $html.html();
+    };
+
     this.getUpdates = function () {
         jQuery('#updates').load(this.getRootPath() + '/ajax/getUpdates.php');
     };

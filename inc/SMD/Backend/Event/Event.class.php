@@ -34,6 +34,7 @@ abstract class Event implements EventInterface
     const TYPE_HOST = 0;
     const TYPE_SERVICE = 1;
     const TYPE_TRIGGER = 2;
+    const TYPE_SMD = 3;
 
     /**
      * @var int

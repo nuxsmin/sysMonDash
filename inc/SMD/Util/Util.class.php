@@ -128,7 +128,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2016021401;
+        $build = 2016021501;
         $version = [1, 0];
 
         if ($retBuild) {
@@ -283,11 +283,10 @@ class Util
      * Obtener datos desde una URL usando CURL
      *
      * @param           $url string La URL
-     * @param array $data
      * @return bool|string
      * @throws \Exception
      */
-    public static function getDataFromUrl($url, array $data = null)
+    public static function getDataFromUrl($url)
     {
         if (!self::curlIsAvailable()) {
             return false;
@@ -302,12 +301,6 @@ class Util
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 
-        if (!is_null($data)) {
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $data['type']);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data['data']);
-        }
-
         $data = curl_exec($ch);
 
         if ($data === false) {
@@ -317,6 +310,16 @@ class Util
         }
 
         return $data;
+    }
+
+    /**
+     * Comprobar si el módulo CURL está instalado.
+     *
+     * @return bool
+     */
+    public static function curlIsAvailable()
+    {
+        return (function_exists('curl_init'));
     }
 
     /**
@@ -336,15 +339,5 @@ class Util
         ];
 
         return (isset($appInfo[$index])) ? $appInfo[$index] : '';
-    }
-
-    /**
-     * Comprobar si el módulo CURL está instalado.
-     *
-     * @return bool
-     */
-    public static function curlIsAvailable()
-    {
-        return (function_exists('curl_init'));
     }
 }

@@ -29,6 +29,7 @@ use SMD\Backend\BackendInterface;
 use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Livestatus;
+use SMD\Backend\SMD;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
 use SMD\Util\Util;
@@ -126,7 +127,7 @@ class sysMonDash
         $backends = [];
 
         foreach (Config::getConfig()->getBackend() as $Backend) {
-            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix */
+            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD */
             if ($Backend->isActive()) {
                 switch ($Backend->getType()) {
                     case ConfigBackend::TYPE_LIVESTATUS:
@@ -137,6 +138,9 @@ class sysMonDash
                         break;
                     case ConfigBackend::TYPE_ZABBIX:
                         $backends[] = new Zabbix($Backend);
+                        break;
+                    case ConfigBackend::TYPE_SMD:
+                        $backends[] = new SMD($Backend);
                         break;
                 }
             }
@@ -344,10 +348,10 @@ class sysMonDash
         }
 
         if (Config::getConfig()->isColStatusInfo()) {
-            if (empty($item->getFilterStatus())){
+            if (empty($item->getFilterStatus())) {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
             } else {
-                $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '<br>Filter: ' . $item->getFilterStatus() .'</td>' . PHP_EOL;
+                $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '<br>Filter: ' . $item->getFilterStatus() . '</td>' . PHP_EOL;
             }
         }
 
@@ -362,6 +366,50 @@ class sysMonDash
         $line .= '</tr>' . PHP_EOL;
 
         return $line;
+    }
+
+    /**
+     * Devolver los eventos sin formato HTML
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getRawEvents()
+    {
+        $rawEvents = [];
+
+        // Obtener los avisos desde la monitorización
+        foreach ($this->getBackends() as $Backend) {
+            $rawEvents = array_merge($rawEvents, $Backend->getProblems());
+        }
+
+        if ($rawEvents === false) {
+            throw new \Exception('No hay datos desde el backend');
+        }
+
+        return $rawEvents;
+    }
+
+    /**
+     * Devolver las paradas sin formato HTML
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getRawDowntimes()
+    {
+        $downtimes = [];
+
+        // Obtener los avisos desde la monitorización
+        foreach ($this->getBackends() as $Backend) {
+            $downtimes = array_merge($downtimes, $Backend->getScheduledDowntimesGroupped());
+        }
+
+        if ($downtimes === false) {
+            throw new \Exception('No hay datos desde el backend');
+        }
+
+        return $downtimes;
     }
 
     /**

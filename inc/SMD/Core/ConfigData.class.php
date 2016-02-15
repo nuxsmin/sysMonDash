@@ -81,6 +81,8 @@ class ConfigData
     private $hash = '';
     /** @var bool */
     private $newItemAudioEnabled = false;
+    /** @var string */
+    private $APIToken = '';
 
     /**
      * @var string
@@ -136,7 +138,7 @@ class ConfigData
     }
 
     /**
-     * @return array|ConfigBackendStatus[]|ConfigBackendLivestatus[]|ConfigBackendZabbix[]
+     * @return array|ConfigBackendStatus[]|ConfigBackendLivestatus[]|ConfigBackendZabbix[]|ConfigBackendSMD[]
      */
     public function getBackend()
     {
@@ -505,5 +507,21 @@ class ConfigData
     public function setNewItemAudioEnabled($newItemAudioEnabled)
     {
         $this->newItemAudioEnabled = $newItemAudioEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAPIToken()
+    {
+        return $this->APIToken;
+    }
+
+    /**
+     * @param string $APIToken
+     */
+    public function setAPIToken($APIToken)
+    {
+        $this->APIToken = $APIToken;
     }
 }

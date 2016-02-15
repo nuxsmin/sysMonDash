@@ -60,6 +60,7 @@ $criticalItems = Request::analyze('critical_items');
 $specialClientURL = Request::analyze('special_client_url');
 $specialRemoteServerURL = Request::analyze('special_remote_server_url');
 $specialMonitorServerUrl = Request::analyze('special_monitor_server_url');
+$specialAPIToken = Request::analyze('special_api_token');
 
 try {
     $Backends = Html::processFormBackends(Request::analyze('backend'));
@@ -85,6 +86,7 @@ $ConfigData->setBackend($Backends);
 $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);
 $ConfigData->setMonitorServerUrl($specialMonitorServerUrl);
+$ConfigData->setAPIToken($specialAPIToken);
 
 try {
     Config::saveConfig(new XmlHandler(XML_CONFIG_FILE), $ConfigData);
