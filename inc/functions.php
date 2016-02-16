@@ -36,7 +36,9 @@ $allHeaders = \SMD\Http\Request::analyze('allheaders', false, false, true);
 echo '<pre>';
 
 if ($raw) {
-    foreach (sysMonDash::getBackend() as $Backend) {
+    $SMD = new sysMonDash();
+
+    foreach ($SMD->getBackends() as $Backend) {
         /** @var \SMD\Backend\BackendInterface $Backend */
         $Backend->setAllHeaders($allHeaders);
 

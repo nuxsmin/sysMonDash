@@ -36,7 +36,7 @@ class ConfigData
     /** @var string */
     private $pageTitle = 'sysMonDash - Cuadro de Mandos';
     /** @var array */
-    private $backend = [];
+    private $backend = array();
     /** @var string */
     private $clientURL = '';
     /** @var string */
@@ -76,7 +76,7 @@ class ConfigData
     /** @var string */
     private $regexServiceNoShow = '';
     /** @var array */
-    private $criticalItems = [];
+    private $criticalItems = array();
     /** @var string */
     private $hash = '';
     /** @var bool */

@@ -165,7 +165,7 @@ class SplClassLoader
             || $this->_namespace . $this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace . $this->_namespaceSeparator))
         ) {
             $fileName = '';
-            $namespace = '';
+//            $namespace = '';
 
             if (false !== ($lastNsPos = strripos($className, $this->_namespaceSeparator))) {
                 $namespace = substr($className, 0, $lastNsPos);

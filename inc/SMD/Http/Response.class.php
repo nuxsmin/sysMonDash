@@ -75,11 +75,11 @@ class Response
         }
 
         if (!is_array($data)) {
-            $json = [
+            $json = array(
                 'status' => $status,
                 'description' => Language::t(Json::safeJsonString($data)),
                 'action' => $action
-            ];
+            );
         } else {
             $data['status'] = $status;
             $data['action'] = $action;

@@ -51,7 +51,7 @@ class sysMonDash
     /**
      * @var DowntimeInterface[]
      */
-    private $downtimes = [];
+    private $downtimes = array();
     /**
      * @var int
      */
@@ -65,7 +65,7 @@ class sysMonDash
     public function getItems()
     {
         try {
-            $rawItems = [];
+            $rawItems = array();
 
             // Obtener los avisos desde la monitorización
             foreach ($this->getBackends() as $Backend) {
@@ -81,7 +81,7 @@ class sysMonDash
             Util::arraySortByProperty($rawItems, 'lastHardStateChange');
 
             $newItemTime = Config::getConfig()->getNewItemTime();
-            $htmlItems = [];
+            $htmlItems = array();
 
             // Recorremos el array y mostramos los elementos
             foreach ($rawItems as $item) {
@@ -122,9 +122,9 @@ class sysMonDash
      *
      * @return BackendInterface[]
      */
-    private function getBackends()
+    public function getBackends()
     {
-        $backends = [];
+        $backends = array();
 
         foreach (Config::getConfig()->getBackend() as $Backend) {
             /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD */
@@ -195,7 +195,7 @@ class sysMonDash
     private function getFilterServices(EventInterface $item)
     {
 
-        if (!empty(Config::getConfig()->getRegexServiceNoShow())
+        if (Config::getConfig()->getRegexServiceNoShow() !== ''
             && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
             && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems())
         ) {
@@ -348,7 +348,7 @@ class sysMonDash
         }
 
         if (Config::getConfig()->isColStatusInfo()) {
-            if (empty($item->getFilterStatus())) {
+            if ($item->getFilterStatus() === '') {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
             } else {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '<br>Filter: ' . $item->getFilterStatus() . '</td>' . PHP_EOL;
@@ -376,7 +376,7 @@ class sysMonDash
      */
     public function getRawEvents()
     {
-        $rawEvents = [];
+        $rawEvents = array();
 
         // Obtener los avisos desde la monitorización
         foreach ($this->getBackends() as $Backend) {
@@ -398,7 +398,7 @@ class sysMonDash
      */
     public function getRawDowntimes()
     {
-        $downtimes = [];
+        $downtimes = array();
 
         // Obtener los avisos desde la monitorización
         foreach ($this->getBackends() as $Backend) {

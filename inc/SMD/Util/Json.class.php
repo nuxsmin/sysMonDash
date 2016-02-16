@@ -63,12 +63,12 @@ class Json
                 function (&$value) {
                     if (is_object($value)) {
                         foreach ($value as &$attribute) {
-                            self::safeJsonString($attribute);
+                            Json::safeJsonString($attribute);
                         }
 
                         return $value;
                     } else {
-                        return self::safeJsonString($value);
+                        return Json::safeJsonString($value);
                     }
                 }
             );

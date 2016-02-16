@@ -88,7 +88,7 @@ class Html
      */
     public static function processFormBackends(array $backends)
     {
-        $BackendsConfig = [];
+        $BackendsConfig = array();
         $ConfigBackend = null;
 
         foreach ($backends as $backend => $n) {

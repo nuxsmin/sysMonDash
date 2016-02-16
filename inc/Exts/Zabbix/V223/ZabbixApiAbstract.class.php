@@ -178,6 +178,7 @@ abstract class ZabbixApiAbstract
      * @param   $apiUrl     API url.
      *
      * @retval  ZabbixApiAbstract
+     * @return $this
      */
 
     public function setApiUrl($apiUrl)
@@ -192,6 +193,7 @@ abstract class ZabbixApiAbstract
      * @param   $authId     API auth ID.
      *
      * @retval  ZabbixApiAbstract
+     * @return $this
      */
 
     public function setAuthId($authId)
@@ -207,6 +209,7 @@ abstract class ZabbixApiAbstract
      * @param   $password   HTTP basic authorization password
      *
      * @retval  ZabbixApiAbstract
+     * @return $this
      */
 
     public function setBasicAuthorization($user, $password)
@@ -225,6 +228,7 @@ abstract class ZabbixApiAbstract
      * @param   $verify     Flag to verify SSL peer
      *
      * @retval  ZabbixApiAbstract
+     * @return $this
      */
 
     public function setVerifyPeer($verify=TRUE)
@@ -251,6 +255,7 @@ abstract class ZabbixApiAbstract
      *
      * @retval  ZabbixApiAbstract
      *
+     * @return $this
      * @throws  Exception
      */
 
@@ -271,6 +276,7 @@ abstract class ZabbixApiAbstract
      * @param   $print  Boolean if requests/responses should be printed out.
      *
      * @retval  ZabbixApiAbstract
+     * @return $this
      */
     public function printCommunication($print = TRUE)
     {
@@ -284,8 +290,11 @@ abstract class ZabbixApiAbstract
      *
      * @param   $method     Name of the API method.
      * @param   $params     Additional parameters.
-     * @param   $auth       Enable auth string (default TRUE).
+     * @param string $resultArrayKey
+     * @param bool|Enable $auth Enable auth string (default TRUE).
      *
+     * @return
+     * @throws Exception
      * @retval  stdClass    API JSON response.
      */
 
@@ -442,6 +451,7 @@ abstract class ZabbixApiAbstract
      * @param   $params     Params array.
      *
      * @retval  Array
+     * @return array|Params
      */
 
     private function getRequestParamsArray($params)
@@ -490,6 +500,7 @@ abstract class ZabbixApiAbstract
      *
      * @retval  stdClass
      *
+     * @return string
      * @throws  Exception
      */
 

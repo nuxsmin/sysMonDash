@@ -106,7 +106,7 @@ class Status extends Backend implements BackendInterface
         // Obtenemos los bloques que corresponden al estado de los hosts y servicios
         preg_match_all('/hoststatus {.*}/isU', $this->fileData, $hostsData);
 
-        $events = [];
+        $events = array();
 
         foreach ($this->getItemsArray($hostsData) as $event) {
             $Event = new Host();
@@ -158,7 +158,7 @@ class Status extends Backend implements BackendInterface
      */
     private function getItemsArray(array $rawItems)
     {
-        $items = [];
+        $items = array();
         $regexPattern = implode('|', $this->getFields());
 
         foreach ($rawItems[0] as $rawItem) {
@@ -183,7 +183,7 @@ class Status extends Backend implements BackendInterface
      */
     private function getFields()
     {
-        return [
+        return array(
             'current_state',
             'state_type',
             'problem_has_been_acknowledged',
@@ -204,7 +204,7 @@ class Status extends Backend implements BackendInterface
             'max_attempts',
             'is_flapping',
             'notifications_enabled'
-        ];
+        );
     }
 
     /**
@@ -228,7 +228,7 @@ class Status extends Backend implements BackendInterface
         // Obtenemos los bloques que corresponden al estado de los servicios
         preg_match_all('/servicestatus {.*}/isU', $this->fileData, $servicesData);
 
-        $events = [];
+        $events = array();
 
         foreach ($this->getItemsArray($servicesData) as $event) {
             $Event = new Service();

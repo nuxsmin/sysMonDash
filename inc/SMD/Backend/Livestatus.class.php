@@ -106,7 +106,7 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        $events = [];
+        $events = array();
 
         foreach ($data as $event) {
             $Event = new Host();
@@ -192,7 +192,7 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        $events = [];
+        $events = array();
 
         foreach ($data as $event) {
             $Event = new Service();
@@ -261,7 +261,7 @@ class Livestatus extends Backend implements BackendInterface
 
         $data = $this->getJsonFromSocket($dataQuery);
 
-        $downtimes = [];
+        $downtimes = array();
 
         foreach ($data as $downtime) {
             $Downtime = new Downtime();

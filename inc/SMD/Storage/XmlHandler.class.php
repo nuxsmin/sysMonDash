@@ -29,7 +29,6 @@ use DOMElement;
 use DOMNode;
 use DOMNodeList;
 use ReflectionObject;
-use SMD\Util\Json;
 
 /**
  * Class XmlHandler para manejo básico de documentos XML
@@ -85,7 +84,7 @@ class XmlHandler implements StorageInterface
             throw new \Exception(sprintf('No es posible leer/escribir el archivo: %s', $this->file));
         }
 
-        $this->items = [];
+        $this->items = array();
         $this->Dom->load($this->file);
 
         $nodes = $this->Dom->getElementsByTagName($tag)->item(0)->childNodes;
@@ -112,7 +111,7 @@ class XmlHandler implements StorageInterface
      */
     protected function readChildNodes(DOMNodeList $NodeList)
     {
-        $nodes = [];
+        $nodes = array();
 
         foreach ($NodeList as $node) {
             /** @var $node DOMNode */
@@ -220,7 +219,7 @@ class XmlHandler implements StorageInterface
             return ($serialize) ? serialize($items) : $this->analyzeObject($items);
         }
 
-        return [];
+        return array();
 
     }
 
@@ -232,7 +231,7 @@ class XmlHandler implements StorageInterface
      */
     protected function analyzeObject($object)
     {
-        $items = [];
+        $items = array();
         $Reflection = new ReflectionObject($object);
 
         foreach ($Reflection->getProperties() as $property) {

@@ -27,7 +27,6 @@ namespace SMD\Backend;
 
 use Exts\Zabbix\ZabbixApiLoader;
 use SMD\Backend\Event\Downtime;
-use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Event\Trigger;
 use SMD\Core\Config;
 use SMD\Core\ConfigBackendZabbix;
@@ -105,7 +104,7 @@ class Zabbix extends Backend implements BackendInterface
     {
         $this->Zabbix = ZabbixApiLoader::getAPI($this->version);
         $this->Zabbix->setApiUrl($this->url);
-        $this->Zabbix->userLogin(['user' => $this->user, 'password' => $this->pass]);
+        $this->Zabbix->userLogin(array('user' => $this->user, 'password' => $this->pass));
     }
 
     /**
@@ -135,25 +134,25 @@ class Zabbix extends Backend implements BackendInterface
     {
         $this->getScheduledDowntimes();
 
-        $params = [
+        $params = array(
             'groupids' => null,
             'hostids' => null,
             'monitored' => true,
             //'maintenance'   => false,
-            'filter' => ['value' => 1],
+            'filter' => array('value' => 1),
             'skipDependent' => true,
             'expandDescription' => true,
-            'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
-            'selectHosts' => ['hostid', 'name', 'maintenance_status'],
-            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
-            'selectItems' => ['name'],
-            'sortfield' => ['lastchange'],
-            'sortorder' => ['DESC'],
+            'output' => array('triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'),
+            'selectHosts' => array('hostid', 'name', 'maintenance_status'),
+            'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'),
+            'selectItems' => array('name'),
+            'sortfield' => array('lastchange'),
+            'sortorder' => array('DESC'),
             'limit' => Config::getConfig()->getMaxDisplayItems()
-        ];
+        );
 
         $triggers = $this->Zabbix->triggerGet($params);
-        $events = [];
+        $events = array();
 
         foreach ($triggers as $event) {
             foreach ($event->hosts as $host) {
@@ -193,11 +192,11 @@ class Zabbix extends Backend implements BackendInterface
             return $this->downtimes;
         }
 
-        $params = [
-            'output' => ['active_since', 'active_till', 'description'],
+        $params = array(
+            'output' => array('active_since', 'active_till', 'description'),
             'selectHosts' => 'extend',
             'selectTimeperiods' => 'extend'
-        ];
+        );
 
         $maintenances = $this->Zabbix->maintenanceGet($params);
 
@@ -234,10 +233,10 @@ class Zabbix extends Backend implements BackendInterface
     {
         foreach ($hosts as $host) {
             if ((int)$host->maintenance_status === 1) {
-                $this->hostsMaintenance[$host->hostid] = [
+                $this->hostsMaintenance[$host->hostid] = array(
                     'host' => $host->host,
                     'maintenanceid' => (int)$host->maintenanceid
-                ];
+                );
             }
         }
     }
@@ -250,13 +249,13 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function getTimePeriod(array $timePeriods)
     {
-        $result = [];
+        $result = array();
 
         foreach ($timePeriods as $timePeriod) {
             $end = $timePeriod->start_date + $timePeriod->period;
 
             if (time() <= $end) {
-                $result[] = ['start' => $timePeriod->start_date, 'end' => $end];
+                $result[] = array('start' => $timePeriod->start_date, 'end' => $end);
             }
         }
 
@@ -273,7 +272,7 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function getHostsForMaintenance($maintenanceId)
     {
-        $hosts = [];
+        $hosts = array();
 
         foreach ($this->hostsMaintenance as $host) {
             if ((int)$host['maintenanceid'] === (int)$maintenanceId) {
@@ -361,24 +360,24 @@ class Zabbix extends Backend implements BackendInterface
     {
         $this->getScheduledDowntimes();
 
-        $params = [
+        $params = array(
             'groupids' => null,
             'hostids' => null,
             'monitored' => true,
             //'maintenance'   => false,
-            'filter' => ['value' => 0, 'lastChangeSince' => time() - (Config::getConfig()->getNewItemTime() / 2)],
+            'filter' => array('value' => 0, 'lastChangeSince' => time() - (Config::getConfig()->getNewItemTime() / 2)),
             'skipDependent' => true,
             'expandDescription' => true,
-            'output' => ['triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'],
-            'selectHosts' => ['hostid', 'name', 'maintenance_status', 'errors_from'],
-            'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'],
-            'sortfield' => ['lastchange'],
-            'sortorder' => ['DESC'],
+            'output' => array('triggerid', 'state', 'status', 'error', 'url', 'expression', 'description', 'priority', 'lastchange', 'value'),
+            'selectHosts' => array('hostid', 'name', 'maintenance_status', 'errors_from'),
+            'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns', 'value'),
+            'sortfield' => array('lastchange'),
+            'sortorder' => array('DESC'),
             'limit' => Config::getConfig()->getMaxDisplayItems()
-        ];
+        );
 
         $triggers = $this->Zabbix->triggerGet($params);
-        $events = [];
+        $events = array();
 
         foreach ($triggers as $event) {
             foreach ($event->hosts as $host) {
@@ -427,13 +426,13 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function getTrigger($id)
     {
-        $params = [
+        $params = array(
             'triggerids' => $id,
             'expandData' => 1,
             'expandDescription' => 1,
             'selectHosts' => 'extend',
-            'output' => ['triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value']
-        ];
+            'output' => array('triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value')
+        );
 
         $trigger = $this->Zabbix->triggerGet($params);
         return $trigger[0];

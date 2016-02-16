@@ -75,7 +75,7 @@ class SMD extends Backend implements BackendInterface
     {
         $url = $this->url . '?action=' . Api::ACTION_EVENTS . '&token=' . $this->token;
         $data = $this->getRemoteData($url);
-        $events = [];
+        $events = array();
 
         if (is_array($data)) {
             foreach ($data as $event) {
@@ -145,7 +145,7 @@ class SMD extends Backend implements BackendInterface
     {
         $url = $this->url . '?action=' . Api::ACTION_DOWNTIMES . '&token=' . $this->token;
         $data = $this->getRemoteData($url);
-        $downtimes = [];
+        $downtimes = array();
 
         if (is_array($data) || is_object($data)) {
             foreach($data as $downtime){

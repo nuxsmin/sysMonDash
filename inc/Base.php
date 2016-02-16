@@ -23,8 +23,6 @@
  *
  */
 
-use SMD\Core\Init;
-
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
 
 define('XML_CONFIG_FILE', DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'sysMonDash' . DIRECTORY_SEPARATOR . 'config.xml');

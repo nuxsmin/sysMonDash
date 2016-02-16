@@ -101,7 +101,7 @@ class Config
             $property->setAccessible(true);
 
             if ($property->getName() === 'backend') {
-                $Backends = [];
+                $Backends = array();
 
                 foreach ($items['backend'] as $backend) {
                     $Backends[] = unserialize(base64_decode($backend));
