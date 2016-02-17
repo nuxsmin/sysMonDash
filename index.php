@@ -45,6 +45,7 @@ $ajaxFile = '/ajax/getData.php?t=' . $type . '&to=' . $timeout;
 Session::setCssHash(Util::getCssHash());
 ?>
 <!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <title>sysMonDash :: <?php echo Config::getConfig()->getPageTitle(); ?></title>

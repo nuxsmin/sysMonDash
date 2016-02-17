@@ -168,7 +168,7 @@ function SMD() {
         var countdown = jQuery("#refreshing_countdown");
         var remaining = parseInt(countdown.text());
         if (remaining == 0) {
-            self.updateNagiosData(placeHolder);
+            self.updateNagiosData();
             countdown.text(Config.getTimeout());
         }
         else {
@@ -187,7 +187,7 @@ function SMD() {
         var curr_min = ('0' + d.getMinutes()).slice(-2);
         var curr_sec = ('0' + d.getSeconds()).slice(-2);
 
-        jQuery('#hora>h1').html(curr_date + '<br>' + curr_hour + ':' + curr_min + ':' + curr_sec);
+        jQuery('#hora').find('h1').html(curr_date + '<br>' + curr_hour + ':' + curr_min + ':' + curr_sec);
     };
 
     /**

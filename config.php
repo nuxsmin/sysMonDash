@@ -37,7 +37,7 @@ require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php
 Init::start();
 
 $hash = Request::analyze('h');
-$hashOk = ($hash === Session::getConfig()->getHash() || empty(Session::getConfig()->getHash()));
+$hashOk = ($hash === Session::getConfig()->getHash() || Session::getConfig()->getHash() === '');
 
 $i = 0;
 $j = 0;
@@ -45,6 +45,7 @@ $k = 0;
 $l = 0;
 ?>
 <!DOCTYPE html>
+<html>
 <head xmlns="http://www.w3.org/1999/html">
     <meta charset="UTF-8">
     <title><?php echo Language::t(Config::getConfig()->getPageTitle()); ?></title>

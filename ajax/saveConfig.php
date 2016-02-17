@@ -39,7 +39,7 @@ Init::start(false);
 
 $hash = Request::analyze('hash');
 
-if (!empty(Session::getConfig()->getHash()) && $hash !== Session::getConfig()->getHash()){
+if (Session::getConfig()->getHash() !== '' && $hash !== Session::getConfig()->getHash()){
     Response::printJSON('Hash de configuración incorrecto');
 }
 

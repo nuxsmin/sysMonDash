@@ -1,5 +1,5 @@
 <?php
-$LANG['sysMonDash - Cuadro de Mandos'] = 'sysMonDash - Monitoring Dashboard';
+$LANG['Panel Monitorización'] = 'Monitoring Dashboard';
 $LANG['Un proyecto de cygnux.org'] = 'A cygnux.org project';
 $LANG['Error al obtener los eventos de monitorización'] = 'Error while retrieving monitoring data';
 $LANG['Panel Monitorización'] = 'Monitoring Dashboard';

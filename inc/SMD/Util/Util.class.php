@@ -107,7 +107,7 @@ class Util
     {
         $version = intval(implode('', self::getVersion(true)));
 
-        if (session_status() === PHP_SESSION_ACTIVE) {
+        if (self::getSessionActive()) {
             if (!isset($_SESSION['VERSION'])) {
                 $_SESSION['VERSION'] = $version;
                 Session::setCssHash(self::getCssHash());
@@ -128,7 +128,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2016021501;
+        $build = 2016021701;
         $version = array(1, 0);
 
         if ($retBuild) {
@@ -136,6 +136,20 @@ class Util
         }
 
         return $version;
+    }
+
+    /**
+     * Devolver si la sesión está activa
+     *
+     * @return bool
+     */
+    public static function getSessionActive()
+    {
+        if (function_exists('\session_status')) {
+            return (session_status() === PHP_SESSION_ACTIVE);
+        } else {
+            return (session_id() !== '');
+        }
     }
 
     /**
@@ -289,6 +303,8 @@ class Util
     public static function getDataFromUrl($url)
     {
         if (!self::curlIsAvailable()) {
+            error_log('cURL not available');
+
             return false;
         }
 
@@ -300,6 +316,8 @@ class Util
         curl_setopt($ch, CURLOPT_USERAGENT, "sysMonDash-App");
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
 
         $data = curl_exec($ch);
 

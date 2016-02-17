@@ -86,7 +86,7 @@ if ($type !== 1) {
                     </div>
                 </td>
             </tr>
-            <script>jQuery("#tblBoard thead").hide()</script>
+            <script>jQuery("#tblBoard").find("thead").hide()</script>
         <?php elseif ($SMD->getDisplayedItems() > Config::getConfig()->getMaxDisplayItems()): ?>
             <tr>
                 <td colspan="5">
@@ -99,12 +99,12 @@ if ($type !== 1) {
                     </div>
                 </td>
             </tr>
-            <script>jQuery("#tblBoard thead").hide()</script>
+            <script>jQuery("#tblBoard").find("thead").hide()</script>
         <?php else: ?>
         <?php foreach ($res as $line): ?>
             <?php echo $line; ?>
         <?php endforeach; ?>
-            <script>jQuery("#tblBoard thead").show()</script>
+            <script>jQuery("#tblBoard").find("thead").show()</script>
         <?php endif; ?>
 
     </table>
@@ -153,6 +153,6 @@ if ($type !== 1) {
 <?php if (Util::checkRefreshSession()): ?>
     <script>
         console.info('RELOAD');
-        window.location.href = window.location.href;
+        window.location.href = "index.php";
     </script>
 <?php endif; ?>

@@ -34,7 +34,7 @@ class ConfigData
     /** @var string */
     private $language = 'en_US';
     /** @var string */
-    private $pageTitle = 'sysMonDash - Cuadro de Mandos';
+    private $pageTitle = 'Panel Monitorización';
     /** @var array */
     private $backend = array();
     /** @var string */
