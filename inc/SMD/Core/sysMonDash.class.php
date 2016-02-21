@@ -41,6 +41,11 @@ use SMD\Util\Util;
 class sysMonDash
 {
     /**
+     * Tipos de llamada
+     */
+    const CALL_TYPE_NORMAL = 0;
+    const CALL_TYPE_API = 1;
+    /**
      * @var int
      */
     private $totalItems = 0;
@@ -55,7 +60,11 @@ class sysMonDash
     /**
      * @var int
      */
-    private $type = 0;
+    private $viewType = 0;
+    /**
+     * @var int
+     */
+    private $callType = 0;
 
     /**
      * Función para obtener los eventos de los backends y devolver los avisos en formato HTML
@@ -97,7 +106,7 @@ class sysMonDash
                 $runFilters = $this->filterItems($item);
 
                 // Filtrar los eventos a mostrar
-                if (($this->type !== VIEW_FRONTLINE && $this->type !== VIEW_DISPLAY)
+                if (($this->viewType !== VIEW_FRONTLINE && $this->viewType !== VIEW_DISPLAY)
                     || ($newItem === true
                         || $newItemUp === true
                         || $runFilters === false)
@@ -139,7 +148,7 @@ class sysMonDash
                     case ConfigBackend::TYPE_ZABBIX:
                         $backends[] = new Zabbix($Backend);
                         break;
-                    case ConfigBackend::TYPE_SMD:
+                    case ((ConfigBackend::TYPE_SMD && $this->callType !== self::CALL_TYPE_API) ? true : false):
                         $backends[] = new SMD($Backend);
                         break;
                 }
@@ -437,10 +446,18 @@ class sysMonDash
     }
 
     /**
-     * @param int $type
+     * @param int $viewType
      */
-    public function setType($type)
+    public function setViewType($viewType)
     {
-        $this->type = $type;
+        $this->viewType = $viewType;
+    }
+
+    /**
+     * @param int $callType
+     */
+    public function setCallType($callType)
+    {
+        $this->callType = $callType;
     }
 }

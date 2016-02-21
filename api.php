@@ -26,6 +26,7 @@ use SMD\Api\Api;
 use SMD\Core\Init;
 use SMD\Http\Request;
 use SMD\Http\Response;
+use SMD\Util\Json;
 
 define('APP_ROOT', '.');
 
@@ -42,18 +43,24 @@ if (!$Api->checkToken($apiToken)){
     Response::printJSON('Token inválido');
 }
 
-$json = null;
+$data = null;
 
 switch ($action){
     case Api::ACTION_EVENTS:
-        $json = $Api->getEvents();
+        $data = $Api->getEvents();
         break;
     case Api::ACTION_DOWNTIMES:
-        $json = $Api->getDowntimes();
+        $data = $Api->getDowntimes();
         break;
     default:
         Response::printJSON('Acción inválida');
 }
 
 header('Content-type: application/json');
-echo $json;
+$json = array(
+    'status' => 0,
+    'data' => $data,
+    'action' => $action
+);
+
+die(Json::getJson($json));

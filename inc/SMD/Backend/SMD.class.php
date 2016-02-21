@@ -25,8 +25,6 @@
 namespace SMD\Backend;
 
 use SMD\Api\Api;
-use SMD\Backend\Event\Downtime;
-use SMD\Backend\Event\SMD as SMDEvent;
 use SMD\Core\ConfigBackendSMD;
 use SMD\Util\Util;
 
@@ -74,46 +72,8 @@ class SMD extends Backend implements BackendInterface
     public function getHostsProblems()
     {
         $url = $this->url . '?action=' . Api::ACTION_EVENTS . '&token=' . $this->token;
-        $data = $this->getRemoteData($url);
-        $events = array();
 
-        if (is_array($data)) {
-            foreach ($data as $event) {
-                $Event = new SMDEvent();
-                $Event->setAlias($event->alias);
-                $Event->setHostAlias($event->hostAlias);
-                $Event->setState($event->state);
-                $Event->setHostState($event->hostState);
-                $Event->setCheckCommand($event->checkCommand);
-                $Event->setHostDisplayName($event->hostDisplayName);
-                $Event->setDisplayName($event->displayName);
-                $Event->setCurrentAttempt($event->currentAttempt);
-                $Event->setMaxCheckAttempts($event->maxCheckAttempts);
-                $Event->setFlapping($event->flapping);
-                $Event->setPluginOutput($event->pluginOutput);
-                $Event->setAcknowledged($event->acknowledged);
-                $Event->setActiveChecksEnabled($event->activeChecksEnabled);
-                $Event->setLastHardState($event->lastHardState);
-                $Event->setHostScheduledDowntimeDepth($event->hostScheduledDowntimeDepth);
-                $Event->setScheduledDowntimeDepth($event->scheduledDowntimeDepth);
-                $Event->setLastCheck($event->lastCheck);
-                $Event->setLastHardStateChange($event->lastHardStateChange);
-                $Event->setHostLastTimeUp($event->hostLastTimeUp);
-                $Event->setLastTimeDown($event->lastTimeDown);
-                $Event->setHostLastTimeUnreachable($event->hostLastTimeUnreachable);
-                $Event->setLastTimeUnreachable($event->lastTimeUnreachable);
-                $Event->setLastTimeUp($event->lastTimeUp);
-                $Event->setLastTimeOk($event->lastTimeOk);
-                $Event->setStateType($event->stateType);
-                $Event->setNotificationsEnabled($event->notificationsEnabled);
-                $Event->setBackendAlias($event->backendAlias);
-                $Event->setBackendUrl($this->url);
-
-                $events[] = $Event;
-            }
-        }
-
-        return $events;
+        return $this->getRemoteData($url);
     }
 
     /**
@@ -144,32 +104,14 @@ class SMD extends Backend implements BackendInterface
     public function getScheduledDowntimesGroupped()
     {
         $url = $this->url . '?action=' . Api::ACTION_DOWNTIMES . '&token=' . $this->token;
-        $data = $this->getRemoteData($url);
-        $downtimes = array();
 
-        if (is_array($data) || is_object($data)) {
-            foreach($data as $downtime){
-                $Downtime = new Downtime();
-                $Downtime->setAuthor($downtime->author);
-                $Downtime->setComment($downtime->comment);
-                $Downtime->setDuration($downtime->duration);
-                $Downtime->setHostAlias($downtime->hostAlias);
-                $Downtime->setHostName($downtime->hostName);
-                $Downtime->setIsService($downtime->isService);
-                $Downtime->setServiceDisplayName($downtime->serviceDisplayName);
-                $Downtime->setStartTime($downtime->startTime);
-                $Downtime->setEndTime($downtime->endTime);
-                $Downtime->setBackendAlias($downtime->backendAlias);
-
-                $downtimes[$Downtime->getHostHash()] = $Downtime;
-            }
-        }
-
-        return $downtimes;
+        return $this->getRemoteData($url);
     }
 
     /**
      * Obtener los datos remotos desde la API de sysMonDash con CURL
+     *
+     * Devuelve los datos deserializados
      *
      * @param $url
      * @return mixed
@@ -185,6 +127,6 @@ class SMD extends Backend implements BackendInterface
             throw new \Exception($msg);
         }
 
-        return $data;
+        return unserialize(base64_decode($data->data));
     }
 }

@@ -42,7 +42,7 @@ $type = Request::analyze('t', VIEW_FRONTLINE);
 $timeout = Request::analyze('to', Config::getConfig()->getRefreshValue());
 
 $SMD = new sysMonDash();
-$SMD->setType($type);
+$SMD->setViewType($type);
 
 ob_start();
 

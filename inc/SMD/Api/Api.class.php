@@ -39,7 +39,7 @@ class Api
     const ACTION_DOWNTIMES = 2;
 
     /**
-     * Devolver los eventos en formato JSON
+     * Devolver los eventos serializados y codificados en base64
      *
      * @return string
      * @throws \Exception
@@ -47,13 +47,12 @@ class Api
     public function getEvents()
     {
         $SMD = new sysMonDash();
-        $events = $SMD->getRawEvents();
-
-        return Json::getJson($events);
+        $SMD->setCallType(sysMonDash::CALL_TYPE_API);
+        return base64_encode(serialize($SMD->getRawEvents()));
     }
 
     /**
-     * Devolver las paradas programadas en formato JSON
+     * Devolver las paradas programadas serializados y codificados en base64
      *
      * @return string
      * @throws \Exception
@@ -61,9 +60,8 @@ class Api
     public function getDowntimes()
     {
         $SMD = new sysMonDash();
-        $downtimes = $SMD->getRawDowntimes();
-
-        return Json::getJson($downtimes);
+        $SMD->setCallType(sysMonDash::CALL_TYPE_API);
+        return base64_encode(serialize($SMD->getRawDowntimes()));
     }
 
     /**

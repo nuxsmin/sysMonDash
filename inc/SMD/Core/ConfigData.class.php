@@ -102,7 +102,7 @@ class ConfigData
      */
     public function setHash()
     {
-        $this->hash = uniqid();
+        $this->hash = bin2hex(openssl_random_pseudo_bytes(16));;
     }
 
     /**
