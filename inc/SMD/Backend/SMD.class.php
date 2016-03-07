@@ -26,6 +26,8 @@ namespace SMD\Backend;
 
 use SMD\Api\Api;
 use SMD\Core\ConfigBackendSMD;
+use SMD\Core\Exceptions\BackendException;
+use SMD\Core\Exceptions\CurlException;
 use SMD\Util\Util;
 
 /**
@@ -121,10 +123,10 @@ class SMD extends Backend implements BackendInterface
     {
         $data = json_decode(Util::getDataFromUrl($url));
 
-        if (is_object($data) && isset($data->status) && $data->status === 1){
+        if (is_object($data) && isset($data->status) && $data->status === 1) {
             $msg = 'API: ' . $data->description;
             error_log($msg);
-            throw new \Exception($msg);
+            throw new BackendException($msg);
         }
 
         return unserialize(base64_decode($data->data));

@@ -32,6 +32,9 @@ use SMD\Backend\Livestatus;
 use SMD\Backend\SMD;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
+use SMD\Core\Exceptions\BackendException;
+use SMD\Core\Exceptions\CurlException;
+use SMD\Core\Exceptions\NoDataException;
 use SMD\Util\Util;
 
 /**
@@ -65,6 +68,10 @@ class sysMonDash
      * @var int
      */
     private $callType = 0;
+    /**
+     * @var array
+     */
+    private $errors = array();
 
     /**
      * Función para obtener los eventos de los backends y devolver los avisos en formato HTML
@@ -73,24 +80,28 @@ class sysMonDash
      */
     public function getItems()
     {
-        try {
-            $rawItems = array();
+        $htmlItems = array();
+        $rawItems = array();
 
+        try {
             // Obtener los avisos desde la monitorización
             foreach ($this->getBackends() as $Backend) {
-                $rawItems = array_merge($rawItems, $Backend->getProblems());
-                $this->downtimes = array_merge($this->downtimes, $Backend->getScheduledDowntimesGroupped());
+                try {
+                    $rawItems = array_merge($rawItems, $Backend->getProblems());
+                    $this->downtimes = array_merge($this->downtimes, $Backend->getScheduledDowntimesGroupped());
+                } catch (CurlException $e){
+                    $this->errors[] = $Backend->getBackend()->getAlias() . ': ' . $e->getMessage();
+                }
             }
 
             if ($rawItems === false) {
-                throw new \Exception('No hay datos desde el backend');
+                throw new NoDataException('No hay datos desde el backend');
             }
 
             // Ordenar los rawItems por tiempo de último cambio
             Util::arraySortByProperty($rawItems, 'lastHardStateChange');
 
             $newItemTime = Config::getConfig()->getNewItemTime();
-            $htmlItems = array();
 
             // Recorremos el array y mostramos los elementos
             foreach ($rawItems as $item) {
@@ -118,9 +129,11 @@ class sysMonDash
                 // Contador del no. de elementos
                 $this->totalItems++;
             }
-        } catch (\Exception $e) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
-            exit();
+        } catch (NoDataException $e) {
+            $this->errors[] = $e->getMessage();
+        } catch (BackendException $e) {
+            $this->errors[] = $e->getMessage();
+            //header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
         }
 
         return $htmlItems;
@@ -459,5 +472,13 @@ class sysMonDash
     public function setCallType($callType)
     {
         $this->callType = $callType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }
