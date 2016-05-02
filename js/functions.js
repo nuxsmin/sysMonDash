@@ -131,7 +131,7 @@ function SMD() {
         jQuery.ajax({
             url: url,
             cache: false,
-            timeout: 5000,
+            timeout: Config.getTimeout(),
             dataType: 'html',
             success: function (data) {
                 placeHolder.html(data);

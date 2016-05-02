@@ -249,7 +249,7 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function getTimePeriod(array $timePeriods)
     {
-        $result = array();
+        $result = array('start' => 0, 'end' => 0);
 
         foreach ($timePeriods as $timePeriod) {
             $end = $timePeriod->start_date + $timePeriod->period;
@@ -261,7 +261,7 @@ class Zabbix extends Backend implements BackendInterface
 
         Util::arraySortByKey($result, 'end');
 
-        return $result[0];
+        return (count($result) > 0) ? $result[0] : $result;
     }
 
     /**

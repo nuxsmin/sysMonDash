@@ -25,6 +25,8 @@
 
 namespace SMD\Util;
 
+use SMD\Core\Config;
+use SMD\Core\Exceptions\CurlException;
 use SMD\Core\Language;
 use SMD\Core\Session;
 
@@ -163,16 +165,6 @@ class Util
     }
 
     /**
-     * Comprobar la versión de PHP
-     *
-     * @return bool
-     */
-    public static function checkPHPVersion()
-    {
-        return (version_compare(PHP_VERSION, '5.4.0') >= 0);
-    }
-
-    /**
      * Comprobar si el archivo se puede leer/escribir
      *
      * @return bool
@@ -305,7 +297,7 @@ class Util
         if (!self::curlIsAvailable()) {
             error_log('cURL not available');
 
-            return false;
+            throw new CurlException('cURL not available');
         }
 
         $ch = curl_init($url);
@@ -315,16 +307,15 @@ class Util
         curl_setopt($ch, CURLINFO_HEADER_OUT, true);
         curl_setopt($ch, CURLOPT_USERAGENT, "sysMonDash-App");
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_TIMEOUT, Config::getConfig()->getRefreshValue() / 3);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $data = curl_exec($ch);
 
         if ($data === false) {
             error_log(curl_error($ch));
-
-            throw new \Exception(curl_error($ch));
+            throw new CurlException(curl_error($ch), curl_errno($ch));
         }
 
         return $data;

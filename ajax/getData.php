@@ -76,7 +76,7 @@ if ($type !== 1) {
         <?php endif; ?>
         </thead>
 
-        <?php if ($SMD->getDisplayedItems() === 0): ?>
+        <?php if ($SMD->getDisplayedItems() === 0 && count($SMD->getErrors()) === 0): ?>
             <tr>
                 <td colspan="5">
                     <div id="nomessages">
@@ -146,6 +146,15 @@ if ($type !== 1) {
         <?php endforeach; ?>
         </tbody>
     </table>
+<?php endif; ?>
+
+<?php if (count($SMD->getErrors()) > 0): ?>
+    <div class="title"><?php echo Language::t('Errores'); ?></div>
+    <?php foreach ($SMD->getErrors() as $error): ?>
+        <div id="nomessages" class="full error">
+            <?php echo $error; ?>
+        </div>
+    <?php endforeach; ?>
 <?php endif; ?>
 
 <?php ob_end_flush(); ?>

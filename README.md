@@ -61,7 +61,7 @@ https://github.com/nuxsmin/sysMonDash
 http://cygnux.org
 
 
-![sysMonDash Main View](http://cloud.cygnux.org/sysMonDash/assets/sysMonDash.png)
+![Main View](http://sysmondash.cygnux.org/assets/sysMonDash.png)
 
 
 
