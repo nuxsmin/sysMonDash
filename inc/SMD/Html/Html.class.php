@@ -86,7 +86,7 @@ class Html
      * @param array $backends
      * @return array
      */
-    public static function processFormBackends(array $backends)
+    public static function processFormBackends($backends)
     {
         $BackendsConfig = array();
         $ConfigBackend = null;
