@@ -62,10 +62,10 @@ class Language
 
             if (isset($LANG)
                 && is_array($LANG)
-                && isset($LANG[$string])
             ) {
                 Session::setLanguage($LANG);
-                return $LANG[$string];
+
+                return (isset($LANG[$string])) ? $LANG[$string] : $string;
             }
 
             return $string;
