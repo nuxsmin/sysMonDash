@@ -78,6 +78,7 @@ $ConfigData->setNewItemAudioEnabled($eventNewItemAudio);
 $ConfigData->setColLastcheck($showColLastCheck);
 $ConfigData->setColHost($showColHost);
 $ConfigData->setColService($showColService);
+$ConfigData->setColStatusInfo($showColInfo);
 $ConfigData->setColBackend($showColBackend);
 $ConfigData->setRegexHostShow($regexHostShow);
 $ConfigData->setRegexServiceNoShow($regexServicesNoShow);
