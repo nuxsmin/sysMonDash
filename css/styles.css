@@ -204,7 +204,7 @@ footer #project a {
     text-align: center;
     background-color: #f2f2f2;
     padding: 1em;
-    border-radius: 15px;
+    border-radius: 5px;
 }
 
 #nomessages.full {
@@ -213,8 +213,11 @@ footer #project a {
 }
 
 #nomessages.error {
-    border: 1px solid  #f44336;
+    border-top: 1px solid  #f44336;
+    border-bottom: 1px solid  #f44336;
     color:  #f44336;
+    background-color: #ffebee;
+    border-radius: 0;
 }
 
 div#nagvis-view {

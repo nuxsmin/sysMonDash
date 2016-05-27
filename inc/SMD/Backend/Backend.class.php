@@ -25,11 +25,13 @@
 
 namespace SMD\Backend;
 
+use SMD\Core\ConfigBackend;
+
 class Backend
 {
     /** @var bool */
     protected $allHeaders = false;
-    /** @var  mixed */
+    /** @var  ConfigBackend */
     protected $backend;
 
     /**
@@ -57,7 +59,7 @@ class Backend
     }
 
     /**
-     * @return mixed
+     * @return ConfigBackend
      */
     public function getBackend()
     {

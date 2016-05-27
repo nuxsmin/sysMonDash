@@ -23,14 +23,7 @@
  */
 
 namespace Exts\Zabbix\V245;
-
-/**
- * @brief   Exception class for ZabbixApi namespace.
- */
-
-class Exception extends \Exception
-{
-}
+use Exception;
 
 /**
  * @brief   Abstract class for the Zabbix API.

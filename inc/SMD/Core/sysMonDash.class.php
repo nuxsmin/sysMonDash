@@ -25,6 +25,7 @@
 
 namespace SMD\Core;
 
+use Exception;
 use SMD\Backend\BackendInterface;
 use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\EventInterface;
@@ -33,7 +34,6 @@ use SMD\Backend\SMD;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
 use SMD\Core\Exceptions\BackendException;
-use SMD\Core\Exceptions\CurlException;
 use SMD\Core\Exceptions\NoDataException;
 use SMD\Util\Util;
 
@@ -89,13 +89,13 @@ class sysMonDash
                 try {
                     $rawItems = array_merge($rawItems, $Backend->getProblems());
                     $this->downtimes = array_merge($this->downtimes, $Backend->getScheduledDowntimesGroupped());
-                } catch (CurlException $e){
+                } catch (Exception $e) {
                     $this->errors[] = $Backend->getBackend()->getAlias() . ': ' . $e->getMessage();
                 }
             }
 
             if ($rawItems === false) {
-                throw new NoDataException('No hay datos desde el backend');
+                throw new NoDataException(Language::t('No hay datos desde el backend'));
             }
 
             // Ordenar los rawItems por tiempo de último cambio
@@ -394,7 +394,7 @@ class sysMonDash
      * Devolver los eventos sin formato HTML
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getRawEvents()
     {
@@ -406,7 +406,7 @@ class sysMonDash
         }
 
         if ($rawEvents === false) {
-            throw new \Exception('No hay datos desde el backend');
+            throw new Exception('No hay datos desde el backend');
         }
 
         return $rawEvents;
@@ -416,7 +416,7 @@ class sysMonDash
      * Devolver las paradas sin formato HTML
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getRawDowntimes()
     {
@@ -428,7 +428,7 @@ class sysMonDash
         }
 
         if ($downtimes === false) {
-            throw new \Exception('No hay datos desde el backend');
+            throw new Exception('No hay datos desde el backend');
         }
 
         return $downtimes;

@@ -108,12 +108,12 @@ class Html
                         break;
                 }
 
-                $active = ($config['active'] === 'on') ? true : false;
+                $active = (isset($config['active']) && $config['active'] === 'on') ? true : false;
                 $ConfigBackend->setActive($active);
                 $ConfigBackend->setAlias($config['alias']);
-            }
 
-            $BackendsConfig[] = $ConfigBackend;
+                $BackendsConfig[] = $ConfigBackend;
+            }
         }
 
         return $BackendsConfig;

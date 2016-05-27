@@ -39,7 +39,7 @@ use SMD\Util\Util;
  */
 class Zabbix extends Backend implements BackendInterface
 {
-    /** @var \Exts\Zabbix\V223\ZabbixApi|\Exts\Zabbix\V243\ZabbixApi */
+    /** @var \Exts\Zabbix\V225\ZabbixApi|\Exts\Zabbix\V245\ZabbixApi */
     private $Zabbix = null;
     /**
      * URL de la API de Zabbix
@@ -102,9 +102,13 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function connect()
     {
-        $this->Zabbix = ZabbixApiLoader::getAPI($this->version);
-        $this->Zabbix->setApiUrl($this->url);
-        $this->Zabbix->userLogin(array('user' => $this->user, 'password' => $this->pass));
+        try {
+            $this->Zabbix = ZabbixApiLoader::getAPI($this->version);
+            $this->Zabbix->setApiUrl($this->url);
+            $this->Zabbix->userLogin(array('user' => $this->user, 'password' => $this->pass));
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 
     /**

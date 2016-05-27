@@ -81,6 +81,8 @@ class Config
         $Storage->save('config');
 
         Session::setConfigTime(0);
+        
+        self::loadConfig($Storage);
     }
 
     /**

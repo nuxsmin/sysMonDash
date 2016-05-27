@@ -22,15 +22,9 @@
  * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 namespace Exts\Zabbix\V225;
-
-/**
- * @brief   Exception class for ZabbixApi namespace.
- */
-
-class Exception extends \Exception
-{
-}
+use Exception;
 
 /**
  * @brief   Abstract class for the Zabbix API.

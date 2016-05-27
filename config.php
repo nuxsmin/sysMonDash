@@ -401,8 +401,8 @@ $l = 0;
             <div class="pure-control-group">
                 <label><?php echo Language::t('Versión API de Zabbix'); ?></label>
                 <select name="backend[zabbix][version]">
-                    <option value="223">2.2.3</option>
-                    <option value="243">2.4.3</option>
+                    <option value="220">2.2</option>
+                    <option value="240">2.4</option>
                 </select>
             </div>
             <div class="pure-control-group">

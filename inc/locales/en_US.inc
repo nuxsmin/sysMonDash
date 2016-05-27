@@ -92,3 +92,4 @@ $LANG['Habilitar sonido en nuevos eventos'] = 'Enable sound on new events';
 $LANG['URL API sysMonDash'] = 'sysMonDash API URL';
 $LANG['Token inválido'] = 'Invalid token';
 $LANG['Acción inválida'] = 'Invalid action';
+$LANG['Error al acceder a la API'] = 'Error while accessing to API';

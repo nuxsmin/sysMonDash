@@ -28,6 +28,7 @@ use SMD\Api\Api;
 use SMD\Core\ConfigBackendSMD;
 use SMD\Core\Exceptions\BackendException;
 use SMD\Core\Exceptions\CurlException;
+use SMD\Core\Language;
 use SMD\Util\Util;
 
 /**
@@ -79,6 +80,34 @@ class SMD extends Backend implements BackendInterface
     }
 
     /**
+     * Obtener los datos remotos desde la API de sysMonDash con CURL
+     *
+     * Devuelve los datos deserializados
+     *
+     * @param $url
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getRemoteData($url)
+    {
+        $data = json_decode(Util::getDataFromUrl($url));
+
+        if (is_object($data) && isset($data->status) && $data->status === 1) {
+            $msg = 'API: ' . $data->description;
+
+            error_log($msg);
+            throw new BackendException($msg);
+        } elseif (!is_object($data)) {
+            $msg = sprintf('%s (%s): %s', $this->getBackend()->getAlias(), 'SMD', Language::t('Error al acceder a la API'));
+
+            error_log($msg);
+            throw new BackendException($msg);
+        }
+
+        return unserialize(base64_decode($data->data));
+    }
+
+    /**
      * Devuelve los eventos de los servicios
      *
      * @return array|bool
@@ -108,27 +137,5 @@ class SMD extends Backend implements BackendInterface
         $url = $this->url . '?action=' . Api::ACTION_DOWNTIMES . '&token=' . $this->token;
 
         return $this->getRemoteData($url);
-    }
-
-    /**
-     * Obtener los datos remotos desde la API de sysMonDash con CURL
-     *
-     * Devuelve los datos deserializados
-     *
-     * @param $url
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function getRemoteData($url)
-    {
-        $data = json_decode(Util::getDataFromUrl($url));
-
-        if (is_object($data) && isset($data->status) && $data->status === 1) {
-            $msg = 'API: ' . $data->description;
-            error_log($msg);
-            throw new BackendException($msg);
-        }
-
-        return unserialize(base64_decode($data->data));
     }
 }

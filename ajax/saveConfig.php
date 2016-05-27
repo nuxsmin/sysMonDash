@@ -39,7 +39,9 @@ Init::start(false);
 
 $hash = Request::analyze('hash');
 
-if (Session::getConfig()->getHash() !== '' && $hash !== Session::getConfig()->getHash()){
+if (Session::getConfig()->getHash() !== '' &&
+    $hash !== Session::getConfig()->getHash()
+) {
     Response::printJSON('Hash de configuración incorrecto');
 }
 
@@ -64,7 +66,7 @@ $specialAPIToken = Request::analyze('special_api_token');
 
 try {
     $Backends = Html::processFormBackends(Request::analyze('backend'));
-} catch (Exception $e){
+} catch (Exception $e) {
     Response::printJSON(\SMD\Core\Language::t($e->getMessage()));
 }
 
