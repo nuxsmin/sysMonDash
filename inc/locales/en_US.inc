@@ -93,3 +93,4 @@ $LANG['URL API sysMonDash'] = 'sysMonDash API URL';
 $LANG['Token inválido'] = 'Invalid token';
 $LANG['Acción inválida'] = 'Invalid action';
 $LANG['Error al acceder a la API'] = 'Error while accessing to API';
+$LANG['Errores'] = 'Errors';
