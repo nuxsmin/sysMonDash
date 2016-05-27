@@ -52,12 +52,17 @@ class ZabbixApiLoader
      *
      * @param $version int la versión de la API
      *
-     * @return V223\ZabbixApi|V243\ZabbixApi
+     * @return V225\ZabbixApi|V245\ZabbixApi
      * @throws \Exception
      */
     public static function getAPI($version)
     {
-        $version = 'V' . $version;
+        if ($version >= 220 && $version < 240){
+            $version = 'V225';
+        } elseif ($version >= 240) {
+            $version = 'V245';
+        }
+
         $apiDir = __DIR__ . DIRECTORY_SEPARATOR . $version;
 
         if (!file_exists($apiDir)) {

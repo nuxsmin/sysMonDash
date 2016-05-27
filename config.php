@@ -243,8 +243,8 @@ $l = 0;
                                     <select id="backend_zabbix_version"
                                             name="backend[zabbix][<?php echo $k; ?>][version]"
                                             data-selected="<?php echo $Backend->getVersion(); ?>">
-                                        <option value="223">2.2.3</option>
-                                        <option value="243">2.4.3</option>
+                                        <option value="220">2.2</option>
+                                        <option value="240">2.4</option>
                                     </select>
                                 </div>
                                 <div class="pure-control-group">

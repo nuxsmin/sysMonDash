@@ -1,3 +1,4 @@
+* [MOD] Updated Zabbix API to 2.2.5 and 2.4.5 versions.
 * [FIX] Fixed issue when retrieving data from Zabbix triggers. Thanks to @ZUNbado
 * [FIX] Fixed issue when saving status info column state. Thanks to @ZUNbado
 
