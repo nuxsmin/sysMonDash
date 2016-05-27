@@ -1,0 +1,70 @@
+* [FIX] Fixed issue when retrieving data from Zabbix triggers. Thanks to @ZUNbado
+* [FIX] Fixed issue when saving status info column state. Thanks to @ZUNbado
+
+* [FIX] Fixed config saving when no backends are defined.
+* [FIX] Fixed language detection when no config is set.
+* [FIX] Fixed PHP version comparison * [MOD] Improved error handling when retrieving events from remote backends.
+
+* [FIX] Fixed PHP version comparison
+* [MOD] Improved error handling when retrieving events from remote backends.
+* [MOD] API requests are now coded into a PHP serialized string and wrapped with JSON. * [MOD] More secure config hash generation.
+* [FIX] PHP 5.3 compatibility issues
+* [MOD] Warns if cURL is unavailable
+* [FIX] Minor bugfixes
+* [MOD] Compatible with PHP 5.3
+* [ADD] New sysMonDash API for SMD remote backends type. This allows to query a sysMonDash proxy backend to get the events from several remote backends.
+* [ADD] Audio alarm support for new events.
+* [MOD] Fix style
+* [ADD] New version detection
+* [ADD] Incompatible PHP version detection
+* [ADD] Show items names when using Zabbix backends.
+* [ADD] Show filters applied when all items are shown.
+* [MOD] Improved events retrieving.
+* [FIX] Fixed issue when saving config.
+* [FIX] Fixed issue when showing acknowledged events.
+* [FIX] Fixed raw data view.
+* [FIX] Fixed issue when removing a backend.
+* [MOD] Improved initialization * [MOD] Updated translation
+* [ADD] Add backend alias setting
+* [MOD] Split display filters * [MOD] Removed unused config options
+
+* [ADD] Multiple backends definition * [MOD] Some tweaks
+* [ADD] Multiple backends definition * [MOD] Some tweaks
+* [ADD] Multiple backends definition * [MOD] Some tweaks
+* [FIX] Revert (Detect Zabbix recovered states)
+* [ADD] Detect Zabbix recovered states
+* [MOD] Change Zabbix events retrieving method.
+* [ADD] Detect page reloading.
+* [MOD] Don't ask for Zabbix pass if it's set.
+* [MOD] Case insensitive regex
+* [MOD] Remove unused Zabbix API versions
+* [FIX] Fixed issue when config file doesn't exist
+* [MOD] Updated jQuery version
+* [MOD] Changed ajax request method
+* [MOD] Session reload when version changing takes place.
+* [MOD] Update version.
+* [MOD] Session reload when version changing takes place.
+* [MOD] Improved event management by sorting it as objects.
+* [ADD] New configuration page. Configuration is stored as XML out of web root.
+* [MOD] Minor improvements.
+* [MOD] Improved event management by soring it as objects.
+* [FIX] Fixed issue on starting session. * [FIX] Fixed issue on scrolling.
+* [ADD] Add some comments to example config.
+* [MOD] Support for downtimes in Zabbix backend (experimental yet)
+* [ADD] Improved config handling. Now it's cached for 1 hour or until session cookie is removed
+* [ADD] Zabbix backend (experimental yet)
+
+* [ADD] PSR-4 Compliant * [ADD] Support for status.dat backend
+* [ADD] Closes #3. Multilanguage support. Thanks to @wagnst
+* [ADD] Closes #2. Remote server support. Thanks to @wagnst
+* [MOD] Security improvements * [MOD] Visual improvements
+* [ADD] Fixes #1. JQuery file was not added to initial commit.
+* [ADD] Created a new class for events and connection handling
+* [MOD] Improved error handling while querying for data
+
+* [ADD] Add some error handling
+* [MOD] Run some checks for socket connection
+* [MOD] Default config file must me renamed from config-example.php to config.php
+* [ADD] Initial version
+* [ADD] Initial version
+* [ADD] Initial version
