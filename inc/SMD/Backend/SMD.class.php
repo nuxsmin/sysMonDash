@@ -93,7 +93,7 @@ class SMD extends Backend implements BackendInterface
         $data = json_decode(Util::getDataFromUrl($url));
 
         if (is_object($data) && isset($data->status) && $data->status === 1) {
-            $msg = 'API: ' . $data->description;
+            $msg = sprintf('%s (%s): %s', $this->getBackend()->getAlias(), 'SMD', $data->description);
 
             error_log($msg);
             throw new BackendException($msg);
