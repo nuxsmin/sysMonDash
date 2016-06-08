@@ -114,7 +114,7 @@ class SMD extends Backend implements BackendInterface
      */
     public function getServicesProblems()
     {
-        // TODO: Implement getServicesProblems() method.
+        return array();
     }
 
     /**
@@ -124,7 +124,7 @@ class SMD extends Backend implements BackendInterface
      */
     public function getScheduledDowntimes()
     {
-        // TODO: Implement getScheduledDowntimes() method.
+        return array();
     }
 
     /**

@@ -23,6 +23,8 @@
  *
  */
 
+use SMD\Backend\BackendInterface;
+use SMD\Core\Init;
 use SMD\Core\sysMonDash;
 use SMD\Util\Util;
 
@@ -30,25 +32,31 @@ define('APP_ROOT', '.');
 
 require APP_ROOT . DIRECTORY_SEPARATOR . 'Base.php';
 
+Init::start();
+
 $raw = \SMD\Http\Request::analyze('raw', 0);
 $allHeaders = \SMD\Http\Request::analyze('allheaders', false, false, true);
 
 echo '<pre>';
 
-if ($raw) {
+if ($raw === 1) {
     $SMD = new sysMonDash();
 
     foreach ($SMD->getBackends() as $Backend) {
-        /** @var \SMD\Backend\BackendInterface $Backend */
-        $Backend->setAllHeaders($allHeaders);
+        try {
+            /** @var BackendInterface $Backend */
+            $Backend->setAllHeaders($allHeaders);
 
-        echo 'Backend: ', $Backend->getBackend()->getAlias(), PHP_EOL;
-        echo 'Hosts', PHP_EOL;
-        print_r(Util::arraySortByProperty($Backend->getHostsProblems(), 'start_time'));
-        echo 'Services', PHP_EOL;
-        print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'start_time'));
-        echo 'Downtimes', PHP_EOL;
-        print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'start_time', false));
+            echo 'Backend: ', $Backend->getBackend()->getAlias(), PHP_EOL;
+            echo 'Hosts', PHP_EOL;
+            print_r(Util::arraySortByProperty($Backend->getHostsProblems(), 'lastHardStateChange'));
+            echo 'Services', PHP_EOL;
+            print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'lastHardStateChange'));
+            echo 'Downtimes', PHP_EOL;
+            print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'startTime', false));
+        } catch (Exception $e) {
+            $this->errors[] = $Backend->getBackend()->getAlias() . ': ' . $e->getMessage();
+        }
     }
 }
 
