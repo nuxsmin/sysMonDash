@@ -27,7 +27,6 @@ namespace SMD\Backend;
 use SMD\Api\Api;
 use SMD\Core\ConfigBackendSMD;
 use SMD\Core\Exceptions\BackendException;
-use SMD\Core\Exceptions\CurlException;
 use SMD\Core\Language;
 use SMD\Util\Util;
 

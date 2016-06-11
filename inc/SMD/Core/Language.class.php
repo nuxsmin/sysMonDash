@@ -46,35 +46,6 @@ class Language
     }
 
     /**
-     * Obtener la traducción desde la sesión o el archivo de idioma
-     *
-     * @param $string
-     * @return mixed
-     */
-    private static function getTranslation($string)
-    {
-        $sessionLang = Session::getLanguage();
-
-        if ($sessionLang === false
-            && self::checkLangFile(self::$_lang)
-        ) {
-            include_once self::getLangFile(self::$_lang);
-
-            if (isset($LANG)
-                && is_array($LANG)
-            ) {
-                Session::setLanguage($LANG);
-
-                return (isset($LANG[$string])) ? $LANG[$string] : $string;
-            }
-
-            return $string;
-        }
-
-        return (isset($sessionLang[$string])) ? $sessionLang[$string] : $string;
-    }
-
-    /**
      * Establece el lenguaje de la aplicación.
      * Esta función establece el lenguaje según esté definido en la configuración o en el navegador.
      */
@@ -85,15 +56,15 @@ class Language
 
         // Establecer a es_ES si no existe la traducción o no está establecido el lenguaje
         if (!empty($language)
-            && ((preg_match('/^es_.*/i', $browserLang)
-            || !self::checkLangFile($browserLang)))
+            && (self::checkLangFile($language)
+            || $language = 'es_ES')
         ) {
-            $lang = 'es_ES';
-        } else {
-            $lang = $browserLang;
+            return $language;
+        } elseif (preg_match('/^es_.*/i', $browserLang)) {
+            return 'es_ES';
+        } elseif (self::checkLangFile($browserLang)) {
+            return $browserLang;
         }
-
-        return $lang;
     }
 
     /**
@@ -126,5 +97,34 @@ class Language
     private static function getLangFile($lang)
     {
         return LOCALES_PATH . DIRECTORY_SEPARATOR . "$lang.inc";
+    }
+
+    /**
+     * Obtener la traducción desde la sesión o el archivo de idioma
+     *
+     * @param $string
+     * @return mixed
+     */
+    private static function getTranslation($string)
+    {
+        $sessionLang = Session::getLanguage();
+
+        if ($sessionLang === false
+            && self::checkLangFile(self::$_lang)
+        ) {
+            include_once self::getLangFile(self::$_lang);
+
+            if (isset($LANG)
+                && is_array($LANG)
+            ) {
+                Session::setLanguage($LANG);
+
+                return (isset($LANG[$string])) ? $LANG[$string] : $string;
+            }
+
+            return $string;
+        }
+
+        return (isset($sessionLang[$string])) ? $sessionLang[$string] : $string;
     }
 }

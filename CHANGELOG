@@ -8,7 +8,8 @@
 
 * [FIX] Fixed config saving when no backends are defined.
 * [FIX] Fixed language detection when no config is set.
-* [FIX] Fixed PHP version comparison * [MOD] Improved error handling when retrieving events from remote backends.
+* [FIX] Fixed PHP version comparison
+* [MOD] Improved error handling when retrieving events from remote backends.
 
 * [FIX] Fixed PHP version comparison
 * [MOD] Improved error handling when retrieving events from remote backends.
