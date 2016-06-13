@@ -163,7 +163,7 @@ class Zabbix extends Backend implements BackendInterface
         foreach ($triggers as $event) {
             foreach ($event->hosts as $host) {
                 $Event = new Trigger();
-                $Event->setState($this->getTriggerState($event->priority));
+                $Event->setState($event->priority);
                 $Event->setStateType($event->state);
                 $Event->setAcknowledged($event->lastEvent->acknowledged);
                 $Event->setHostDisplayName($host->name);
@@ -194,6 +194,7 @@ class Zabbix extends Backend implements BackendInterface
      */
     public function getScheduledDowntimes()
     {
+        // Reutilizar la caché
         if (count($this->downtimes) > 0) {
             return $this->downtimes;
         }
@@ -238,12 +239,12 @@ class Zabbix extends Backend implements BackendInterface
     private function setHostsInMaintenance(array $hosts)
     {
         foreach ($hosts as $host) {
-            if ((int)$host->maintenance_status === 1) {
-                $this->hostsMaintenance[$host->hostid] = array(
-                    'host' => $host->host,
-                    'maintenanceid' => (int)$host->maintenanceid
-                );
-            }
+            error_log($host->host);
+
+            $this->hostsMaintenance[$host->hostid] = array(
+                'host' => $host->host,
+                'maintenanceid' => (int)$host->maintenanceid
+            );
         }
     }
 
@@ -287,29 +288,6 @@ class Zabbix extends Backend implements BackendInterface
         }
 
         return (count($hosts) > 0) ? implode(',', $hosts) : '';
-    }
-
-    /**
-     * Unificar el tipo de estado según prioridad del trigger
-     *
-     * @param $state int El tipo de estado
-     * @return int
-     */
-    private function getTriggerState($state)
-    {
-        switch ($state) {
-            case 0:
-                return SERVICE_UNKNOWN;
-            case 1:
-            case 2:
-            case 3:
-                return SERVICE_WARNING;
-            case 4:
-            case 5:
-                return SERVICE_CRITICAL;
-            default:
-                return SERVICE_UNKNOWN;
-        }
     }
 
     /**
@@ -411,36 +389,5 @@ class Zabbix extends Backend implements BackendInterface
         }
 
         return $events;
-    }
-
-    /**
-     * Comprobar si el host del objeto trigger está en mantenimiento
-     *
-     * @param array $hosts
-     * @return int
-     */
-    private function checkHostMaintenance(array $hosts)
-    {
-        return ((int)$hosts[0]->maintenance_status === 1) ? 1 : 0;
-    }
-
-    /**
-     * Obtener los datos de un trigger
-     *
-     * @param $id int El Id del trigger
-     * @return object
-     */
-    private function getTrigger($id)
-    {
-        $params = array(
-            'triggerids' => $id,
-            'expandData' => 1,
-            'expandDescription' => 1,
-            'selectHosts' => 'extend',
-            'output' => array('triggerid', 'description', 'priority', 'status', 'url', 'state', 'lastchange', 'value')
-        );
-
-        $trigger = $this->Zabbix->triggerGet($params);
-        return $trigger[0];
     }
 }

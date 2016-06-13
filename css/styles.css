@@ -72,7 +72,19 @@ tr.item-data > td, thead > th {
     color: #555;
 }
 
-.critical, .warning, .unknown, .downtime, .acknowledged, .new-up,
+.average {
+    background-color: #fb8c00;
+}
+
+.high {
+    background-color: #ef9a9a;
+}
+
+.information {
+    background-color: #5c6bc0;
+}
+
+.critical, .warning, .unknown, .downtime, .acknowledged, .new-up, .average, .information,
 .critical a, .warning a, .unknown a, .downtime a, .acknowledged a, .new-up a {
     color: #fff;
     font-size: 1em;
@@ -144,6 +156,7 @@ footer a, footer a:visited {
 footer #project {
     margin-right: 2em;
 }
+
 footer #project a {
     vertical-align: baseline;
 }
@@ -213,9 +226,9 @@ footer #project a {
 }
 
 #nomessages.error {
-    border-top: 1px solid  #f44336;
-    border-bottom: 1px solid  #f44336;
-    color:  #f44336;
+    border-top: 1px solid #f44336;
+    border-bottom: 1px solid #f44336;
+    color: #f44336;
     background-color: #ffebee;
     border-radius: 0;
 }

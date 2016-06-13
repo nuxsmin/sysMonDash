@@ -124,10 +124,12 @@ if ($type !== 1) {
             <th><?php echo Language::t('Servidor'); ?></th>
             <th><?php echo Language::t('Servicio'); ?></th>
             <th><?php echo Language::t('Estado'); ?></th>
-            <th><?php echo Language::t('Inicio'); ?></th>
-            <th><?php echo Language::t('Fin'); ?></th>
+            <th><?php echo Language::t('Inicio'), ' &#8594; ', Language::t('Fin'); ?></th>
             <th><?php echo Language::t('Autor'); ?></th>
             <th><?php echo Language::t('Comentarios'); ?></th>
+            <?php if (Config::getConfig()->isColBackend()): ?>
+                <th><?php echo Language::t('Backend'); ?></th>
+            <?php endif; ?>
         </tr>
         </thead>
         <tbody>
@@ -138,10 +140,12 @@ if ($type !== 1) {
                 <td><?php echo $downtime->getHostName(); ?></td>
                 <td><?php echo ($downtime->getServiceDisplayName()) ? $downtime->getServiceDisplayName() : $downtime->getHostName(); ?></td>
                 <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
-                <td><?php echo date('d-m-Y H:i', $downtime->getStartTime()); ?></td>
-                <td><?php echo date('d-m-Y H:i', $downtime->getEndTime()); ?></td>
+                <td><?php echo date('d-m-Y H:i', $downtime->getStartTime()), ' &#8594; ', date('d-m-Y H:i', $downtime->getEndTime()); ?></td>
                 <td><?php echo $downtime->getAuthor(); ?></td>
                 <td><?php echo $downtime->getComment(); ?></td>
+                <?php if (Config::getConfig()->isColBackend()): ?>
+                    <th><?php echo $downtime->getBackendAlias(); ?></th>
+                <?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>

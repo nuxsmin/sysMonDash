@@ -79,7 +79,7 @@ class Status extends Backend implements BackendInterface
      */
     public function getScheduledDowntimes()
     {
-        // TODO: Implement getScheduledDowntimes() method.
+        return array();
     }
 
     /**
@@ -87,7 +87,7 @@ class Status extends Backend implements BackendInterface
      */
     public function getScheduledDowntimesGroupped()
     {
-        // TODO: Implement getScheduledDowntimesGroupped() method.
+        return array();
     }
 
     /**

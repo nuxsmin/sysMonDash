@@ -53,9 +53,9 @@ if ($raw === 1) {
             echo 'Services', PHP_EOL;
             print_r(Util::arraySortByProperty($Backend->getServicesProblems(), 'lastHardStateChange'));
             echo 'Downtimes', PHP_EOL;
-            print_r(Util::arraySortByProperty($Backend->getScheduledDowntimesGroupped(), 'startTime', false));
+            print_r(Util::arraySortByProperty($Backend->getScheduledDowntimes(), 'startTime', false));
         } catch (Exception $e) {
-            $this->errors[] = $Backend->getBackend()->getAlias() . ': ' . $e->getMessage();
+            echo 'ERROR: ' . $Backend->getBackend()->getAlias() . ': ' . $e->getMessage();
         }
     }
 }

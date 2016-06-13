@@ -123,7 +123,7 @@ class SMD extends Backend implements BackendInterface
      */
     public function getScheduledDowntimes()
     {
-        return array();
+        return $this->getScheduledDowntimesGroupped();
     }
 
     /**
