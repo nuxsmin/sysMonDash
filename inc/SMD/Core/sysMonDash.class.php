@@ -28,7 +28,13 @@ namespace SMD\Core;
 use Exception;
 use SMD\Backend\BackendInterface;
 use SMD\Backend\Event\DowntimeInterface;
+use SMD\Backend\Event\Event;
 use SMD\Backend\Event\EventInterface;
+use SMD\Backend\Event\EventState;
+use SMD\Backend\Event\EventStateHost;
+use SMD\Backend\Event\EventStateInterface;
+use SMD\Backend\Event\EventStateService;
+use SMD\Backend\Event\EventStateTrigger;
 use SMD\Backend\Livestatus;
 use SMD\Backend\SMD;
 use SMD\Backend\Status;
@@ -294,8 +300,6 @@ class sysMonDash
      */
     private function getHtmlItems(EventInterface $item, $newItem = false, $newItemUp = false)
     {
-        $statusId = $item->getState();
-        $ack = $item->isAcknowledged();
         $lastStateTime = date("m-d-Y H:i:s", $item->getLastHardStateChange());
         $lastStateDuration = Util::timeElapsed(time() - $item->getLastHardStateChange());
         $lastCheckDuration = Util::timeElapsed(time() - $item->getLastCheck());
@@ -304,54 +308,35 @@ class sysMonDash
         $hostAlias = ($item->getHostAlias()) ? $item->getHostAlias() : (($item->getAlias()) ? $item->getAlias() : $hostname);
         $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || ($item->getHostScheduledDowntimeDepth() >= 1));
         $tdClass = '';
-        $trClass = '';
-        $statusName = '';
+        $trClass = EventState::getStateClass($item);
+        $statusName = EventState::getStateName($item);
         $link = null;
-
-        switch ($statusId) {
-            case 0:
-                $trClass = "new-up";
-                $statusName = Language::t('OK');
-                break;
-            case 1:
-                $trClass = "warning";
-                $statusName = Language::t('AVISO');
-                break;
-            case 2:
-                $trClass = "critical";
-                $statusName = Language::t('CRITICO');
-                break;
-            case 3:
-                $trClass = "unknown";
-                $statusName = Language::t('DESCONOCIDO');
-                break;
-        }
 
         if (($item->getHostLastTimeUnreachable() > $item->getHostLastTimeUp() && !$newItemUp) ||
             ($item->getLastTimeUnreachable() > $item->getLastCheck() && $item->getStateType() === 1)
         ) {
-            $trClass = "unknown";
-            $statusName = Language::t('INALCANZABLE');
+            $trClass = EventState::getStateClass($item, EventStateInterface::STATE_UNREACHABLE);
+            $statusName = EventState::getStateName($item, EventStateInterface::STATE_UNREACHABLE);
         }
 
         if ($scheduled) {
-            $trClass = "downtime";
-            $statusName = Language::t('PROGRAMADO');
+            $trClass = EventState::getStateClass($item, EventStateInterface::STATE_SCHEDULED);
+            $statusName = EventState::getStateName($item, EventStateInterface::STATE_SCHEDULED);
         }
 
-        if ($newItem && !$ack && !$scheduled && !$newItemUp) {
+        if ($newItem && !$item->isAcknowledged() && !$scheduled && !$newItemUp) {
             $tdClass = "new";
         } elseif ($newItemUp
             && time() - $item->getLastHardStateChange() <= Config::getConfig()->getNewItemTime() / 2
         ) {
-            $trClass = "new-up";
-            $statusName = Language::t('RECUPERADO');
+            $trClass = EventState::getStateClass($item, EventStateInterface::STATE_RECOVER);
+            $statusName = EventState::getStateName($item, EventStateInterface::STATE_RECOVER);
         } elseif ($item->isFlapping()) {
-            $trClass = "flapping";
-            $statusName = Language::t('CAMBIANTE');
-        } elseif ($ack) {
-            $trClass = "acknowledged";
-            $statusName = Language::t('RECONOCIDO');
+            $trClass = EventState::getStateClass($item, EventStateInterface::STATE_FLAPPING);
+            $statusName = EventState::getStateName($item, EventStateInterface::STATE_FLAPPING);
+        } elseif ($item->isAcknowledged()) {
+            $trClass = EventState::getStateClass($item, EventStateInterface::STATE_ACKNOWLEDGED);
+            $statusName = EventState::getStateName($item, EventStateInterface::STATE_ACKNOWLEDGED);
         }
 
         $line = '<tr class="item-data ' . $trClass . '" title="' . sprintf(Language::t('Estado %s desde %s'), $statusName, $lastStateTime) . '">' . PHP_EOL;
