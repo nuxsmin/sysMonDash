@@ -191,6 +191,7 @@ class sysMonDash
             || $this->getFilterIsFlapping($item)
             || $this->getFilterState($item)
             || $this->getFilterUnreachable($item)
+            || $this->getFilterScheduled($item)
         );
     }
 
@@ -291,6 +292,24 @@ class sysMonDash
     }
 
     /**
+     * Comprobar si está programado y se debe mostrar
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterScheduled(EventInterface $item)
+    {
+        if ($item->getScheduledDowntimeDepth() >= 1 || $item->getHostScheduledDowntimeDepth() >= 1) {
+            if (!Config::getConfig()->isShowScheduled()) {
+                $item->setFilterStatus('Scheduled & Show');
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Función para mostrar los elementos del Dashboard
      *
      * @param EventInterface $item El elemento que contiene los datos.
@@ -306,7 +325,7 @@ class sysMonDash
         $serviceDesc = ($item->getDisplayName()) ? $item->getDisplayName() : $item->getCheckCommand();
         $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
         $hostAlias = ($item->getHostAlias()) ? $item->getHostAlias() : (($item->getAlias()) ? $item->getAlias() : $hostname);
-        $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || ($item->getHostScheduledDowntimeDepth() >= 1));
+        $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || $item->getHostScheduledDowntimeDepth() >= 1);
         $tdClass = '';
         $trClass = EventState::getStateClass($item);
         $statusName = EventState::getStateName($item);
@@ -355,7 +374,7 @@ class sysMonDash
         }
 
         if (Config::getConfig()->isColStatusInfo()) {
-            if ($item->getFilterStatus() === '') {
+            if ($item->getFilterStatus() === '' || $newItem) {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
             } else {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '<br>Filter: ' . $item->getFilterStatus() . '</td>' . PHP_EOL;

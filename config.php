@@ -136,6 +136,11 @@ $l = 0;
                                name="col_backend" <?php echo (Config::getConfig()->isColBackend()) ? 'checked' : ''; ?>/>
                     </div>
                     <div class="pure-control-group">
+                        <label for="show_scheduled"><?php echo Language::t('Mostrar eventos programados'); ?></label>
+                        <input type="checkbox" id="show_scheduled"
+                               name="show_scheduled" <?php echo (Config::getConfig()->isShowScheduled()) ? 'checked' : ''; ?>/>
+                    </div>
+                    <div class="pure-control-group">
                         <label
                             for="regex_host_show"><?php echo Language::t('REGEX hosts visibles en inicio'); ?></label>
                         <input type="text" id="regex_host_show" name="regex_host_show" class="pure-input-1-2"

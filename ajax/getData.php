@@ -58,7 +58,7 @@ if ($type !== 1) {
 ?>
     <table id="tblBoard" width="90%" border="0" class="boldtable" align="center">
         <thead class="head">
-        <th width="3%"><?php echo Language::t('Estado'); ?></th>
+        <th width="3%"><?php echo Language::t('Nivel'); ?></th>
         <?php if (Config::getConfig()->isColLastcheck()): ?>
             <th width="13%"><?php echo Language::t('Desde'); ?></th>
         <?php endif; ?>
@@ -137,7 +137,7 @@ if ($type !== 1) {
             <?php /** @var $downtime \SMD\Backend\Event\DowntimeInterface */ ?>
             <?php $tiempoRestante = $downtime->getStartTime() - time(); ?>
             <tr>
-                <td><?php echo $downtime->getHostName(); ?></td>
+                <td><?php echo (is_array($downtime->getHostName())) ? implode('<br>', $downtime->getHostName()) : $downtime->getHostName(); ?></td>
                 <td><?php echo ($downtime->getServiceDisplayName()) ? $downtime->getServiceDisplayName() : $downtime->getHostName(); ?></td>
                 <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime->getStartTime()), ' &#8594; ', date('d-m-Y H:i', $downtime->getEndTime()); ?></td>

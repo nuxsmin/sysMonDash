@@ -2,27 +2,15 @@
  * Función para activar el parpadeo de los eventos recientes
  */
 (function ($) {
-    $.fn.blink = function (opts) {
+    $.fn.highlight = function (opts) {
         var defaults = {delay: 1000};
         var options = $.extend(defaults, opts);
 
         return this.each(function () {
             var obj = $(this);
-            var bgcolor = $(this).css('background-color');
-            var fgcolor = $(this).css('color');
-            var on = 0;
 
-            setInterval(function () {
-                if (on === 0) {
-                    $(obj).css('color', options.fgcolor_on);
-                    $(obj).css('background-color', options.bgcolor_on);
-                    on = 1;
-                } else {
-                    $(obj).css('color', fgcolor);
-                    $(obj).css('background-color', bgcolor);
-                    on = 0;
-                }
-            }, options.delay);
+            $(obj).css('color', options.fgcolor_on);
+            $(obj).css('background-color', options.bgcolor_on);
         });
     }
 }(jQuery));
@@ -153,7 +141,7 @@ function SMD() {
                     playBeep();
                 }
 
-                newItems.blink({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
+                newItems.highlight({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
             },
             error: function (xhr, textStatus, errorThrown) {
                 placeHolder.html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");

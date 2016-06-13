@@ -83,6 +83,8 @@ class ConfigData
     private $newItemAudioEnabled = false;
     /** @var string */
     private $APIToken = '';
+    /** @var bool */
+    private $showScheduled = true;
 
     /**
      * @var string
@@ -523,5 +525,21 @@ class ConfigData
     public function setAPIToken($APIToken)
     {
         $this->APIToken = $APIToken;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isShowScheduled()
+    {
+        return $this->showScheduled;
+    }
+
+    /**
+     * @param boolean $showScheduled
+     */
+    public function setShowScheduled($showScheduled)
+    {
+        $this->showScheduled = $showScheduled;
     }
 }

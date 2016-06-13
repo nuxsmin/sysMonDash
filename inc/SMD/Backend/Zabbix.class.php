@@ -239,8 +239,6 @@ class Zabbix extends Backend implements BackendInterface
     private function setHostsInMaintenance(array $hosts)
     {
         foreach ($hosts as $host) {
-            error_log($host->host);
-
             $this->hostsMaintenance[$host->hostid] = array(
                 'host' => $host->host,
                 'maintenanceid' => (int)$host->maintenanceid
@@ -287,7 +285,7 @@ class Zabbix extends Backend implements BackendInterface
             }
         }
 
-        return (count($hosts) > 0) ? implode(',', $hosts) : '';
+        return (count($hosts) > 0) ? $hosts : '';
     }
 
     /**
