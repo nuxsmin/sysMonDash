@@ -38,12 +38,12 @@ $action = Request::analyze('action');
 $data = Request::analyze('data');
 
 if (!$action || !$data) {
-    Response::printJSON('Consulta inválida');
+    Response::printJSON('Petición inválida');
 } else {
     $data = json_decode($data);
 
     if (json_last_error() !== 0) {
-        Response::printJSON('Consulta inválida');
+        Response::printJSON('Petición inválida');
     }
 }
 
@@ -57,13 +57,13 @@ try {
             $ZabbixLoader = new \Exts\Zabbix\ZabbixApiLoader();
             $Zabbix = $ZabbixLoader->getAPI($data->version);
             $Zabbix->setApiUrl($data->url);
-            $Zabbix->userLogin(['user' => $data->user, 'password' => $data->pass]);
+            $Zabbix->userLogin(array('user' => $data->user, 'password' => $data->pass));
             $version = $Zabbix->apiinfoVersion();
 
             Response::printJSON('V ' . $version, 0);
             break;
         default:
-            Response::printJSON('Consulta inválida');
+            Response::printJSON('Petición inválida');
     }
 } catch (Exception $e) {
     Response::printJSON($e->getMessage());

@@ -37,7 +37,10 @@ require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php
 Init::start();
 
 $hash = Request::analyze('h');
-$hashOk = ($hash === Session::getConfig()->getHash() || Session::getConfig()->getHash() === '');
+$hashOk = ($hash === Session::getConfig()->getHash()
+    || $hash === (string)Session::getConfig()->getConfigPassword()
+    || Session::getConfig()->getHash() === ''
+);
 
 $i = 0;
 $j = 0;
@@ -52,9 +55,6 @@ $l = 0;
     <meta name="author" content="Rubén Domínguez">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/alertify.min.js"></script>
-    <script type="text/javascript" src="js/functions.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/reset.min.css">
     <link rel="stylesheet" type="text/css" href="css/pure-min.css">
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
@@ -76,15 +76,17 @@ $l = 0;
         <?php if (Util::checkConfigFile()): ?>
             <form method="post" id="frmConfig" name="frmConfig" class="pure-form pure-form-aligned">
                 <fieldset>
-                    <legend><?php echo Language::t('Aplicación'); ?></legend>
-                    <div class="flex-wrapper">
+                    <legend>
+                        <i class="fa fa-caret-up container-state" data-container="application-config-container"></i>
+                        <?php echo Language::t('Aplicación'); ?>
+                    </legend>
+                    <div id="application-config-container" class="flex-wrapper" aria-expanded="true">
                         <div class="pure-control-group">
                             <label for="site_language"><?php echo Language::t('Idioma'); ?></label>
                             <select id="site_language" name="site_language"
                                     data-selected="<?php echo Config::getConfig()->getLanguage(); ?>">
                                 <option value="es_ES">Español</option>
                                 <option value="en_US">English</option>
-                                <option value="de_DE">Deutsch</option>
                             </select>
                         </div class="pure-control-group">
                         <div class="pure-control-group">
@@ -170,8 +172,11 @@ $l = 0;
                     </div>
                 </fieldset>
                 <fieldset>
-                    <legend>Backends</legend>
-                    <div id="backends" class="flex-wrapper">
+                    <legend>
+                        <i class="fa fa-caret-up container-state" data-container="backends-config-container"></i>
+                        Backends
+                    </legend>
+                    <div id="backends-config-container" class="flex-wrapper" aria-expanded="true">
                         <div class="pure-menu pure-menu-horizontal">
                             <ul class="pure-menu-list">
                                 <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
@@ -308,52 +313,55 @@ $l = 0;
                                 </button>
                             </div>
                             <?php $k++; ?>
-                        <?php elseif ($Backend->getType() === ConfigBackend::TYPE_SMD): ?>
-                            <div class="backendSMD backendConfig">
-                                <div class="pure-control-group">
-                                    <label><?php echo Language::t('Alias'); ?></label>
-                                    <input type="text" name="backend[smd][<?php echo $l; ?>][alias]"
-                                           class="pure-input-1-2"
-                                           value="<?php echo $Backend->getAlias(); ?>"/>
+                            <?php elseif ($Backend->getType() === ConfigBackend::TYPE_SMD): ?>
+                                <div class="backendSMD backendConfig">
+                                    <div class="pure-control-group">
+                                        <label><?php echo Language::t('Alias'); ?></label>
+                                        <input type="text" name="backend[smd][<?php echo $l; ?>][alias]"
+                                               class="pure-input-1-2"
+                                               value="<?php echo $Backend->getAlias(); ?>"/>
+                                    </div>
+                                    <div class="pure-control-group">
+                                        <label><?php echo Language::t('URL API sysMonDash'); ?></label>
+                                        <input type="text"
+                                               name="backend[smd][<?php echo $l; ?>][url]"
+                                               class="pure-input-1-2 backend_smd_url"
+                                               value="<?php echo $Backend->getUrl(); ?>"
+                                               placeholder="http://foo.bar/sysMonDash/api.php"/>
+                                    </div>
+                                    <div class="pure-control-group">
+                                        <label><?php echo Language::t('Token'); ?></label>
+                                        <input type="text" name="backend[smd][<?php echo $l; ?>][token]"
+                                               class="pure-input-1-2 backend_smd_token"
+                                               value="<?php echo $Backend->getToken(); ?>"/>
+                                    </div>
+                                    <div class="pure-control-group">
+                                        <label><?php echo Language::t('Activo'); ?></label>
+                                        <input type="checkbox"
+                                               name="backend[smd][<?php echo $l; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                                    </div>
+                                    <div class="buttons">
+                                        <button type="button" class="button-secondary pure-button backendCheckSMD">
+                                            <i class="fa fa-check-circle"></i>
+                                            <?php echo Language::t('Comprobar'); ?>
+                                        </button>
+                                        <button type="button" class="button-error pure-button backendDelete">
+                                            <i class="fa fa-minus-circle"></i>
+                                            <?php echo Language::t('Eliminar'); ?>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="pure-control-group">
-                                    <label><?php echo Language::t('URL API sysMonDash'); ?></label>
-                                    <input type="text"
-                                           name="backend[smd][<?php echo $l; ?>][url]"
-                                           class="pure-input-1-2 backend_smd_url"
-                                           value="<?php echo $Backend->getUrl(); ?>"
-                                           placeholder="http://foo.bar/sysMonDash/api.php"/>
-                                </div>
-                                <div class="pure-control-group">
-                                    <label><?php echo Language::t('Token'); ?></label>
-                                    <input type="text" name="backend[smd][<?php echo $l; ?>][token]"
-                                           class="pure-input-1-2 backend_smd_token"
-                                           value="<?php echo $Backend->getToken(); ?>"/>
-                                </div>
-                                <div class="pure-control-group">
-                                    <label><?php echo Language::t('Activo'); ?></label>
-                                    <input type="checkbox"
-                                           name="backend[smd][<?php echo $l; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
-                                </div>
-                                <div class="buttons">
-                                    <button type="button" class="button-secondary pure-button backendCheckSMD">
-                                        <i class="fa fa-check-circle"></i>
-                                        <?php echo Language::t('Comprobar'); ?>
-                                    </button>
-                                    <button type="button" class="button-error pure-button backendDelete">
-                                        <i class="fa fa-minus-circle"></i>
-                                        <?php echo Language::t('Eliminar'); ?>
-                                    </button>
-                                </div>
-                            </div>
-                            <?php $l++; ?>
-                        <?php endif; ?>
-                        <?php endforeach; ?>
-                    </div>
+                                <?php $l++; ?>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
                 </fieldset>
                 <fieldset>
-                    <legend><?php echo Language::t('Especial'); ?></legend>
-                    <div class="flex-wrapper">
+                    <legend>
+                        <i class="fa fa-caret-up container-state" data-container="special-config-container"></i>
+                        <?php echo Language::t('Especial'); ?>
+                    </legend>
+                    <div id="special-config-container" class="flex-wrapper" aria-expanded="true">
                         <div class="pure-control-group">
                             <label for="special_client_url"><?php echo Language::t('URL del cliente'); ?></label>
                             <input type="text" id="special_client_url" name="special_client_url"
@@ -381,9 +389,23 @@ $l = 0;
                                    value="<?php echo Config::getConfig()->getAPIToken(); ?>"
                                    placeholder=""/>
                             <button class="btn-gen-token pure-button" type="button"
-                                    title="<?php echo Language::t('Generar Token'); ?>">
+                                    title="<?php echo Language::t('Generar Token'); ?>"
+                                    data-dst="special_api_token">
                                 <i class="fa fa-refresh"></i>
                             </button>
+                        </div>
+                        <div class="pure-control-group">
+                            <label
+                                for="special_config_pass"><?php echo Language::t('Clave de configuración'); ?></label>
+                            <input type="password" id="special_config_pass" name="special_config_pass"
+                                   value="<?php echo Config::getConfig()->getConfigPassword(); ?>"
+                                   placeholder=""/>
+                            <button class="btn-gen-pass pure-button" type="button"
+                                    title="<?php echo Language::t('Generar Clave'); ?>"
+                                    data-dst="special_config_pass">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <i class="fa fa-eye" aria-hidden="true" title=""></i>
                         </div>
                     </div>
                 </fieldset>
@@ -401,7 +423,7 @@ $l = 0;
                     </button>
                 </div>
 
-                <input type="hidden" name="hash" value="<?php echo Request::analyze('h'); ?>"/>
+                <input type="hidden" name="hash" value="<?php echo $hash; ?>"/>
             </form>
 
             <div id="result">&nbsp;</div>
@@ -525,7 +547,7 @@ $l = 0;
             </div>
         <?php endif; ?>
     <?php else: ?>
-        <form method="get" action="config.php" id="frmHash" name="frmHash" class="pure-form">
+        <form method="post" action="config.php" id="frmHash" name="frmHash" class="pure-form">
             <fieldset>
                 <legend><?php echo Language::t('Configuración'); ?></legend>
                 <label for="hash"><?php echo Language::t('Hash de configuración'); ?></label>
@@ -537,23 +559,29 @@ $l = 0;
             </fieldset>
         </form>
     <?php endif; ?>
+    <div id="help">
+        <i class="fa fa-info-circle" aria-hidden="true"></i>
+        <?php printf(Language::t('Más información en %s'), Util::getAppInfo('appWiki')); ?>
+    </div>
 </div>
 
 <footer>
     <div id="project">
         <span id="updates"></span>
-        <?php echo Util::getAppInfo('appVersion'), ' :: ', Util::getAppInfo('appCode'), ' :: ', Util::getAppInfo('appAuthor'); ?>
+        <?php printf('%s :: %s :: %s', Util::getAppInfo('appVersion'), Util::getAppInfo('appCode'), Util::getAppInfo('appAuthor')); ?>
     </div>
-
 </footer>
 
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/alertify.min.js"></script>
+<script type="text/javascript" src="js/functions.min.js"></script>
 <script>
     (function () {
         config.setLang('<?php echo Language::t('Seguro?'); ?>');
-        config.setLang('<?php echo Language::t('Conexión correcta.'); ?>');
+        config.setLang('<?php echo Language::t('Conexión correcta'); ?>');
         config.setLang('<?php echo Language::t('Respuesta:'); ?>');
-        config.setLang('<?php echo Language::t('Error de conexión.'); ?>');
-        config.setLang('<?php echo Language::t('URL no indicada.'); ?>');
+        config.setLang('<?php echo Language::t('Error de conexión'); ?>');
+        config.setLang('<?php echo Language::t('URL no indicada'); ?>');
         smd.setConfig(config);
         smd.setConfigHooks();
     }());

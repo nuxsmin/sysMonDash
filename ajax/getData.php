@@ -144,7 +144,7 @@ if ($type !== 1) {
                 <td><?php echo $downtime->getAuthor(); ?></td>
                 <td><?php echo $downtime->getComment(); ?></td>
                 <?php if (Config::getConfig()->isColBackend()): ?>
-                    <th><?php echo $downtime->getBackendAlias(); ?></th>
+                    <td><?php echo $downtime->getBackendAlias(); ?></td>
                 <?php endif; ?>
             </tr>
         <?php endforeach; ?>

@@ -85,11 +85,26 @@ class ConfigData
     private $APIToken = '';
     /** @var bool */
     private $showScheduled = true;
+    /** @var string */
+    private $configPassword = '';
+    /** @var string */
+    private $configHash = '';
 
     /**
-     * @var string
+     * @return string
      */
-    private $configHash = '';
+    public function getConfigPassword()
+    {
+        return $this->configPassword;
+    }
+
+    /**
+     * @param string $configPassword
+     */
+    public function setConfigPassword($configPassword)
+    {
+        $this->configPassword = $configPassword;
+    }
 
     /**
      * @return string

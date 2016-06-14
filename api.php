@@ -53,10 +53,10 @@ switch ($action){
         $data = $Api->getDowntimes();
         break;
     case Api::ACTION_CHECK:
-        Response::printJSON('Conexión correcta', 0);
+        Response::printJSON('V ' . implode('.', \SMD\Util\Util::getVersion(true)), 0);
         break;
     default:
-        Response::printJSON('Acción inválida');
+        Response::printJSON('Petición inválida');
 }
 
 header('Content-type: application/json');

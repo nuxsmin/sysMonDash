@@ -377,7 +377,7 @@ function SMD() {
             var el = jQuery('<div/>', {
                 'class': 'backendLivestatus backendConfig',
                 html: self.getNewLivestatusBackend()
-            }).hide().appendTo('#backends').slideDown('slow');
+            }).hide().appendTo('#backends-config-container').slideDown('slow');
 
             var offset = el.offset();
             window.scroll(0, offset.top);
@@ -389,7 +389,7 @@ function SMD() {
             var el = jQuery('<div/>', {
                 'class': 'backendStatus backendConfig',
                 html: self.getNewStatusBackend()
-            }).hide().appendTo('#backends').slideDown('slow');
+            }).hide().appendTo('#backends-config-container').slideDown('slow');
 
             var offset = el.offset();
             window.scroll(0, offset.top);
@@ -401,7 +401,7 @@ function SMD() {
             var el = jQuery('<div/>', {
                 'class': 'backendZabbix backendConfig',
                 html: self.getNewZabbixBackend()
-            }).hide().appendTo('#backends').slideDown('slow');
+            }).hide().appendTo('#backends-config-container').slideDown('slow');
 
             var offset = el.offset();
             window.scroll(0, offset.top);
@@ -413,13 +413,14 @@ function SMD() {
             var el = jQuery('<div/>', {
                 'class': 'backendSMD backendConfig',
                 html: self.getNewSMDBackend()
-            }).hide().appendTo('#backends').slideDown('slow');
+            }).hide().appendTo('#backends-config-container').slideDown('slow');
 
             var offset = el.offset();
+
             window.scroll(0, offset.top);
         });
 
-        jQuery('#backends').on('click', '.backendDelete', function (e) {
+        jQuery('#backends-config-container').on('click', '.backendDelete', function (e) {
             e.preventDefault();
 
             var res = window.confirm(Config.getLang(0));
@@ -440,13 +441,13 @@ function SMD() {
             var url = parent.find('.backend_smd_url').val();
             var token = parent.find('.backend_smd_token').val();
 
-            if (url === ''){
+            if (url === '') {
                 alertify.alert(Config.getLang(4));
                 return;
             }
 
             var checkData = {'url': url, 'action': 10, 'token': token};
-            var ajaxData = {'action' : 'smdBackend', 'data': JSON.stringify(checkData)};
+            var ajaxData = {'action': 'smdBackend', 'data': JSON.stringify(checkData)};
 
             checkConfig(ajaxData);
         }).on('click', '.backendCheckZabbix', function (e) {
@@ -459,24 +460,53 @@ function SMD() {
             var user = parent.find('.backend_zabbix_user').val();
             var pass = parent.find('.backend_zabbix_pass').val();
 
-            if (version === '' || url === ''){
+            if (version === '' || url === '') {
                 alertify.alert(Config.getLang(4));
                 return;
             }
 
             var checkData = {'url': url, 'version': version, 'user': user, 'pass': pass};
-            var ajaxData = {'action' : 'zabbixBackend', 'data': JSON.stringify(checkData)};
+            var ajaxData = {'action': 'zabbixBackend', 'data': JSON.stringify(checkData)};
 
             checkConfig(ajaxData);
         });
 
-        jQuery('.btn-gen-token').click(function (e) {
-            jQuery('#special_api_token').val(self.makeHash(32));
+        jQuery('.btn-gen-token, .btn-gen-pass').click(function (e) {
+            var hash = self.makeHash(32);
+
+            document.getElementById(this.getAttribute('data-dst')).value = hash;
+            jQuery(this).next('.fa-eye').attr('title', hash);
         });
 
-        jQuery("#btnBack").click(function () {
+        jQuery('.fa-eye').click(function () {
+            var title = this.getAttribute('title');
+            if (title !== "") {
+                alertify.alert(title);
+            }
+        });
+
+        jQuery('#special_config_pass').on('keyup', function () {
+            jQuery(this).parent().find('.fa-eye').attr('title', this.value);
+        });
+
+        jQuery('#btnBack').click(function () {
             location.href = self.getRootPath();
         });
+
+        jQuery('.container-state').on('click', function (e) {
+            var container = document.getElementById(this.getAttribute('data-container'));
+            var state = container.getAttribute('aria-expanded');
+
+            if (state == 'true') {
+                container.setAttribute('aria-expanded', 'false');
+                jQuery(this).removeClass('fa-caret-up').addClass('fa-caret-down');
+                jQuery(container).slideUp('slow');
+            } else {
+                container.setAttribute('aria-expanded', 'true');
+                jQuery(this).removeClass('fa-caret-down').addClass('fa-caret-up');
+                jQuery(container).slideDown('slow');
+            }
+        })
     };
 
     /**
@@ -515,7 +545,7 @@ function SMD() {
      *
      * @param ajaxData
      */
-    var checkConfig = function(ajaxData) {
+    var checkConfig = function (ajaxData) {
         jQuery.ajax({
             url: self.getRootPath() + '/ajax/checkConfig.php',
             type: 'post',

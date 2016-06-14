@@ -39,8 +39,10 @@ Init::start(false);
 
 $hash = Request::analyze('hash');
 
-if (Session::getConfig()->getHash() !== '' &&
-    $hash !== Session::getConfig()->getHash()
+if (Session::getConfig()->getHash() !== ''
+    && $hash !== Session::getConfig()->getHash()
+    && Session::getConfig()->getConfigPassword() !== ''
+    && $hash !== (string)Session::getConfig()->getConfigPassword()
 ) {
     Response::printJSON('Hash de configuración incorrecto');
 }
@@ -64,6 +66,7 @@ $specialClientURL = Request::analyze('special_client_url');
 $specialRemoteServerURL = Request::analyze('special_remote_server_url');
 $specialMonitorServerUrl = Request::analyze('special_monitor_server_url');
 $specialAPIToken = Request::analyze('special_api_token');
+$specialConfigPass = Request::analyze('special_config_pass');
 
 try {
     $Backends = Html::processFormBackends(Request::analyze('backend'));
@@ -92,6 +95,7 @@ $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);
 $ConfigData->setMonitorServerUrl($specialMonitorServerUrl);
 $ConfigData->setAPIToken($specialAPIToken);
+$ConfigData->setConfigPassword($specialConfigPass);
 
 try {
     Config::saveConfig(new XmlHandler(XML_CONFIG_FILE), $ConfigData);

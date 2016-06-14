@@ -52,9 +52,9 @@ Session::setCssHash(Util::getCssHash());
     <meta name="author" content="Rubén Domínguez">
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <script type="text/javascript" src="js/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/reset.min.css">
     <link rel="stylesheet" type="text/css" href="css/pure-min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?v=<?php echo Session::getCssHash(); ?>">
+    <link rel="stylesheet" type="text/css" href="css/styles.min.css?v=<?php echo Session::getCssHash(); ?>">
 </head>
 <body>
 <div id="logo">
@@ -71,7 +71,7 @@ Session::setCssHash(Util::getCssHash());
 <footer>
     <div id="project">
         <span id="updates"></span>
-        <?php echo Util::getAppInfo('appVersion'), ' :: ', Util::getAppInfo('appCode'), ' :: ', Util::getAppInfo('appAuthor'); ?>
+        <?php printf('%s :: %s :: %s', Util::getAppInfo('appVersion'), Util::getAppInfo('appCode'), Util::getAppInfo('appAuthor')); ?>
     </div>
 </footer>
 

@@ -1,3 +1,20 @@
+* [ADD] New config password besides hash based auth
+* [ADD] New config backup before saving.
+* [ADD] New backend config checking options.
+* [MOD] Improved backend config behavior.
+* [ADD] New trigger states for Zabbix backends. Related #13. Thanks to @osnet
+* [ADD] New option to disable downtime events viewing in main view.
+* [ADD] API token random hash generation.
+* [MOD] Improved config UI.
+* [MOD] Resources minifying.
+* [MOD] New events blinking disabled because intensive CPU resource  usage on thin clients.
+* [MOD] Modified error message.
+* [MOD] Updated language strings
+* [FIX] Fixed Zabbix time periods issue. Complex time periods are not yet implemented.
+* [FIX] Fixed language selection issue. Related #14. Thanks to @osnet
+* [FIX] Fixed warnings when retrieving raw events
+* [FIX] Minor bugfixes
+
 * [MOD] Improved backend error handling.
 * [FIX] Closes #10. Multiple same backend type were not saved. Thanks to @ZUNbado
 * [FIX] Minor bugfixes

@@ -25,6 +25,7 @@
 
 namespace SMD\Backend;
 
+use DateTime;
 use Exts\Zabbix\ZabbixApiLoader;
 use SMD\Backend\Event\Downtime;
 use SMD\Backend\Event\Trigger;
@@ -213,17 +214,19 @@ class Zabbix extends Backend implements BackendInterface
             if (time() <= $maintenance->active_till) {
                 $period = $this->getTimePeriod($maintenance->timeperiods);
 
-                $Downtime = new Downtime();
-                $Downtime->setAuthor('Zabbix');
-                $Downtime->setComment($maintenance->description);
-                $Downtime->setHostName($this->getHostsForMaintenance($maintenance->maintenanceid));
-                $Downtime->setIsService(false);
-                $Downtime->setServiceDisplayName('-');
-                $Downtime->setStartTime($period['start']);
-                $Downtime->setEndTime($period['end']);
-                $Downtime->setBackendAlias($this->backend->getAlias());
+                if ($period !== false) {
+                    $Downtime = new Downtime();
+                    $Downtime->setAuthor('Zabbix');
+                    $Downtime->setComment($maintenance->description);
+                    $Downtime->setHostName($this->getHostsForMaintenance($maintenance->maintenanceid));
+                    $Downtime->setIsService(false);
+                    $Downtime->setServiceDisplayName('-');
+                    $Downtime->setStartTime($period['start']);
+                    $Downtime->setEndTime($period['end']);
+                    $Downtime->setBackendAlias($this->backend->getAlias());
 
-                $this->downtimes[] = $Downtime;
+                    $this->downtimes[] = $Downtime;
+                }
             }
         }
 
@@ -254,19 +257,26 @@ class Zabbix extends Backend implements BackendInterface
      */
     private function getTimePeriod(array $timePeriods)
     {
-        $result = array('start' => 0, 'end' => 0);
+        $result = array();
 
         foreach ($timePeriods as $timePeriod) {
-            $end = $timePeriod->start_date + $timePeriod->period;
+            if ($timePeriod->timeperiod_type === 0) {
+                $end = $timePeriod->start_date + $timePeriod->period;
 
-            if (time() <= $end) {
-                $result[] = array('start' => $timePeriod->start_date, 'end' => $end);
+                if (time() <= $end) {
+                    $result[] = array('start' => $timePeriod->start_date, 'end' => $end);
+                }
+            } else {
+                $start = strtotime('today', time()) + $timePeriod->start_time;
+                $end = $start + $timePeriod->period;
+
+                $result[] = array('start' => $start,  'end' => $end);
             }
         }
 
         Util::arraySortByKey($result, 'end');
 
-        return (count($result) > 0) ? $result[0] : $result;
+        return (count($result) > 0) ? $result[0] : false;
     }
 
     /**
