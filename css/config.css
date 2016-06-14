@@ -22,7 +22,7 @@
  */
 
 #wrap {
-    width: 70%;
+    width: 80%;
     margin: 1em auto;
 }
 
@@ -38,7 +38,9 @@
 
 #wrap .backendStatus,
 #wrap .backendLivestatus,
-#wrap .backendZabbix {
+#wrap .backendZabbix,
+#wrap .backendSMD {
+    padding: .5em 0;
     margin: .5em 0;
     border-bottom: 1px solid #e5e5e5;
 }
@@ -58,4 +60,38 @@
 
 #wrap #result.ok {
     background-color: #c8e6c9;
+}
+
+.buttons {
+    text-align: right;
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button-success {
+    background: #66bb6a;
+}
+
+.button-error {
+    background: #ef5350;
+}
+
+.button-warning {
+    background: #ffa726;
+}
+
+.button-secondary {
+    background: #42a5f5;
+}
+
+.pure-form legend {
+    padding: .2em;
+    background-color: #fff;
 }

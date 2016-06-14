@@ -37,6 +37,7 @@ class Api
 {
     const ACTION_EVENTS = 1;
     const ACTION_DOWNTIMES = 2;
+    const ACTION_CHECK = 10;
 
     /**
      * Devolver los eventos serializados y codificados en base64

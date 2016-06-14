@@ -274,6 +274,7 @@ class Livestatus extends Backend implements BackendInterface
             $Downtime->setServiceDisplayName($downtime[6]);
             $Downtime->setStartTime($downtime[7]);
             $Downtime->setEndTime($downtime[8]);
+            $Downtime->setBackendAlias($this->backend->getAlias());
 
             $downtimes[] = $Downtime;
         }

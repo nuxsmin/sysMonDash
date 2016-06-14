@@ -52,6 +52,9 @@ switch ($action){
     case Api::ACTION_DOWNTIMES:
         $data = $Api->getDowntimes();
         break;
+    case Api::ACTION_CHECK:
+        Response::printJSON('Conexión correcta', 0);
+        break;
     default:
         Response::printJSON('Acción inválida');
 }

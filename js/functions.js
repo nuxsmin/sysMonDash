@@ -15,7 +15,6 @@
     }
 }(jQuery));
 
-
 function SMD() {
     jQuery.noConflict();
 
@@ -96,7 +95,12 @@ function SMD() {
         return window.location.protocol + "//" + window.location.host + rootPath();
     };
 
-
+    /**
+     * Convertir un color de hexadecimal a RGB
+     *
+     * @param hexStr
+     * @returns {string}
+     */
     this.hex2rgb = function (hexStr) {
         // note: hexStr should be #rrggbb
         var hex = parseInt(hexStr.substring(1), 16);
@@ -209,6 +213,11 @@ function SMD() {
         window.location.reload(false);
     };
 
+    /**
+     * Guardar la configuración
+     *
+     * @param obj
+     */
     this.saveConfig = function (obj) {
         jQuery.ajax({
             url: self.getRootPath() + '/ajax/saveConfig.php',
@@ -231,6 +240,11 @@ function SMD() {
         });
     };
 
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
     this.getNewLivestatusBackend = function () {
         var len = jQuery('.backendLivestatus').length;
         var $html = jQuery('.livestatusTemplate').clone();
@@ -242,6 +256,11 @@ function SMD() {
         return $html.html();
     };
 
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
     this.getNewStatusBackend = function () {
         var len = jQuery('.backendStatus').length;
         var $html = jQuery('.statusTemplate').clone();
@@ -253,6 +272,11 @@ function SMD() {
         return $html.html();
     };
 
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
     this.getNewZabbixBackend = function () {
         var len = jQuery('.backendZabbix').length;
         var $html = jQuery('.zabbixTemplate').clone();
@@ -267,6 +291,11 @@ function SMD() {
         return $html.html();
     };
 
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
     this.getNewSMDBackend = function () {
         var len = jQuery('.backendSMD').length;
         var $html = jQuery('.SMDTemplate').clone();
@@ -279,10 +308,16 @@ function SMD() {
         return $html.html();
     };
 
+    /**
+     * Comprobar actualizaciones
+     */
     this.getUpdates = function () {
         jQuery('#updates').load(this.getRootPath() + '/ajax/getUpdates.php');
     };
 
+    /**
+     * Inicializar sysMonDash
+     */
     this.startSMD = function () {
         jQuery.ajaxSetup({
             global: false,
@@ -295,11 +330,164 @@ function SMD() {
         }, Config.getTimeout());
     };
 
+    /**
+     * Establecer el objeto de configuración
+     *
+     * @param c
+     */
     this.setConfig = function (c) {
         Config = c;
     };
 
-    // Reproducir sonido
+    /**
+     * Generar un hash aleatorio
+     *
+     * @param length
+     * @returns {string}
+     */
+    this.makeHash = function (length) {
+        var hash = "";
+        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < length; i++) {
+            hash += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return hash;
+    };
+
+    /**
+     * Establecer los eventos para la vista de configuración
+     */
+    this.setConfigHooks = function () {
+        var form = jQuery('#frmConfig');
+
+        form.on('submit', function (e) {
+            e.preventDefault();
+            self.saveConfig(form);
+        }).find("select").each(function () {
+            var sel = jQuery(this)
+            var selvalue = sel.data('selected');
+            sel.val(selvalue);
+        });
+
+        jQuery('#addLivestatusBackend').on('click', function (e) {
+            e.preventDefault();
+
+            var el = jQuery('<div/>', {
+                'class': 'backendLivestatus backendConfig',
+                html: self.getNewLivestatusBackend()
+            }).hide().appendTo('#backends').slideDown('slow');
+
+            var offset = el.offset();
+            window.scroll(0, offset.top);
+        });
+
+        jQuery('#addStatusBackend').on('click', function (e) {
+            e.preventDefault();
+
+            var el = jQuery('<div/>', {
+                'class': 'backendStatus backendConfig',
+                html: self.getNewStatusBackend()
+            }).hide().appendTo('#backends').slideDown('slow');
+
+            var offset = el.offset();
+            window.scroll(0, offset.top);
+        });
+
+        jQuery('#addZabbixBackend').on('click', function (e) {
+            e.preventDefault();
+
+            var el = jQuery('<div/>', {
+                'class': 'backendZabbix backendConfig',
+                html: self.getNewZabbixBackend()
+            }).hide().appendTo('#backends').slideDown('slow');
+
+            var offset = el.offset();
+            window.scroll(0, offset.top);
+        });
+
+        jQuery('#addSMDBackend').on('click', function (e) {
+            e.preventDefault();
+
+            var el = jQuery('<div/>', {
+                'class': 'backendSMD backendConfig',
+                html: self.getNewSMDBackend()
+            }).hide().appendTo('#backends').slideDown('slow');
+
+            var offset = el.offset();
+            window.scroll(0, offset.top);
+        });
+
+        jQuery('#backends').on('click', '.backendDelete', function (e) {
+            e.preventDefault();
+
+            var res = window.confirm(Config.getLang(0));
+
+            if (res === true) {
+                var $parent = jQuery(this).parent().parent('.backendConfig');
+
+                $parent.slideUp('slow', function () {
+                        $parent.remove();
+                    }
+                );
+            }
+        }).on('click', '.backendCheckSMD', function (e) {
+            e.preventDefault();
+
+            var parent = jQuery(this).parent().parent('.backendConfig');
+
+            var url = parent.find('.backend_smd_url').val();
+            var token = parent.find('.backend_smd_token').val();
+
+            if (url === ''){
+                alertify.alert(Config.getLang(4));
+                return;
+            }
+
+            var checkData = {'url': url, 'action': 10, 'token': token};
+            var ajaxData = {'action' : 'smdBackend', 'data': JSON.stringify(checkData)};
+
+            checkConfig(ajaxData);
+        }).on('click', '.backendCheckZabbix', function (e) {
+            e.preventDefault();
+
+            var parent = jQuery(this).parent().parent('.backendConfig');
+
+            var version = parent.find('.backend_zabbix_version').val();
+            var url = parent.find('.backend_zabbix_url').val();
+            var user = parent.find('.backend_zabbix_user').val();
+            var pass = parent.find('.backend_zabbix_pass').val();
+
+            if (version === '' || url === ''){
+                alertify.alert(Config.getLang(4));
+                return;
+            }
+
+            var checkData = {'url': url, 'version': version, 'user': user, 'pass': pass};
+            var ajaxData = {'action' : 'zabbixBackend', 'data': JSON.stringify(checkData)};
+
+            checkConfig(ajaxData);
+        });
+
+        jQuery('.btn-gen-token').click(function (e) {
+            jQuery('#special_api_token').val(self.makeHash(32));
+        });
+
+        jQuery("#btnBack").click(function () {
+            location.href = self.getRootPath();
+        });
+    };
+
+    /**
+     * Establecer los eventos para la vista de eventos
+     */
+    this.setDashboardHooks = function () {
+    };
+
+    /**
+     * Reproducir sonido
+     */
     var playBeep = function playBeep() {
         //console.info('BEEP');
         if (Config.getAudioEnabled()) {
@@ -320,7 +508,33 @@ function SMD() {
 
             audio.play();
         }
-    }
+    };
+
+    /**
+     * Comprobar parámetros de configuración mediante AJAX
+     *
+     * @param ajaxData
+     */
+    var checkConfig = function(ajaxData) {
+        jQuery.ajax({
+            url: self.getRootPath() + '/ajax/checkConfig.php',
+            type: 'post',
+            dataType: 'json',
+            data: ajaxData,
+            success: function (data) {
+                var msg;
+
+                if (typeof data.status === "undefined" || data.status !== 0) {
+                    msg = Config.getLang(3) + '<br>' + Config.getLang(2) + ' ' + data.description || '';
+                    alertify.alert(msg);
+                } else {
+                    msg = Config.getLang(1) + '<br>' + Config.getLang(2) + ' ' + data.description;
+                    alertify.alert(msg);
+                }
+
+            }
+        });
+    };
 }
 
 var smd = new SMD();

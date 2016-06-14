@@ -312,9 +312,13 @@ class Util
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         $data = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($data === false) {
-            error_log(curl_error($ch));
+        if ($httpCode >= 400 && $httpCode < 600) {
+            throw new CurlException(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+        } elseif ($data === false
+            || curl_errno($ch) > 0
+        ) {
             throw new CurlException(curl_error($ch), curl_errno($ch));
         }
 

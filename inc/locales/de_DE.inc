@@ -97,7 +97,3 @@ $LANG['Token inválido'] = 'Invalid token';
 $LANG['Acción inválida'] = 'Invalid action';
 $LANG['Error al acceder a la API'] = 'Error while accessing to API';
 $LANG['Errores'] = 'Errors';
-$LANG['Conexión correcta'] = 'Connection OK';
-$LANG['Generar Token'] = 'Generate token';
-$LANG['Seguro?'] = 'Are you sure?';
-$LANG['Añadir Backend'] = 'Add Backend';
