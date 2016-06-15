@@ -260,7 +260,7 @@ class Zabbix extends Backend implements BackendInterface
         $result = array();
 
         foreach ($timePeriods as $timePeriod) {
-            if ($timePeriod->timeperiod_type === 0) {
+            if ($timePeriod->timeperiod_type == 0) {
                 $end = $timePeriod->start_date + $timePeriod->period;
 
                 if (time() <= $end) {
