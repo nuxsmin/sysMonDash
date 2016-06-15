@@ -56,6 +56,10 @@ abstract class ConfigBackend
      * @var string
      */
     protected $alias = '';
+    /**
+     * @var int
+     */
+    protected $level = null;
 
     /**
      * @return int
@@ -136,4 +140,18 @@ abstract class ConfigBackend
     {
         $this->alias = $alias;
     }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param int $level
+     * @return mixed
+     */
+    public abstract function setLevel($level);
 }

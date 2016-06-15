@@ -24,6 +24,9 @@
 
 namespace SMD\Core;
 
+use SMD\Backend\Event\EventStateInterface;
+use SMD\Backend\Event\EventStateTrigger;
+
 /**
  * Class ConfigBackendZabbix
  *
@@ -50,14 +53,16 @@ class ConfigBackendZabbix extends ConfigBackend
      * @param $url
      * @param $user
      * @param $pass
+     * @param int $level
      */
-    public function __construct($version, $url, $user, $pass)
+    public function __construct($version, $url, $user, $pass, $level = 0)
     {
         $this->setType(self::TYPE_ZABBIX);
-        $this->version = intval($version);
-        $this->url = $url;
-        $this->user = $user;
-        $this->pass = $pass;
+        $this->setVersion($version);
+        $this->setUrl($url);
+        $this->setUser($user);
+        $this->setPass($pass);
+        $this->setLevel($level);
     }
 
     /**
@@ -73,7 +78,7 @@ class ConfigBackendZabbix extends ConfigBackend
      */
     public function setVersion($version)
     {
-        $this->version = $version;
+        $this->version = intval($version);
     }
 
     /**
@@ -106,5 +111,20 @@ class ConfigBackendZabbix extends ConfigBackend
     public function setPass($pass)
     {
         $this->pass = $pass;
+    }
+
+    /**
+     * @param int $level
+     * @return mixed|void
+     */
+    public function setLevel($level)
+    {
+        $levels = EventStateTrigger::getStates();
+
+        if (isset($levels[$level])) {
+            $this->level = $level;
+        } else {
+            throw new \InvalidArgumentException('Nivel no disponible');
+        }
     }
 }

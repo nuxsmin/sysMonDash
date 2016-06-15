@@ -192,6 +192,7 @@ class sysMonDash
             || $this->getFilterState($item)
             || $this->getFilterUnreachable($item)
             || $this->getFilterScheduled($item)
+            || $this->getFilterLevel($item)
         );
     }
 
@@ -304,6 +305,22 @@ class sysMonDash
                 $item->setFilterStatus('Scheduled & Show');
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * Comprobar si el evento supera el nivel mínimo para mostrarlo
+     *
+     * @param EventInterface $item
+     * @return bool
+     */
+    private function getFilterLevel(EventInterface $item)
+    {
+        if (null !== $item->getBackendLevel() && $item->getState() < $item->getBackendLevel()) {
+            $item->setFilterStatus('Backend level');
+            return true;
         }
 
         return false;

@@ -101,7 +101,7 @@ class Html
                         $ConfigBackend = new ConfigBackendLivestatus($config['path']);
                         break;
                     case 'zabbix':
-                        $ConfigBackend = new ConfigBackendZabbix($config['version'], $config['url'], $config['user'], $config['pass']);
+                        $ConfigBackend = new ConfigBackendZabbix($config['version'], $config['url'], $config['user'], $config['pass'], $config['level']);
                         break;
                     case 'smd':
                         $ConfigBackend = new ConfigBackendSMD($config['url'], $config['token']);

@@ -180,6 +180,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setNotificationsEnabled(true);
                 $Event->setBackendAlias($this->backend->getAlias());
                 $Event->setBackendUrl($this->backend->getUrl());
+                $Event->setBackendLevel($this->backend->getLevel());
 
                 $events[] = $Event;
             }
@@ -391,6 +392,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setNotificationsEnabled(true);
                 $Event->setBackendAlias($this->backend->getAlias());
                 $Event->setBackendUrl($this->backend->getUrl());
+                $Event->setBackendLevel($this->backend->getLevel());
 
                 $events[] = $Event;
             }

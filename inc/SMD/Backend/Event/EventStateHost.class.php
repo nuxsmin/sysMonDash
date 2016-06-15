@@ -66,4 +66,14 @@ class EventStateHost implements EventStateInterface
     {
         return isset(self::$states[$state]) ? self::$states[$state][0] : '';
     }
+
+    /**
+     * Devuelve los estados soportados
+     * 
+     * @return array
+     */
+    public static function getStates()
+    {
+        return self::$states;
+    }
 }

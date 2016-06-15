@@ -46,7 +46,7 @@ class EventStateTrigger implements EventStateInterface
 
     /**
      * Devuelve la clase CSS a utilizar para mostrar el estado
-     * 
+     *
      * @param $state
      * @return string
      */
@@ -64,5 +64,15 @@ class EventStateTrigger implements EventStateInterface
     public static function getStateName($state)
     {
         return isset(self::$states[$state]) ? self::$states[$state][0] : null;
+    }
+
+    /**
+     * Devuelve los estados soportados
+     *
+     * @return array
+     */
+    public static function getStates()
+    {
+        return self::$states;
     }
 }

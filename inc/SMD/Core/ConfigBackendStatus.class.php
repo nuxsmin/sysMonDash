@@ -24,6 +24,8 @@
 
 namespace SMD\Core;
 
+use SMD\Backend\Event\EventStateHost;
+
 
 /**
  * Class ConfigBackendStatus
@@ -34,11 +36,14 @@ class ConfigBackendStatus extends ConfigBackend
     /**
      * ConfigBackendStatus constructor.
      * @param $path
+     * @param int $level
+     * @throws \Exception
      */
-    public function __construct($path)
+    public function __construct($path, $level = 1)
     {
         $this->setType(self::TYPE_STATUS);
         $this->setPath($path);
+        $this->setLevel($level);
     }
 
     /**
@@ -52,5 +57,21 @@ class ConfigBackendStatus extends ConfigBackend
         }
 
         $this->path = $path;
+    }
+
+    /**
+     * @param int $level
+     * @return mixed
+     */
+    public function setLevel($level)
+    {
+        $levels = EventStateHost::getStates();
+
+        if (isset($levels[$level])) {
+            $this->level = $level;
+        } else {
+            throw new \InvalidArgumentException('Nivel no disponible');
+
+        }
     }
 }

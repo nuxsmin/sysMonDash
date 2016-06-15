@@ -1,4 +1,5 @@
-* [ADD] New config password besides hash based auth
+* [ADD] New events level threshold by backend. Closes #12
+* [ADD] New config password besides hash based auth.
 * [ADD] New config backup before saving.
 * [ADD] New backend config checking options.
 * [MOD] Improved backend config behavior.

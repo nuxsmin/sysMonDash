@@ -54,4 +54,11 @@ interface EventStateInterface
      * @return string
      */
     public static function getStateName($state);
+
+    /**
+     * Devuelve los estados soportados
+     *
+     * @return array
+     */
+    public static function getStates();
 }

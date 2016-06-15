@@ -329,4 +329,14 @@ interface EventInterface
      * @return string
      */
     public function getFilterStatus();
+
+    /**
+     * @return int
+     */
+    public function getBackendLevel();
+
+    /**
+     * @param int $backendLevel
+     */
+    public function setBackendLevel($backendLevel);
 }

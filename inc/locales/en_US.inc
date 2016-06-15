@@ -110,3 +110,4 @@ $LANG['Mostrar eventos programados'] = 'Show scheduled events';
 $LANG['Más información en %s'] = 'More info at %s';
 $LANG['Clave de configuración'] = 'Configuration password';
 $LANG['Generar Clave'] = 'Generate password';
+$LANG['Nivel mínimo de eventos'] = 'Events level threshold';

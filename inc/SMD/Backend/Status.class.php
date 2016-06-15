@@ -132,6 +132,7 @@ class Status extends Backend implements BackendInterface
             $Event->setNotificationsEnabled($event['notifications_enabled']);
             $Event->setBackendAlias($this->backend->getAlias());
             $Event->setBackendUrl($this->backend->getUrl());
+            $Event->setBackendLevel($this->backend->getLevel());
 
             $events[] = $Event;
         }
@@ -251,6 +252,7 @@ class Status extends Backend implements BackendInterface
             $Event->setNotificationsEnabled($event['notifications_enabled']);
             $Event->setBackendAlias($this->backend->getAlias());
             $Event->setBackendUrl($this->backend->getUrl());
+            $Event->setBackendLevel($this->backend->getLevel());
 
             $events[] = $Event;
         }

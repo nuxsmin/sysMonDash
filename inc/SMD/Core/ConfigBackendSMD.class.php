@@ -36,12 +36,14 @@ class ConfigBackendSMD extends ConfigBackend
      * ConfigBackendStatus constructor.
      * @param $url
      * @param $token
+     * @param int $level
      */
-    public function __construct($url, $token)
+    public function __construct($url, $token, $level = 0)
     {
         $this->setType(self::TYPE_SMD);
         $this->setUrl($url);
         $this->setToken($token);
+        $this->setLevel($level);
     }
 
     /**
@@ -58,5 +60,14 @@ class ConfigBackendSMD extends ConfigBackend
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    /**
+     * @param int $level
+     * @return mixed
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
     }
 }

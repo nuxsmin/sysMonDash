@@ -22,6 +22,7 @@
  * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use SMD\Backend\Event\EventStateTrigger;
 use SMD\Core\Config;
 use SMD\Core\ConfigBackend;
 use SMD\Core\Init;
@@ -296,6 +297,17 @@ $l = 0;
                                        value="<?php echo $Backend->getPass(); ?>"/>
                             </div>
                             <div class="pure-control-group">
+                                <label><?php echo Language::t('Nivel mínimo de eventos'); ?></label>
+                                <select class="backend_zabbix_level"
+                                        name="backend[zabbix][<?php echo $k; ?>][level]"
+                                        data-selected="<?php echo $Backend->getLevel(); ?>">
+                                    <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
+                                        <option
+                                            value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="pure-control-group">
                                 <label><?php echo Language::t('Activo'); ?></label>
                                 <input type="checkbox"
                                        name="backend[zabbix][<?php echo $k; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
@@ -421,7 +433,8 @@ $l = 0;
                     </button>
                 </div>
 
-                <input type="hidden" name="hash" value="<?php echo ($passOK) ? Session::getConfig()->getConfigPassword() : $hash; ?>"/>
+                <input type="hidden" name="hash"
+                       value="<?php echo ($passOK) ? Session::getConfig()->getConfigPassword() : $hash; ?>"/>
             </form>
 
             <div id="result">&nbsp;</div>
@@ -497,10 +510,23 @@ $l = 0;
                     <input type="password" name="backend[zabbix][pass]" class="backend_zabbix_pass"/>
                 </div>
                 <div class="pure-control-group">
+                    <label><?php echo Language::t('Nivel mínimo de eventos'); ?></label>
+                    <select class="backend_zabbix_level"
+                            name="backend[zabbix][level]">
+                        <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
+                            <option value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="pure-control-group">
                     <label><?php echo Language::t('Activo'); ?></label>
                     <input type="checkbox" name="backend[zabbix][active]"/>
                 </div>
                 <div class="buttons">
+                    <button type="button" class="button-secondary pure-button backendCheckZabbix">
+                        <i class="fa fa-check-circle"></i>
+                        <?php echo Language::t('Comprobar'); ?>
+                    </button>
                     <button type="button" class="button-error pure-button backendDelete">
                         <i class="fa fa-minus-circle"></i>
                         <?php echo Language::t('Eliminar'); ?>

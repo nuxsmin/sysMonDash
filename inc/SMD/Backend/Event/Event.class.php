@@ -153,6 +153,10 @@ abstract class Event implements EventInterface
      */
     public $backendUrl = '';
     /**
+     * @var null
+     */
+    public $backendLevel = null;
+    /**
      * @var string
      */
     public $filterStatus = '';
@@ -631,6 +635,14 @@ abstract class Event implements EventInterface
     }
 
     /**
+     * @return string
+     */
+    public function getFilterStatus()
+    {
+        return $this->filterStatus;
+    }
+
+    /**
      * @param $status string
      */
     public function setFilterStatus($status)
@@ -639,10 +651,18 @@ abstract class Event implements EventInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getFilterStatus()
+    public function getBackendLevel()
     {
-        return $this->filterStatus;
+        return $this->backendLevel;
+    }
+
+    /**
+     * @param int $backendLevel
+     */
+    public function setBackendLevel($backendLevel)
+    {
+        $this->backendLevel = $backendLevel;
     }
 }

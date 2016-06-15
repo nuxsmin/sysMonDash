@@ -23,6 +23,7 @@
  */
 
 namespace SMD\Core;
+use SMD\Backend\Event\EventStateHost;
 
 /**
  * Class ConfigBackendLivestatus
@@ -33,11 +34,14 @@ class ConfigBackendLivestatus extends ConfigBackend
     /**
      * ConfigBackendLivestatus constructor.
      * @param $path
+     * @param int $level
+     * @throws \Exception
      */
-    public function __construct($path)
+    public function __construct($path, $level = 1)
     {
         $this->setType(self::TYPE_LIVESTATUS);
         $this->setPath($path);
+        $this->setLevel($level);
     }
 
     /**
@@ -51,5 +55,20 @@ class ConfigBackendLivestatus extends ConfigBackend
         }
 
         $this->path = $path;
+    }
+
+    /**
+     * @param int $level
+     * @return mixed
+     */
+    public function setLevel($level)
+    {
+        $levels = EventStateHost::getStates();
+
+        if (isset($levels[$level])) {
+            $this->level = $level;
+        } else {
+            throw new \InvalidArgumentException('Nivel no disponible');
+        }
     }
 }
