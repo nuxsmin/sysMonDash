@@ -39,11 +39,10 @@ Init::start(false);
 
 $hash = Request::analyze('hash');
 
-if (Session::getConfig()->getHash() !== ''
-    && $hash !== Session::getConfig()->getHash()
-    && Session::getConfig()->getConfigPassword() !== ''
-    && $hash !== (string)Session::getConfig()->getConfigPassword()
-) {
+$hashOk = ($hash === Session::getConfig()->getHash() || Session::getConfig()->getHash() === '');
+$passOK = ($hash === (string)Session::getConfig()->getConfigPassword());
+
+if (!$hashOk && !$passOK) {
     Response::printJSON('Hash de configuración incorrecto');
 }
 
@@ -95,7 +94,14 @@ $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);
 $ConfigData->setMonitorServerUrl($specialMonitorServerUrl);
 $ConfigData->setAPIToken($specialAPIToken);
-$ConfigData->setConfigPassword($specialConfigPass);
+
+if (!empty($specialConfigPass)
+    && $specialConfigPass !== (string)Session::getConfig()->getConfigPassword()
+) {
+    $ConfigData->setConfigPassword(sha1($specialConfigPass));
+} else {
+    $ConfigData->setConfigPassword($specialConfigPass);
+}
 
 try {
     Config::saveConfig(new XmlHandler(XML_CONFIG_FILE), $ConfigData);

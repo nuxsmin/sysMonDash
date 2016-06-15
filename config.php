@@ -37,10 +37,8 @@ require APP_ROOT . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'Base.php
 Init::start();
 
 $hash = Request::analyze('h');
-$hashOk = ($hash === Session::getConfig()->getHash()
-    || $hash === (string)Session::getConfig()->getConfigPassword()
-    || Session::getConfig()->getHash() === ''
-);
+$hashOk = ($hash === Session::getConfig()->getHash() || Session::getConfig()->getHash() === '');
+$passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
 
 $i = 0;
 $j = 0;
@@ -72,7 +70,7 @@ $l = 0;
     </div>
 </div>
 <div id="wrap">
-    <?php if ($hashOk): ?>
+    <?php if ($hashOk || $passOK): ?>
         <?php if (Util::checkConfigFile()): ?>
             <form method="post" id="frmConfig" name="frmConfig" class="pure-form pure-form-aligned">
                 <fieldset>
@@ -398,7 +396,7 @@ $l = 0;
                             <label
                                 for="special_config_pass"><?php echo Language::t('Clave de configuración'); ?></label>
                             <input type="password" id="special_config_pass" name="special_config_pass"
-                                   value="<?php echo Config::getConfig()->getConfigPassword(); ?>"
+                                   value="<?php echo Session::getConfig()->getConfigPassword(); ?>"
                                    placeholder=""/>
                             <button class="btn-gen-pass pure-button" type="button"
                                     title="<?php echo Language::t('Generar Clave'); ?>"
@@ -423,7 +421,7 @@ $l = 0;
                     </button>
                 </div>
 
-                <input type="hidden" name="hash" value="<?php echo $hash; ?>"/>
+                <input type="hidden" name="hash" value="<?php echo ($passOK) ? Session::getConfig()->getConfigPassword() : $hash; ?>"/>
             </form>
 
             <div id="result">&nbsp;</div>
@@ -551,7 +549,7 @@ $l = 0;
             <fieldset>
                 <legend><?php echo Language::t('Configuración'); ?></legend>
                 <label for="hash"><?php echo Language::t('Hash de configuración'); ?></label>
-                <input type="text" id="hash" name="h" class="pure-input-1-2" required/>
+                <input type="password" id="hash" name="h" class="pure-input-1-2" required/>
                 <button type="submit"
                         class="pure-button pure-button-primary"><?php echo Language::t('Comprobar'); ?></button>
                 <button type="button" id="btnBack"
