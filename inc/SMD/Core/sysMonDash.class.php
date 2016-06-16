@@ -135,9 +135,7 @@ class sysMonDash
                 // Contador del no. de elementos
                 $this->totalItems++;
             }
-        } catch (NoDataException $e) {
-            $this->errors[] = $e->getMessage();
-        } catch (BackendException $e) {
+        } catch (Exception $e) {
             $this->errors[] = $e->getMessage();
             //header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error - ' . utf8_decode(Language::t($e->getMessage())), true, 500);
         }

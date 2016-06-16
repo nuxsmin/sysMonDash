@@ -152,7 +152,7 @@ class Downtime implements DowntimeInterface
      */
     public function setHostName($name)
     {
-        $this->hostHash = md5($name);
+        $this->hostHash = (is_array($name)) ? md5(implode(',', $name)) : md5($name);
         $this->hostName = $name;
     }
 

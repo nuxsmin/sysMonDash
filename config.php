@@ -96,19 +96,19 @@ $l = 0;
                         <div class="pure-control-group">
                             <label for="event_refresh"><?php echo Language::t('Tiempo actualización (s)'); ?></label>
                             <input type="number" id="event_refresh" name="event_refresh" min="5" step="5"
-                                   value="<?php echo Config::getConfig()->getRefreshValue(); ?>"/>
+                                   value="<?php echo Config::getConfig()->getRefreshValue(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
                                 for="event_new_item_time"><?php echo Language::t('Tiempo nuevo evento (s)'); ?></label>
                             <input type="number" id="event_new_item_time" name="event_new_item_time" min="60" step="60"
-                                   value="<?php echo Config::getConfig()->getNewItemTime(); ?>"/>
+                                   value="<?php echo Config::getConfig()->getNewItemTime(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
                                 for="event_max_items"><?php echo Language::t('Número máximo de eventos a mostrar'); ?></label>
                             <input type="number" id="event_max_items" name="event_max_items" min="50"
-                                   value="<?php echo Config::getConfig()->getMaxDisplayItems(); ?>"/>
+                                   value="<?php echo Config::getConfig()->getMaxDisplayItems(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
@@ -215,7 +215,7 @@ $l = 0;
                                            name="backend[status][<?php echo $i; ?>][path]"
                                            class="pure-input-1-2 backend_status_file"
                                            value="<?php echo $Backend->getPath(); ?>"
-                                           placeholder="/var/lib/icinga/status.dat"/>
+                                           placeholder="/var/lib/icinga/status.dat" required/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label><?php echo Language::t('Activo'); ?></label>
@@ -244,7 +244,7 @@ $l = 0;
                                            name="backend[livestatus][<?php echo $j; ?>][path]"
                                            class="pure-input-1-2 backend_livestatus_file"
                                            value="<?php echo $Backend->getPath(); ?>"
-                                           placeholder="/var/lib/icinga/rw/live"/>
+                                           placeholder="/var/lib/icinga/rw/live" required/>
                                 </div>
                                 <div class="pure-control-group">
                                     <label><?php echo Language::t('Activo'); ?></label>
@@ -273,13 +273,13 @@ $l = 0;
                                        name="backend[zabbix][<?php echo $k; ?>][url]"
                                        class="pure-input-1-2 backend_zabbix_url"
                                        value="<?php echo $Backend->getUrl(); ?>"
-                                       placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
+                                       placeholder="http://foo.bar/zabbix/api_jsonrpc.php" required/>
                             </div>
                             <div class="pure-control-group">
                                 <label><?php echo Language::t('Versión API de Zabbix'); ?></label>
                                 <select class="backend_zabbix_version"
                                         name="backend[zabbix][<?php echo $k; ?>][version]"
-                                        data-selected="<?php echo $Backend->getVersion(); ?>">
+                                        data-selected="<?php echo $Backend->getVersion(); ?>" required>
                                     <option value="220">2.2</option>
                                     <option value="240">2.4</option>
                                 </select>
@@ -288,19 +288,19 @@ $l = 0;
                                 <label><?php echo Language::t('Usuario API de Zabbix'); ?></label>
                                 <input type="text" class="backend_zabbix_user"
                                        name="backend[zabbix][<?php echo $k; ?>][user]"
-                                       value="<?php echo $Backend->getUser(); ?>"/>
+                                       value="<?php echo $Backend->getUser(); ?>" required/>
                             </div>
                             <div class="pure-control-group">
                                 <label><?php echo Language::t('Clave API de Zabbix'); ?></label>
                                 <input type="password" class="backend_zabbix_pass"
                                        name="backend[zabbix][<?php echo $k; ?>][pass]"
-                                       value="<?php echo $Backend->getPass(); ?>"/>
+                                       value="<?php echo $Backend->getPass(); ?>" required/>
                             </div>
                             <div class="pure-control-group">
                                 <label><?php echo Language::t('Nivel mínimo de eventos'); ?></label>
                                 <select class="backend_zabbix_level"
                                         name="backend[zabbix][<?php echo $k; ?>][level]"
-                                        data-selected="<?php echo $Backend->getLevel(); ?>">
+                                        data-selected="<?php echo $Backend->getLevel(); ?>" required>
                                     <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
                                         <option
                                             value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
@@ -337,7 +337,7 @@ $l = 0;
                                                name="backend[smd][<?php echo $l; ?>][url]"
                                                class="pure-input-1-2 backend_smd_url"
                                                value="<?php echo $Backend->getUrl(); ?>"
-                                               placeholder="http://foo.bar/sysMonDash/api.php"/>
+                                               placeholder="http://foo.bar/sysMonDash/api.php" required/>
                                     </div>
                                     <div class="pure-control-group">
                                         <label><?php echo Language::t('Token'); ?></label>
@@ -448,7 +448,7 @@ $l = 0;
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Ruta socket livestatus'); ?></label>
                     <input type="text" name="backend[livestatus][path]"
-                           class="pure-input-1-2 backend_livestatus_file" placeholder="/var/lib/icinga/rw/live"/>
+                           class="pure-input-1-2 backend_livestatus_file" placeholder="/var/lib/icinga/rw/live" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Activo'); ?></label>
@@ -470,7 +470,7 @@ $l = 0;
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Ruta archivo status.dat'); ?></label>
                     <input type="text" name="backend[status][path]"
-                           class="pure-input-1-2 backend_status_file" placeholder="/var/lib/icinga/status.dat"/>
+                           class="pure-input-1-2 backend_status_file" placeholder="/var/lib/icinga/status.dat" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Activo'); ?></label>
@@ -492,27 +492,27 @@ $l = 0;
                 <div class="pure-control-group">
                     <label><?php echo Language::t('URL API de Zabbix'); ?></label>
                     <input type="text" name="backend[zabbix][url]" class="pure-input-1-2 backend_zabbix_url"
-                           placeholder="http://foo.bar/zabbix/api_jsonrpc.php"/>
+                           placeholder="http://foo.bar/zabbix/api_jsonrpc.php" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Versión API de Zabbix'); ?></label>
-                    <select name="backend[zabbix][version]">
+                    <select name="backend[zabbix][version]" required>
                         <option value="220">2.2</option>
                         <option value="240">2.4</option>
                     </select>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Usuario API de Zabbix'); ?></label>
-                    <input type="text" name="backend[zabbix][user]" class="backend_zabbix_user"/>
+                    <input type="text" name="backend[zabbix][user]" class="backend_zabbix_user" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Clave API de Zabbix'); ?></label>
-                    <input type="password" name="backend[zabbix][pass]" class="backend_zabbix_pass"/>
+                    <input type="password" name="backend[zabbix][pass]" class="backend_zabbix_pass" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Nivel mínimo de eventos'); ?></label>
                     <select class="backend_zabbix_level"
-                            name="backend[zabbix][level]">
+                            name="backend[zabbix][level]" required>
                         <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
                             <option value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
                         <?php endforeach; ?>
@@ -542,7 +542,7 @@ $l = 0;
                 <div class="pure-control-group">
                     <label><?php echo Language::t('URL API sysMonDash'); ?></label>
                     <input type="text" name="backend[smd][url]"
-                           class="pure-input-1-2 backend_smd_url" placeholder="http://foo.bar/sysMonDash/api.php"/>
+                           class="pure-input-1-2 backend_smd_url" placeholder="http://foo.bar/sysMonDash/api.php" required/>
                 </div>
                 <div class="pure-control-group">
                     <label><?php echo Language::t('Token'); ?></label>

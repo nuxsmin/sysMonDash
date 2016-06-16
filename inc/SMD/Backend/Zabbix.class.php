@@ -31,6 +31,7 @@ use SMD\Backend\Event\Downtime;
 use SMD\Backend\Event\Trigger;
 use SMD\Core\Config;
 use SMD\Core\ConfigBackendZabbix;
+use SMD\Core\Language;
 use SMD\Util\Util;
 
 /**
@@ -108,7 +109,8 @@ class Zabbix extends Backend implements BackendInterface
             $this->Zabbix->setApiUrl($this->url);
             $this->Zabbix->userLogin(array('user' => $this->user, 'password' => $this->pass));
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            error_log(Language::t($e->getMessage()));
+            throw $e;
         }
     }
 

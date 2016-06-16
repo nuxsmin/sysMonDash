@@ -156,7 +156,7 @@ if ($type !== 1) {
     <div class="title"><?php echo Language::t('Errores'); ?></div>
     <?php foreach ($SMD->getErrors() as $error): ?>
         <div id="nomessages" class="full error">
-            <?php echo $error; ?>
+            <?php echo Language::t($error); ?>
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
