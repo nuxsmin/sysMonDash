@@ -15,6 +15,7 @@ Las funcionalidades de **sysMonDash** son las siguientes:
 * Filtrado de servicios para NO mostrar en vista principal
 * Selección de elementos críticos para mostrar siempre
 * Detección de paradas programadas que se hayan establecido, así como su visualización en la vista principal
+* Enlace con backends remotos mediante API JSON
 
 ---
 
@@ -41,6 +42,7 @@ The **sysMonDash** key features are:
 * Services filtering to NOT be shown in the main view
 * Critical items selection to be always shown
 * Scheduled downtimes detection and showing them in the main view
+* Link to remote backends through JSON API
 
 ---
 

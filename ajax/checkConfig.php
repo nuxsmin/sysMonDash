@@ -23,6 +23,7 @@
  *
  */
 
+use Exts\Zabbix\ZabbixApiLoader;
 use SMD\Core\Init;
 use SMD\Http\Request;
 use SMD\Http\Response;
@@ -54,7 +55,7 @@ try {
             $json = Util::getDataFromUrl($url);
             break;
         case 'zabbixBackend':
-            $ZabbixLoader = new \Exts\Zabbix\ZabbixApiLoader();
+            $ZabbixLoader = new ZabbixApiLoader();
             $Zabbix = $ZabbixLoader->getAPI($data->version);
             $Zabbix->setApiUrl($data->url);
             $Zabbix->userLogin(array('user' => $data->user, 'password' => $data->pass));

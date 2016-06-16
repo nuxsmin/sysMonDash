@@ -4,7 +4,7 @@
 }
 
 body {
-    font-family: Arial, helvetica, verdana, tahoma, "sans serif";
+    font-family: Arial, helvetica, verdana, tahoma, "sans serif", serif;
     line-height: 1.3em;
     overflow-x: hidden;
     font-size: 1.2em;
@@ -33,6 +33,8 @@ tr.item-data > td, thead > th {
 
 .new {
     font-weight: bold;
+    background-color: #ffff00;
+    color: #333333;
 }
 
 .up a, .new a {

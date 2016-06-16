@@ -144,8 +144,6 @@ function SMD() {
                     newItemsCount = newItems.length;
                     playBeep();
                 }
-
-                newItems.highlight({bgcolor_on: self.hex2rgb('#ffff00'), fgcolor_on: self.hex2rgb('#333333')});
             },
             error: function (xhr, textStatus, errorThrown) {
                 placeHolder.html("<div id=\"nomessages\" class=\"error\">" + Config.getLang(1) + "<p>" + xhr.status + " " + xhr.statusText + "</p></div>");
@@ -286,6 +284,7 @@ function SMD() {
         $html.find('[name=\'backend[zabbix][version]\']')[0].name = "backend[zabbix][" + len + "][version]";
         $html.find('[name=\'backend[zabbix][user]\']')[0].name = "backend[zabbix][" + len + "][user]";
         $html.find('[name=\'backend[zabbix][pass]\']')[0].name = "backend[zabbix][" + len + "][pass]";
+        $html.find('[name=\'backend[zabbix][level]\']')[0].name = "backend[zabbix][" + len + "][level]";
         $html.find('[name=\'backend[zabbix][active]\']')[0].name = "backend[zabbix][" + len + "][active]";
 
         return $html.html();
@@ -507,12 +506,6 @@ function SMD() {
                 jQuery(container).slideDown('slow');
             }
         })
-    };
-
-    /**
-     * Establecer los eventos para la vista de eventos
-     */
-    this.setDashboardHooks = function () {
     };
 
     /**
