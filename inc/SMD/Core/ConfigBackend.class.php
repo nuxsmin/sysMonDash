@@ -59,7 +59,7 @@ abstract class ConfigBackend
     /**
      * @var int
      */
-    protected $level = null;
+    protected $level = 0;
 
     /**
      * @return int
