@@ -43,18 +43,12 @@ use SMD\Util\Util;
 class Livestatus extends Backend implements BackendInterface
 {
     /**
-     * @var string
-     */
-    protected $path = '';
-
-    /**
      * Livestatus constructor.
      * @param ConfigBackendLivestatus $backend
      */
     public function __construct(ConfigBackendLivestatus $backend)
     {
         $this->backend = $backend;
-        $this->path = $backend->getPath();
     }
 
     /**
@@ -294,7 +288,7 @@ class Livestatus extends Backend implements BackendInterface
     {
         try {
             $Socket = new Socket();
-            $Socket->setSocketFile($this->path);
+            $Socket->setSocketFile($this->backend->getPath());
             $data = json_decode($Socket->getDataFromSocket($dataQuery));
 
             if (json_last_error() !== JSON_ERROR_NONE) {

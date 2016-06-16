@@ -37,23 +37,12 @@ use SMD\Util\Util;
 class SMD extends Backend implements BackendInterface
 {
     /**
-     * @var string
-     */
-    protected $token = '';
-    /**
-     * @var string
-     */
-    protected $url = '';
-
-    /**
      * Livestatus constructor.
      * @param ConfigBackendSMD $backend
      */
     public function __construct(ConfigBackendSMD $backend)
     {
         $this->backend = $backend;
-        $this->url = $backend->getUrl();
-        $this->token = $backend->getToken();
     }
 
     /**
@@ -73,7 +62,7 @@ class SMD extends Backend implements BackendInterface
      */
     public function getHostsProblems()
     {
-        $url = $this->url . '?action=' . Api::ACTION_EVENTS . '&token=' . $this->token;
+        $url = $this->backend->getUrl() . '?action=' . Api::ACTION_EVENTS . '&token=' . $this->backend->getToken();
 
         return $this->getRemoteData($url);
     }
@@ -133,7 +122,7 @@ class SMD extends Backend implements BackendInterface
      */
     public function getScheduledDowntimesGroupped()
     {
-        $url = $this->url . '?action=' . Api::ACTION_DOWNTIMES . '&token=' . $this->token;
+        $url = $this->backend->getUrl() . '?action=' . Api::ACTION_DOWNTIMES . '&token=' . $this->backend->getToken();
 
         return $this->getRemoteData($url);
     }

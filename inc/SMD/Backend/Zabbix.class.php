@@ -44,30 +44,6 @@ class Zabbix extends Backend implements BackendInterface
     /** @var \Exts\Zabbix\V225\ZabbixApi|\Exts\Zabbix\V245\ZabbixApi */
     private $Zabbix = null;
     /**
-     * URL de la API de Zabbix
-     *
-     * @var string
-     */
-    private $url = '';
-    /**
-     * Usuario de conexión
-     *
-     * @var string
-     */
-    private $user = '';
-    /**
-     * Clave de conexión
-     *
-     * @var string
-     */
-    private $pass = '';
-    /**
-     * Versión de la API
-     *
-     * @var int
-     */
-    private $version = 0;
-    /**
      * Array con los hosts en mantenimiento
      *
      * @var array
@@ -89,11 +65,6 @@ class Zabbix extends Backend implements BackendInterface
     public function __construct(ConfigBackendZabbix $backend)
     {
         $this->backend = $backend;
-        $this->version = $backend->getVersion();
-        $this->url = $backend->getUrl();
-        $this->user = $backend->getUser();
-        $this->pass = $backend->getPass();
-
         $this->connect();
     }
 
@@ -105,9 +76,9 @@ class Zabbix extends Backend implements BackendInterface
     private function connect()
     {
         try {
-            $this->Zabbix = ZabbixApiLoader::getAPI($this->version);
-            $this->Zabbix->setApiUrl($this->url);
-            $this->Zabbix->userLogin(array('user' => $this->user, 'password' => $this->pass));
+            $this->Zabbix = ZabbixApiLoader::getAPI($this->backend->getVersion());
+            $this->Zabbix->setApiUrl($this->backend->getUrl());
+            $this->Zabbix->userLogin(array('user' => $this->backend->getUser(), 'password' => $this->backend->getPass()));
         } catch (\Exception $e) {
             error_log(Language::t($e->getMessage()));
             throw $e;

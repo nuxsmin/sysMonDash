@@ -150,7 +150,11 @@ class sysMonDash
      */
     public function getBackends()
     {
-        $backends = array();
+        $backends = (!Util::checkConfigRefresh()) ? Session::getActiveBackends() : array();
+
+        if (count($backends) > 0) {
+            return $backends;
+        }
 
         foreach (Config::getConfig()->getBackend() as $Backend) {
             /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD */
@@ -171,6 +175,8 @@ class sysMonDash
                 }
             }
         }
+
+        Session::setActiveBackends($backends);
 
         return $backends;
     }

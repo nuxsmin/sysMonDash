@@ -354,4 +354,14 @@ class Util
 
         return (isset($appInfo[$index])) ? $appInfo[$index] : '';
     }
+
+    /**
+     * Comprobar si la configuración se ha actualizado
+     * 
+     * @return bool
+     */
+    public static function checkConfigRefresh()
+    {
+        return (time() - Session::getConfigTime() <= Config::getConfig()->getRefreshValue());
+    }
 }

@@ -146,4 +146,24 @@ class Session
     {
         return self::getSessionKey('configTime', 0);
     }
+
+    /**
+     * Establecer los backends activos
+     *
+     * @param array $backends
+     */
+    public static function setActiveBackends(array $backends)
+    {
+        self::setSessionKey('activeBackends', $backends);
+    }
+
+    /**
+     * Devolver los backends activos
+     *
+     * @return array
+     */
+    public static function getActiveBackends()
+    {
+        return self::getSessionKey('activeBackends', array());
+    }
 }
