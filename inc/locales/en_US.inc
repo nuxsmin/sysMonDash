@@ -113,3 +113,4 @@ $LANG['Generar Clave'] = 'Generate password';
 $LANG['Nivel mínimo de eventos'] = 'Events level threshold';
 $LANG['Nivel no disponible'] = 'Level not available';
 $LANG['Especial']  = 'Special';
+$LANG['N/D']  = 'N/A';

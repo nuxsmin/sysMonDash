@@ -222,7 +222,6 @@ class Zabbix extends Backend implements BackendInterface
                     $Downtime->setAuthor('Zabbix');
                     $Downtime->setComment($maintenance->description);
                     $Downtime->setHostName($this->getHostsForMaintenance($maintenance->maintenanceid));
-                    $Downtime->setIsService(false);
                     $Downtime->setServiceDisplayName('-');
                     $Downtime->setStartTime($period['start']);
                     $Downtime->setEndTime($period['end']);
@@ -267,13 +266,21 @@ class Zabbix extends Backend implements BackendInterface
                 $end = $timePeriod->start_date + $timePeriod->period;
 
                 if (time() <= $end) {
-                    $result[] = array('start' => $timePeriod->start_date, 'end' => $end);
+                    $result[] = array(
+                        'type' => $timePeriod->timeperiod_type,
+                        'start' => $timePeriod->start_date,
+                        'end' => $end
+                    );
                 }
             } else {
                 $start = strtotime('today', time()) + $timePeriod->start_time;
                 $end = $start + $timePeriod->period;
 
-                $result[] = array('start' => $start,  'end' => $end);
+                $result[] = array(
+                    'type' => $timePeriod->timeperiod_type,
+                    'start' => $start,
+                    'end' => $end
+                );
             }
         }
 
@@ -298,7 +305,7 @@ class Zabbix extends Backend implements BackendInterface
             }
         }
 
-        return (count($hosts) > 0) ? $hosts : '';
+        return (count($hosts) > 0) ? $hosts : Language::t('N/D');
     }
 
     /**
