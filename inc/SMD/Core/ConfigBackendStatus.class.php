@@ -39,7 +39,7 @@ class ConfigBackendStatus extends ConfigBackend
      * @param int $level
      * @throws \Exception
      */
-    public function __construct($path, $level = 1)
+    public function __construct($path, $level = 0)
     {
         $this->setType(self::TYPE_STATUS);
         $this->setPath($path);

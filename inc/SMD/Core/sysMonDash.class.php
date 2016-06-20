@@ -117,7 +117,7 @@ class sysMonDash
                 $newItemUp = ($item->getState() === 0 && ($item->getLastTimeUp() || $item->getLastTimeOk())) ? (abs(time() - $item->getLastHardStateChange()) < $newItemTime / 2) : false;
 
                 // Detectar si es un elemento nuevo, no se trata de un "RECOVERY" y no está "ACKNOWLEDGED"
-                $newItem = (time() - $item->getLastHardState() <= $newItemTime && !$newItemUp && !$item->isAcknowledged());
+                $newItem = (time() - $item->getLastHardStateChange() <= $newItemTime && !$newItemUp && !$item->isAcknowledged());
 
                 // Calcular los filtros de cada evento
                 $runFilters = $this->filterItems($item);

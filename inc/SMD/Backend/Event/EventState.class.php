@@ -41,7 +41,7 @@ class EventState
      */
     public static function getStateClass(EventInterface $item, $state = null)
     {
-        $state = (is_null($state) ? $item->getState(): intval($state));
+        $state = (is_null($state) ? $item->getState() : intval($state));
 
         switch ($item->getType()) {
             case Event::TYPE_HOST:
@@ -64,7 +64,7 @@ class EventState
      */
     public static function getStateName(EventInterface $item, $state = null)
     {
-        $state = (is_null($state) ? $item->getState(): intval($state));
+        $state = (is_null($state) ? $item->getState() : intval($state));
 
         switch ($item->getType()) {
             case Event::TYPE_HOST:
