@@ -39,15 +39,15 @@ class SocketUnix extends SocketBase
     protected function getLiveSocket()
     {
         if (file_exists($this->socketPath) && filetype($this->socketPath) === 'socket') {
-            $socket = stream_socket_client('unix://' . $this->socketPath, $errno, $errstr);
+            $this->socket = stream_socket_client('unix://' . $this->socketPath, $errno, $errstr);
 
-            if (!$socket) {
+            if (!$this->socket) {
                 throw new Exception("ERROR: $errno - $errstr");
             }
         } else {
             throw new Exception("ERROR: unable to read file $this->socketPath");
         }
 
-        return $socket;
+        return $this->socket;
     }
 }
