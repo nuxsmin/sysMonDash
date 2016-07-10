@@ -1,6 +1,7 @@
 * [ADD] Added new Check_MK backend. Related #18. Thanks to @ikiranreddy for the feedback
 * [ADD] Added new warning message when configuration is changed.
 * [MOD] Improved socket connections.
+* [MOD] Improved response handling on socket connections.
 
 * [ADD] New events level threshold by backend. Closes #12
 * [ADD] New config password besides hash based auth.

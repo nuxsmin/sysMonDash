@@ -53,7 +53,8 @@ class CheckMK extends Livestatus
         if ($this->isAllHeaders() === false) {
             $filter = array(
                 'GET hosts',
-                'Filter: checks_enabled = 1',
+                'ResponseHeader: fixed16',
+                'Filter: host_checks_enabled = 1',
                 'Filter: state != ' . HOST_UP,
                 'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
                 'Filter: is_flapping = 1',
@@ -65,7 +66,7 @@ class CheckMK extends Livestatus
 
             $dataQuery = implode("\n", $filter) . "\n\n";
         } else {
-            $dataQuery = "GET hosts\nFilter: state != " . HOST_UP . "\nFilter: checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
+            $dataQuery = "GET hosts\nFilter: state != " . HOST_UP . "\nFilter: host_checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
         }
 
         return $dataQuery;
@@ -82,6 +83,8 @@ class CheckMK extends Livestatus
         if ($this->isAllHeaders() === false) {
             $filter = array(
                 'GET services',
+                'ResponseHeader: fixed16',
+                'Filter: host_checks_enabled = 1',
                 'Filter: state != ' . SERVICE_OK,
                 'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
                 'Filter: is_flapping = 1',
@@ -93,7 +96,7 @@ class CheckMK extends Livestatus
 
             $dataQuery = implode("\n", $filter) . "\n\n";
         } else {
-            $dataQuery = "GET services\nFilter: state != " . SERVICE_OK . "\nFilter: checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
+            $dataQuery = "GET services\nFilter: state != " . SERVICE_OK . "\nFilter: host_checks_enabled = 1\nColumnHeaders: off\nOutputFormat: json\n\n";
         }
 
         return $dataQuery;

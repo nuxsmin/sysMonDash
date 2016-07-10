@@ -118,6 +118,7 @@ class Livestatus extends Backend implements BackendInterface
         if ($this->isAllHeaders() === false) {
             $filter = array(
                 'GET downtimes',
+                'ResponseHeader: fixed16',
                 'Columns: ' . implode(' ', $fields),
                 'ColumnHeaders: off',
                 'OutputFormat: json'
@@ -155,6 +156,7 @@ class Livestatus extends Backend implements BackendInterface
      *
      * @param string $dataQuery La consulta a realizar
      * @return bool|mixed
+     * @throws Exception
      */
     private function getJsonFromSocket(&$dataQuery)
     {
@@ -167,7 +169,7 @@ class Livestatus extends Backend implements BackendInterface
             }
         } catch (Exception $e) {
             error_log('ERROR: ' . $e->getMessage());
-            return false;
+            throw $e;
         }
 
         return $data;
@@ -255,6 +257,7 @@ class Livestatus extends Backend implements BackendInterface
         if ($this->isAllHeaders() === false) {
             $filter = array(
                 'GET hosts',
+                'ResponseHeader: fixed16',
                 'Filter: checks_enabled = 1',
                 'Filter: state != ' . HOST_UP,
                 'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
@@ -356,6 +359,7 @@ class Livestatus extends Backend implements BackendInterface
         if ($this->isAllHeaders() === false) {
             $filter = array(
                 'GET services',
+                'ResponseHeader: fixed16',
                 'Filter: checks_enabled = 1',
                 'Filter: state != ' . SERVICE_OK,
                 'Filter: last_hard_state_change > ' . (time() - Config::getConfig()->getNewItemTime() / 2),
