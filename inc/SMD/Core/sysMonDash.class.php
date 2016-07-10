@@ -27,6 +27,7 @@ namespace SMD\Core;
 
 use Exception;
 use SMD\Backend\BackendInterface;
+use SMD\Backend\CheckMK;
 use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\Event;
 use SMD\Backend\Event\EventInterface;
@@ -162,6 +163,9 @@ class sysMonDash
                 switch ($Backend->getType()) {
                     case ConfigBackend::TYPE_LIVESTATUS:
                         $backends[] = new Livestatus($Backend);
+                        break;
+                    case ConfigBackend::TYPE_CHECKMK:
+                        $backends[] = new CheckMK($Backend);
                         break;
                     case ConfigBackend::TYPE_STATUS:
                         $backends[] = new Status($Backend);

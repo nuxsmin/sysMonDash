@@ -223,17 +223,15 @@ function SMD() {
             dataType: 'json',
             data: obj.serialize(),
             success: function (data) {
-                var target = jQuery("#result");
-
-                target.removeClass();
+                alertify.logPosition("bottom right");
 
                 if (data.status == 0) {
-                    target.addClass('ok');
+                    jQuery('#warn-save').hide();
+                    alertify.delay(5000).closeLogOnClick(true).success(data.description)
                 } else {
-                    target.addClass('error');
+                    alertify.error(data.description);
+                    // target.addClass('error');
                 }
-
-                target.html(data.description);
             }
         });
     };
@@ -250,6 +248,22 @@ function SMD() {
         $html.find('[name=\'backend[livestatus][alias]\']')[0].name = "backend[livestatus][" + len + "][alias]]";
         $html.find('[name=\'backend[livestatus][path]\']')[0].name = "backend[livestatus][" + len + "][path]]";
         $html.find('[name=\'backend[livestatus][active]\']')[0].name = "backend[livestatus][" + len + "][active]]";
+
+        return $html.html();
+    };
+
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
+    this.getNewCheckMKBackend = function () {
+        var len = jQuery('.backendCheckMK').length;
+        var $html = jQuery('.checkmkTemplate').clone();
+
+        $html.find('[name=\'backend[checkmk][alias]\']')[0].name = "backend[checkmk][" + len + "][alias]]";
+        $html.find('[name=\'backend[checkmk][path]\']')[0].name = "backend[checkmk][" + len + "][path]]";
+        $html.find('[name=\'backend[checkmk][active]\']')[0].name = "backend[checkmk][" + len + "][active]]";
 
         return $html.html();
     };
@@ -356,6 +370,20 @@ function SMD() {
     };
 
     /**
+     * Avisar para guardar la configuración
+     */
+    this.warnConfig = function () {
+        alertify.logPosition("bottom right");
+        alertify.warn(Config.getLang(5));
+
+        var warnSave = jQuery('#warn-save');
+
+        if (warnSave.css('display') !== 'block') {
+            warnSave.show();
+        }
+    };
+
+    /**
      * Establecer los eventos para la vista de configuración
      */
     this.setConfigHooks = function () {
@@ -370,12 +398,32 @@ function SMD() {
             sel.val(selvalue);
         });
 
+        form.on('change', 'input', function (e) {
+            var warnSave = jQuery('#warn-save');
+
+            if (warnSave.css('display') !== 'block') {
+                warnSave.show();
+            }
+        });
+
         jQuery('#addLivestatusBackend').on('click', function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
                 'class': 'backendLivestatus backendConfig',
                 html: self.getNewLivestatusBackend()
+            }).hide().appendTo('#backends-config-container').slideDown('slow');
+
+            var offset = el.offset();
+            window.scroll(0, offset.top);
+        });
+
+        jQuery('#addCheckMKBackend').on('click', function (e) {
+            e.preventDefault();
+
+            var el = jQuery('<div/>', {
+                'class': 'backendCheckMK backendConfig',
+                html: self.getNewCheckMKBackend()
             }).hide().appendTo('#backends-config-container').slideDown('slow');
 
             var offset = el.offset();
@@ -431,6 +479,8 @@ function SMD() {
                         $parent.remove();
                     }
                 );
+
+                self.warnConfig();
             }
         }).on('click', '.backendCheckSMD', function (e) {
             e.preventDefault();
@@ -505,7 +555,7 @@ function SMD() {
                 jQuery(this).removeClass('fa-caret-down').addClass('fa-caret-up');
                 jQuery(container).slideDown('slow');
             }
-        })
+        });
     };
 
     /**

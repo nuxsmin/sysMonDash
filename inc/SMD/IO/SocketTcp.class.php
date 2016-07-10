@@ -24,26 +24,43 @@
 
 namespace SMD\IO;
 
+use Exception;
+
 /**
- * Class Socket
+ * Class SocketTcp para conectar a un socket TCP
+ *
  * @package SMD\IO
  */
-class Socket
+class SocketTcp extends SocketBase
 {
+
     /**
-     * Devolver una instancia del tipo SocketInterface según el tipo de socket
-     *
-     * @param $socketPath
-     * @return SocketInterface
+     * Obtener un recurso del tipo Socket utilizando el socket tcp
+     * @return bool|resource
+     * @throws Exception
      */
-    public static function getSocket($socketPath)
+    protected function getLiveSocket()
     {
-        if (filter_var($socketPath, FILTER_VALIDATE_IP)
-            || filter_var($socketPath, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)
-        ) {
-            return new SocketTcp($socketPath);
-        } else {
-            return new SocketUnix($socketPath);
+        $this->socket = stream_socket_client('tcp://' . $this->getUrl(), $errno, $errstr, 10);
+
+        if (!$this->socket) {
+            throw new Exception("ERROR: $errno - $errstr");
         }
+
+        return true;
+    }
+
+    /**
+     * Devolver la URL del socket sin protocolo
+     *
+     * @return string
+     */
+    protected function getUrl()
+    {
+        if (preg_match('#^https?://([\w\d.:]+)/?#', $this->socketPath, $match)) {
+            return $match[1];
+        }
+
+        return $this->socketPath;
     }
 }

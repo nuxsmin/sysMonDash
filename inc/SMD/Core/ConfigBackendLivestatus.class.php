@@ -23,6 +23,7 @@
  */
 
 namespace SMD\Core;
+
 use SMD\Backend\Event\EventStateHost;
 
 /**
@@ -50,7 +51,10 @@ class ConfigBackendLivestatus extends ConfigBackend
      */
     public function setPath($path)
     {
-        if (!file_exists($path) || filetype($path) !== 'socket') {
+        if (!(filter_var($path, FILTER_VALIDATE_IP)
+                || filter_var($path, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED))
+            && (!file_exists($path) || filetype($path) !== 'socket')
+        ) {
             throw new \Exception('Ruta o archivo no válido');
         }
 

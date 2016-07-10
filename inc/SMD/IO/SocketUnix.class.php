@@ -24,26 +24,30 @@
 
 namespace SMD\IO;
 
+use Exception;
+
 /**
- * Class Socket
+ * Class SocketFile para conectar a un socket unix
  * @package SMD\IO
  */
-class Socket
+class SocketUnix extends SocketBase
 {
     /**
-     * Devolver una instancia del tipo SocketInterface según el tipo de socket
-     *
-     * @param $socketPath
-     * @return SocketInterface
+     * @return mixed
+     * @throws Exception
      */
-    public static function getSocket($socketPath)
+    protected function getLiveSocket()
     {
-        if (filter_var($socketPath, FILTER_VALIDATE_IP)
-            || filter_var($socketPath, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)
-        ) {
-            return new SocketTcp($socketPath);
+        if (file_exists($this->socketPath) && filetype($this->socketPath) === 'socket') {
+            $socket = stream_socket_client('unix://' . $this->socketPath, $errno, $errstr);
+
+            if (!$socket) {
+                throw new Exception("ERROR: $errno - $errstr");
+            }
         } else {
-            return new SocketUnix($socketPath);
+            throw new Exception("ERROR: unable to read file $this->socketPath");
         }
+
+        return $socket;
     }
 }

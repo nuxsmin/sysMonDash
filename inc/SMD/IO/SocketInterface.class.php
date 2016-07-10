@@ -24,26 +24,27 @@
 
 namespace SMD\IO;
 
-/**
- * Class Socket
- * @package SMD\IO
- */
-class Socket
+use Exception;
+
+interface SocketInterface
 {
     /**
-     * Devolver una instancia del tipo SocketInterface según el tipo de socket
+     * Realizar una petición a un socket y obtener los resultados.
      *
-     * @param $socketPath
-     * @return SocketInterface
+     * @param string $inData Los datos a consultar
+     * @return bool|string
+     * @throws Exception
      */
-    public static function getSocket($socketPath)
-    {
-        if (filter_var($socketPath, FILTER_VALIDATE_IP)
-            || filter_var($socketPath, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)
-        ) {
-            return new SocketTcp($socketPath);
-        } else {
-            return new SocketUnix($socketPath);
-        }
-    }
+    public function getDataFromSocket(&$inData);
+
+    /**
+     * @param string $socketPath
+     * @return mixed
+     */
+    public function setSocketPath($socketPath);
+
+    /**
+     * @return string
+     */
+    public function getSocketPath();
 }

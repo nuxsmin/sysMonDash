@@ -25,6 +25,7 @@
 
 namespace SMD\Html;
 
+use SMD\Core\ConfigBackendCheckMK;
 use SMD\Core\ConfigBackendLivestatus;
 use SMD\Core\ConfigBackendSMD;
 use SMD\Core\ConfigBackendStatus;
@@ -99,6 +100,9 @@ class Html
                         break;
                     case 'livestatus':
                         $ConfigBackend = new ConfigBackendLivestatus($config['path']);
+                        break;
+                    case 'checkmk':
+                        $ConfigBackend = new ConfigBackendCheckMK($config['path']);
                         break;
                     case 'zabbix':
                         $ConfigBackend = new ConfigBackendZabbix($config['version'], $config['url'], $config['user'], $config['pass'], $config['level']);

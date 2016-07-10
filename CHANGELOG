@@ -1,3 +1,7 @@
+* [ADD] Added new Check_MK backend. Related #18. Thanks to @ikiranreddy for the feedback
+* [ADD] Added new warning message when configuration is changed.
+* [MOD] Improved socket connections.
+
 * [ADD] New events level threshold by backend. Closes #12
 * [ADD] New config password besides hash based auth.
 * [ADD] New config backup before saving.
@@ -31,7 +35,8 @@
 
 * [FIX] Fixed PHP version comparison
 * [MOD] Improved error handling when retrieving events from remote backends.
-* [MOD] API requests are now coded into a PHP serialized string and wrapped with JSON. * [MOD] More secure config hash generation.
+* [MOD] API requests are now coded into a PHP serialized string and wrapped with JSON.
+* [MOD] More secure config hash generation.
 * [FIX] PHP 5.3 compatibility issues
 * [MOD] Warns if cURL is unavailable
 * [FIX] Minor bugfixes

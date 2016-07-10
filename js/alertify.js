@@ -469,6 +469,10 @@
                 _alertify.log(message, "error", click);
                 return this;
             },
+            warn: function(message, click) {
+                _alertify.log(message, "warn", click);
+                return this;
+            },
             cancelBtn: function(label) {
                 _alertify.cancelBtn(label);
                 return this;

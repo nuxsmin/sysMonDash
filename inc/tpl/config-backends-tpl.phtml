@@ -1,0 +1,180 @@
+<?php
+/**
+ * sysMonDash
+ *
+ * @author    nuxsmin
+ * @link      http://cygnux.org
+ * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ *
+ * This file is part of sysMonDash.
+ *
+ * sysMonDash is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * sysMonDash is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
+ */
+use SMD\Backend\Event\EventStateTrigger;
+use SMD\Core\Language;
+
+?>
+<!-- Templates -->
+<div class="livestatusTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[livestatus][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Ruta socket livestatus'); ?></label>
+        <input type="text" name="backend[livestatus][path]"
+               class="pure-input-1-2 backend_livestatus_file" placeholder="/var/lib/icinga/rw/live"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[livestatus][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-minus-circle"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>
+<div class="checkmkTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[checkmk][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Ruta socket Check_MK'); ?></label>
+        <input type="text" name="backend[checkmk][path]"
+               class="pure-input-1-2 backend_checkmk_file"
+               placeholder="/omd/sites/mysite/tmp/run/live | http://omdserver:6557"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[checkmk][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-minus-circle"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>
+<div class="statusTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[status][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Ruta archivo status.dat'); ?></label>
+        <input type="text" name="backend[status][path]"
+               class="pure-input-1-2 backend_status_file" placeholder="/var/lib/icinga/status.dat"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[status][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-trash"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>
+<div class="zabbixTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[zabbix][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('URL API de Zabbix'); ?></label>
+        <input type="text" name="backend[zabbix][url]" class="pure-input-1-2 backend_zabbix_url"
+               placeholder="http://foo.bar/zabbix/api_jsonrpc.php" required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Versión API de Zabbix'); ?></label>
+        <select name="backend[zabbix][version]" required>
+            <option value="220">2.2</option>
+            <option value="240">2.4</option>
+        </select>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Usuario API de Zabbix'); ?></label>
+        <input type="text" name="backend[zabbix][user]" class="backend_zabbix_user" required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Clave API de Zabbix'); ?></label>
+        <input type="password" name="backend[zabbix][pass]" class="backend_zabbix_pass" required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Nivel mínimo de eventos'); ?></label>
+        <select class="backend_zabbix_level"
+                name="backend[zabbix][level]" required>
+            <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
+                <option value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[zabbix][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-secondary pure-button backendCheckZabbix">
+            <i class="fa fa-check-circle"></i>
+            <?php echo Language::t('Comprobar'); ?>
+        </button>
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-minus-circle"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>
+<div class="SMDTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[smd][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('URL API sysMonDash'); ?></label>
+        <input type="text" name="backend[smd][url]"
+               class="pure-input-1-2 backend_smd_url" placeholder="http://foo.bar/sysMonDash/api.php"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Token'); ?></label>
+        <input type="text" name="backend[smd][token]"
+               class="pure-input-1-2 backend_smd_token" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[smd][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-secondary pure-button backendCheckSMD">
+            <i class="fa fa-check-circle"></i>
+            <?php echo Language::t('Comprobar'); ?>
+        </button>
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-minus-circle"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>

@@ -22,28 +22,21 @@
  * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SMD\IO;
+namespace SMD\Core;
 
-/**
- * Class Socket
- * @package SMD\IO
- */
-class Socket
+
+class ConfigBackendCheckMK extends ConfigBackendLivestatus
 {
     /**
-     * Devolver una instancia del tipo SocketInterface según el tipo de socket
-     *
-     * @param $socketPath
-     * @return SocketInterface
+     * ConfigBackendLivestatus constructor.
+     * @param $path
+     * @param int $level
+     * @throws \Exception
      */
-    public static function getSocket($socketPath)
+    public function __construct($path, $level = 0)
     {
-        if (filter_var($socketPath, FILTER_VALIDATE_IP)
-            || filter_var($socketPath, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)
-        ) {
-            return new SocketTcp($socketPath);
-        } else {
-            return new SocketUnix($socketPath);
-        }
+        parent::__construct($path, $level);
+
+        $this->setType(self::TYPE_CHECKMK);
     }
 }

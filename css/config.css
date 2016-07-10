@@ -36,10 +36,7 @@
     margin: 1em 0;
 }
 
-#wrap .backendStatus,
-#wrap .backendLivestatus,
-#wrap .backendZabbix,
-#wrap .backendSMD {
+#wrap .backendConfig {
     padding: .5em 0;
     margin: .5em 0;
     border-bottom: 1px solid #e5e5e5;
@@ -63,6 +60,7 @@
 }
 
 #wrap #help {
+    margin-top: 1em;
     text-align: center;
     color: #555;
 }
@@ -70,6 +68,21 @@
 #wrap #help a {
     color: #555;
     vertical-align: baseline;
+}
+
+#warn-save {
+    background: rgba(255, 255, 255, .8);
+    padding: 1em;
+    position: fixed;
+    top: 7em;
+    left: 0;
+    display: none;
+}
+
+#warn-save i {
+    font-size: 2em;
+    color: #ffa726;
+    cursor: pointer;
 }
 
 .buttons {
