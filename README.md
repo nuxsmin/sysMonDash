@@ -4,7 +4,7 @@
 
 **sysMonDash** es un panel de monitorización optimizado para entornos con un alto número de elementos a monitorizar mostrando aquellos eventos que requieran de atención.
 
-Los backend soportados son Nagios, Icinga y Zabbix.
+Los backend soportados son Nagios, Icinga, Zabbix y Check_MK.
 
 Es posible utilizar Nagios o Icinga mediante el plugin 'mk_livestatus' (recomendado) o el archivo 'status.dat'.
 
@@ -31,7 +31,7 @@ Acceder a http://tuservidor.com/sysMonDash/config.php y configurar según tu ent
 
 **sysMonDash** is an optimized monitoring dashboard for large environments which have a large number of items to monitor by showing those events that requires an special attention.
 
-The supported backends are Nagios, Icinga and Zabbix.
+The supported backends are Nagios, Icinga, Zabbix and Check_MK.
 
 It's possible to use Nagios or Icinga through the 'mk_livestatus' plugin (recommended) or the 'status.dat' file.
 
