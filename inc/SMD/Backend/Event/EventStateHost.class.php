@@ -34,7 +34,7 @@ class EventStateHost implements EventStateInterface
      * @var array
      */
     private static $states = array(
-        0 => array('OK', 'new'),
+        0 => array('OK', 'up'),
         1 => array('AVISO', 'warning'),
         2 => array('CRITICO', 'critical'),
         3 => array('DESCONOCIDO', 'unknown'),
