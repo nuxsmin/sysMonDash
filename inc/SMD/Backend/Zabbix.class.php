@@ -25,7 +25,6 @@
 
 namespace SMD\Backend;
 
-use DateTime;
 use Exts\Zabbix\ZabbixApiLoader;
 use SMD\Backend\Event\Downtime;
 use SMD\Backend\Event\Trigger;

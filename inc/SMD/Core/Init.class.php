@@ -25,9 +25,6 @@
 
 namespace SMD\Core;
 
-use SMD\Core\ConfigData;
-use SMD\Core\Language;
-use SMD\Core\Session;
 use SMD\Storage\XmlHandler;
 
 /**

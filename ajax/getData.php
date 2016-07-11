@@ -110,7 +110,7 @@ if ($type !== 1) {
     </table>
 
     <div id="total">
-        <?php printf('%s | %d@%.4fs | auto %ds', date('H:i:s', time()), $SMD->getDisplayedItems(), microtime(true) - $time_start, $timeout); ?>
+        <?php printf('%s | %d@%.4fs | <i class="fa fa-clock-o" aria-hidden="true"></i> %ds', date('H:i:s', time()), $SMD->getDisplayedItems(), microtime(true) - $time_start, $timeout); ?>
         |
         <?php printf('%d/%d %s %s', $SMD->getDisplayedItems(), $SMD->getTotalItems(), Language::t('avisos'), $showAll); ?>
     </div>

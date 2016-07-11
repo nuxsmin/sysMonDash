@@ -29,18 +29,13 @@ use Exception;
 use SMD\Backend\BackendInterface;
 use SMD\Backend\CheckMK;
 use SMD\Backend\Event\DowntimeInterface;
-use SMD\Backend\Event\Event;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Event\EventState;
-use SMD\Backend\Event\EventStateHost;
 use SMD\Backend\Event\EventStateInterface;
-use SMD\Backend\Event\EventStateService;
-use SMD\Backend\Event\EventStateTrigger;
 use SMD\Backend\Livestatus;
 use SMD\Backend\SMD;
 use SMD\Backend\Status;
 use SMD\Backend\Zabbix;
-use SMD\Core\Exceptions\BackendException;
 use SMD\Core\Exceptions\NoDataException;
 use SMD\Util\Util;
 

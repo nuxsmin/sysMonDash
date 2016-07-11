@@ -24,6 +24,7 @@
  */
 
 namespace SMD\Core;
+
 use ReflectionObject;
 use SMD\Storage\StorageInterface;
 use SMD\Util\Util;

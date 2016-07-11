@@ -1,13 +1,23 @@
+@font-face {
+    font-family: 'noto_sansregular';
+    src: url('fonts/NotoSans-Regular-webfont.eot');
+    src: url('fonts/NotoSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+    url('fonts/NotoSans-Regular-webfont.woff') format('woff'),
+    url('fonts/NotoSans-Regular-webfont.svg#noto_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     margin: 0;
     padding: 0;
+    font-family: noto_sansregular, Arial, helvetica, verdana, tahoma, "sans serif", serif;
 }
 
 body {
-    font-family: Arial, helvetica, verdana, tahoma, "sans serif", serif;
     line-height: 1.3em;
+    font-size: 1.1em;
     overflow-x: hidden;
-    font-size: 1.2em;
     background-color: #f5f5f5;
 }
 
@@ -95,6 +105,10 @@ tr.item-data > td, thead > th {
 
 .statusinfo {
     font-size: .7em !important;
+}
+
+.a-nodecorate {
+    text-decoration: none;
 }
 
 #total {
@@ -188,10 +202,6 @@ footer #project a {
     border: 0;
 }
 
-#logo h1, #logo h2 {
-    font-size: 1em;
-}
-
 #hora {
     position: absolute;
     top: 0;
@@ -201,7 +211,12 @@ footer #project a {
     text-align: center;
     color: #fff;
     font-size: 1.3em;
+    line-height: 1.5em;
     display: inline-block;
+}
+
+#hora h1 {
+    font-size: 1.2em;
 }
 
 #titulo {
@@ -210,6 +225,10 @@ footer #project a {
     right: 1em;
     text-align: right;
     color: #fff;
+}
+
+#titulo h1, #titulo h2 {
+    font-size: 1.2em;
 }
 
 #nomessages {
@@ -290,4 +309,9 @@ div.title {
 footer #updates {
     display: inline-block;
     margin-right: .5em;
+}
+
+footer #updates i {
+    color: #26a69a;
+    font-size: 1.5em;
 }

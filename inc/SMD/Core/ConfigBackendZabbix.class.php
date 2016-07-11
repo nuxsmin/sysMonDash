@@ -24,7 +24,6 @@
 
 namespace SMD\Core;
 
-use SMD\Backend\Event\EventStateInterface;
 use SMD\Backend\Event\EventStateTrigger;
 
 /**

@@ -26,7 +26,6 @@ namespace SMD\Core;
 
 use SMD\Backend\Event\EventStateHost;
 
-
 /**
  * Class ConfigBackendStatus
  * @package SMD\Core

@@ -26,7 +26,6 @@ namespace SMD\Api;
 
 use SMD\Core\Config;
 use SMD\Core\sysMonDash;
-use SMD\Util\Json;
 
 /**
  * Class Api para la implementación de un backend de sysMonDash remoto

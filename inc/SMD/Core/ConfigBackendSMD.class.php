@@ -24,7 +24,6 @@
 
 namespace SMD\Core;
 
-
 class ConfigBackendSMD extends ConfigBackend
 {
     /**

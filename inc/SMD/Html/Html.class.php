@@ -122,4 +122,23 @@ class Html
 
         return $BackendsConfig;
     }
+    
+    /**
+     * Truncar un texto a una determinada longitud.
+     *
+     * @param string $text  la cadena a truncar
+     * @param int    $limit la longitud máxima de la cadena
+     * @param string $ellipsis
+     * @return string con el texto truncado
+     *
+     * @link http://www.pjgalbraith.com/truncating-text-html-with-php/
+     */
+    public static function truncate($text, $limit, $ellipsis = '...')
+    {
+        if (strlen($text) > $limit) {
+            $text = trim(mb_substr($text, 0, $limit)) . $ellipsis;
+        }
+
+        return $text;
+    }
 }

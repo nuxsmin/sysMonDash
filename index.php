@@ -54,6 +54,7 @@ Session::setCssHash(Util::getCssHash());
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/reset.min.css">
     <link rel="stylesheet" type="text/css" href="css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.min.css?v=<?php echo Session::getCssHash(); ?>">
 </head>
 <body>
@@ -71,6 +72,10 @@ Session::setCssHash(Util::getCssHash());
 <footer>
     <div id="project">
         <span id="updates"></span>
+        <a href="config.php" title="Config" class="a-nodecorate">
+            <i class="fa fa-wrench" aria-hidden="true"></i>
+        </a>
+        ::
         <?php printf('%s :: %s :: %s', Util::getAppInfo('appVersion'), Util::getAppInfo('appCode'), Util::getAppInfo('appAuthor')); ?>
     </div>
 </footer>
