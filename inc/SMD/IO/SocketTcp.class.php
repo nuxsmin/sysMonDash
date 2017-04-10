@@ -57,7 +57,7 @@ class SocketTcp extends SocketBase
      */
     protected function getUrl()
     {
-        if (preg_match('#^https?://([\w\d.:]+)/?#', $this->socketPath, $match)) {
+        if (preg_match('#^https?://([\w.:]+)/?#', $this->socketPath, $match)) {
             return $match[1];
         }
 

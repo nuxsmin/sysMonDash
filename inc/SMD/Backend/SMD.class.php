@@ -49,6 +49,7 @@ class SMD extends Backend implements BackendInterface
      * Devuelve los eventos
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getProblems()
     {
@@ -59,6 +60,7 @@ class SMD extends Backend implements BackendInterface
      * Devuelve los eventos de los hosts
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getHostsProblems()
     {
@@ -85,7 +87,9 @@ class SMD extends Backend implements BackendInterface
 
             error_log($msg);
             throw new BackendException($msg);
-        } elseif (!is_object($data)) {
+        }
+
+        if (!is_object($data)) {
             $msg = sprintf('%s (%s): %s', $this->getBackend()->getAlias(), 'SMD', Language::t('Error al acceder a la API'));
 
             error_log($msg);
@@ -109,6 +113,7 @@ class SMD extends Backend implements BackendInterface
      * Devuelve los eventos programados
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getScheduledDowntimes()
     {
@@ -119,6 +124,7 @@ class SMD extends Backend implements BackendInterface
      * Devuelve los eventos programados agrupados
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getScheduledDowntimesGroupped()
     {

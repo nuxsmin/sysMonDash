@@ -268,14 +268,16 @@ class Status extends Backend implements BackendInterface
      */
     private function clearArrayValues($value)
     {
-        return (is_numeric($value)) ? intval($value) : htmlentities($value);
+        return is_numeric($value) ? (int)$value : htmlentities($value);
     }
 
     /**
      * @param ConfigBackendStatus $backend
      */
-    public function setBackend(ConfigBackendStatus $backend)
+    public function setBackend($backend)
     {
-        $this->backend = $backend;
+        if ($backend instanceof ConfigBackendStatus) {
+            $this->backend = $backend;
+        }
     }
 }

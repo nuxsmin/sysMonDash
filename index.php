@@ -89,10 +89,10 @@ Session::setCssHash(Util::getCssHash());
     (function () {
         config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
         config.setAjaxFile('<?php echo $ajaxFile; ?>');
-        config.setScroll(<?php echo ($scroll) ? 'true' : 'false'; ?>);
+        config.setScroll(<?php echo $scroll ? 'true' : 'false'; ?>);
         config.setTimeout(<?php echo $timeout; ?>);
         config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
-        config.setAudioEnabled(<?php echo (Config::getConfig()->isNewItemAudioEnabled()) ? 'true' : 'false'; ?>);
+        config.setAudioEnabled(<?php echo Config::getConfig()->isNewItemAudioEnabled() ? 'true' : 'false'; ?>);
 
         smd.setConfig(config);
         smd.startSMD();

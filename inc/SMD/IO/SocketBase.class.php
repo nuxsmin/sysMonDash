@@ -84,7 +84,7 @@ abstract class SocketBase implements SocketInterface
 
             fwrite($this->socket, $inData);
             $code = fread($this->socket, 3);
-            $length = intval(trim(fread($this->socket, 12)));
+            $length = (int)trim(fread($this->socket, 12));
             $outData = stream_get_contents($this->socket, $length);
 
             if ($code != 200) {

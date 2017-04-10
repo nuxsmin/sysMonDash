@@ -42,7 +42,7 @@ class Session
      *
      * @param mixed $key
      * @param mixed $default
-     * @return bool|int
+     * @return mixed
      */
     public static function getSessionKey($key, $default = '')
     {

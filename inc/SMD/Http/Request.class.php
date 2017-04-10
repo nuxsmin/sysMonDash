@@ -65,7 +65,9 @@ class Request
 
         if ($check) {
             return true;
-        } elseif ($force) {
+        }
+
+        if ($force) {
             return $force;
         }
 
@@ -108,14 +110,14 @@ class Request
      */
     public static function checkReload()
     {
-        return (self::getRequestHeaders('Cache-Control') == 'max-age=0');
+        return (self::getRequestHeaders('Cache-Control') === 'max-age=0');
     }
 
     /**
      * Devolver las cabeceras enviadas desde el cliente.
      *
      * @param string $header nombre de la cabecera a devolver
-     * @return array
+     * @return array|string
      */
     public static function getRequestHeaders($header = '')
     {
@@ -127,8 +129,10 @@ class Request
 
         if (!empty($header) && array_key_exists($header, $headers)) {
             return $headers[$header];
-        } elseif (!empty($header)) {
-            return false;
+        }
+
+        if (!empty($header)) {
+            return '';
         }
 
         return $headers;
@@ -161,8 +165,8 @@ class Request
         $headers = array();
 
         foreach ($_SERVER as $key => $value) {
-            if (substr($key, 0, 5) == "HTTP_") {
-                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($key, 5)))));
+            if (strpos($key, 'HTTP_') === 0) {
+                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
                 $headers[$key] = $value;
             } else {
                 $headers[$key] = $value;

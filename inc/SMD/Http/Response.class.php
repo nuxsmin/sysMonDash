@@ -48,15 +48,15 @@ class Response
             return false;
         }
 
-        $arrStrFrom = array("&", "<", ">", "\"", "\'");
-        $arrStrTo = array("&amp;", "&lt;", "&gt;", "&quot;", "&apos;");
+        $arrStrFrom = array('&', '<', '>', '"', '\'');
+        $arrStrTo = array('&amp;', '&lt;', '&gt;', '&quot;', '&apos;');
 
         $cleanDescription = str_replace($arrStrFrom, $arrStrTo, $description);
 
-        $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         $xml .= "<root>\n<status>" . $status . "</status>\n <description>" . $cleanDescription . "</description>\n</root>";
 
-        header("Content-Type: application/xml");
+        header('Content-Type: application/xml');
         exit($xml);
     }
 

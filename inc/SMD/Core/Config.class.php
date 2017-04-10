@@ -49,7 +49,7 @@ class Config
     {
         $Config = Session::getConfig();
 
-        return (gettype($Config) === 'object') ? $Config : new ConfigData();
+        return is_object($Config) ? $Config : new ConfigData();
     }
 
     /**
@@ -60,7 +60,7 @@ class Config
     public static function loadConfig(StorageInterface $Storage)
     {
         if (Util::checkReload()
-            || gettype(Session::getConfig()) !== 'object'
+            || !is_object(Session::getConfig())
             || time() >= (Session::getConfigTime() + self::TIMEOUT_REFRESH)
         ) {
             Session::setConfig(self::arrayMapper($Storage));
@@ -76,7 +76,7 @@ class Config
     {
         copy(XML_CONFIG_FILE, XML_CONFIG_FILE . '.bak');
 
-        $ConfigData = (is_null($Config)) ? self::getConfig() : $Config;
+        $ConfigData = null === $Config ? self::getConfig() : $Config;
         $Config->setHash();
         $Config->setConfigHash();
 

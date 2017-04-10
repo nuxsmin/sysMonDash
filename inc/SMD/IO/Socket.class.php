@@ -42,8 +42,8 @@ class Socket
             || filter_var($socketPath, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)
         ) {
             return new SocketTcp($socketPath);
-        } else {
-            return new SocketUnix($socketPath);
         }
+
+        return new SocketUnix($socketPath);
     }
 }

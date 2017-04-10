@@ -86,6 +86,7 @@ class Html
      *
      * @param array $backends
      * @return array
+     * @throws \Exception
      */
     public static function processFormBackends($backends)
     {
@@ -112,7 +113,7 @@ class Html
                         break;
                 }
 
-                $active = (isset($config['active']) && $config['active'] === 'on') ? true : false;
+                $active = (isset($config['active']) && $config['active'] === 'on');
                 $ConfigBackend->setActive($active);
                 $ConfigBackend->setAlias($config['alias']);
 

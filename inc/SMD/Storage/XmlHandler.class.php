@@ -75,7 +75,7 @@ class XmlHandler implements StorageInterface
      * Cargar un archivo XML
      *
      * @param string $tag
-     * @return bool|void
+     * @return $this
      * @throws \Exception
      */
     public function load($tag = 'root')
@@ -122,7 +122,7 @@ class XmlHandler implements StorageInterface
                     $nodes[$node->nodeName] = $this->readChildNodes($node->childNodes);
                 }
             } elseif ($node->nodeType === XML_ELEMENT_NODE) {
-                $val = (is_numeric($node->nodeValue)) ? intval($node->nodeValue) : $node->nodeValue;
+                $val = is_numeric($node->nodeValue) ? (int)$node->nodeValue : $node->nodeValue;
 
                 if ($node->nodeName === 'item') {
                     $nodes[] = $val;
@@ -150,12 +150,12 @@ class XmlHandler implements StorageInterface
      * Guardar el archivo XML
      *
      * @param string $tag
-     * @return bool|void
+     * @return $this
      * @throws \Exception
      */
     public function save($tag = 'root')
     {
-        if (is_null($this->items)) {
+        if (null === $this->items) {
             throw new \Exception('No hay elementos para guardar');
         }
 
@@ -186,13 +186,11 @@ class XmlHandler implements StorageInterface
                 $newNode = $this->Dom->createElement($key);
             }
 
-            if (is_array($value) || is_object($value)) {
-                if (is_object($value)) {
+            if (is_array($value)) {
+                    $this->writeChildNodes($value, $newNode, $key);
+            } elseif (is_object($value)) {
                     $newNode->setAttribute('class', get_class($value));
                     $newNode->appendChild($this->Dom->createTextNode(base64_encode(serialize($value))));
-                } else {
-                    $this->writeChildNodes($value, $newNode, $key);
-                }
             } else {
                 $newNode->appendChild($this->Dom->createTextNode(trim($value)));
             }
@@ -214,9 +212,10 @@ class XmlHandler implements StorageInterface
             ksort($items);
 
             return $items;
-        } elseif (is_object($items)) {
+        }
 
-            return ($serialize) ? serialize($items) : $this->analyzeObject($items);
+        if (is_object($items)) {
+            return $serialize ? serialize($items) : $this->analyzeObject($items);
         }
 
         return array();

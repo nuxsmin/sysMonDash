@@ -48,7 +48,7 @@ class Util
     {
         // Ordenar el array multidimensional por la clave $fielName de mayor a menor
         usort($data, function ($a, $b) use ($fieldName, $sortAsc) {
-            return ($sortAsc) ? ($a[$fieldName] < $b[$fieldName]) : ($a[$fieldName] > $b[$fieldName]);
+            return $sortAsc ? ($a[$fieldName] < $b[$fieldName]) : ($a[$fieldName] > $b[$fieldName]);
         });
 
         return $data;
@@ -66,7 +66,7 @@ class Util
     {
         // Ordenar el array multidimensional por la propiedad $propertyName de mayor a menor
         usort($data, function ($a, $b) use ($propertyName, $sortAsc) {
-            return ($sortAsc) ? ($a->{$propertyName} < $b->{$propertyName}) : ($a->{$propertyName} > $b->{$propertyName});
+            return $sortAsc ? ($a->{$propertyName} < $b->{$propertyName}) : ($a->{$propertyName} > $b->{$propertyName});
         });
 
         return $data;
@@ -89,13 +89,15 @@ class Util
             's' => abs($secs) % 60
         );
 
+        $ret = array();
+
         foreach ($bit as $k => $v) {
             if ($v > 0) {
                 $ret[] = $v . $k;
             }
         }
 
-        return join(' ', $ret);
+        return implode(' ', $ret);
     }
 
     /**
@@ -107,7 +109,7 @@ class Util
      */
     public static function checkRefreshSession()
     {
-        $version = intval(implode('', self::getVersion(true)));
+        $version = (int)implode('', self::getVersion(true));
 
         if (self::getSessionActive()) {
             if (!isset($_SESSION['VERSION'])) {
@@ -130,7 +132,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2016071001;
+        $build = 2017041001;
         $version = array(1, 0);
 
         if ($retBuild) {
@@ -149,9 +151,9 @@ class Util
     {
         if (function_exists('\session_status')) {
             return (session_status() === PHP_SESSION_ACTIVE);
-        } else {
-            return (session_id() !== '');
         }
+
+        return (session_id() !== '');
     }
 
     /**
@@ -175,7 +177,7 @@ class Util
             return touch(XML_CONFIG_FILE);
         }
 
-        return (is_writable(XML_CONFIG_FILE));
+        return is_writable(XML_CONFIG_FILE);
     }
 
     /**
@@ -185,14 +187,14 @@ class Util
      */
     public static function checkReload()
     {
-        return (self::getRequestHeaders('Cache-Control') == 'max-age=0');
+        return (self::getRequestHeaders('Cache-Control') === 'max-age=0');
     }
 
     /**
      * Devolver las cabeceras enviadas desde el cliente.
      *
      * @param string $header nombre de la cabecera a devolver
-     * @return array
+     * @return array|string
      */
     public static function getRequestHeaders($header = '')
     {
@@ -204,8 +206,10 @@ class Util
 
         if (!empty($header) && array_key_exists($header, $headers)) {
             return $headers[$header];
-        } elseif (!empty($header)) {
-            return false;
+        }
+
+        if (!empty($header)) {
+            return '';
         }
 
         return $headers;
@@ -221,8 +225,8 @@ class Util
         $headers = array();
 
         foreach ($_SERVER as $key => $value) {
-            if (substr($key, 0, 5) == "HTTP_") {
-                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($key, 5)))));
+            if (strpos($key, 'HTTP_') === 0) {
+                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
                 $headers[$key] = $value;
             } else {
                 $headers[$key] = $value;
@@ -277,12 +281,12 @@ class Util
                     'title' => $title,
                     'description' => $description,
                     'date' => $date);
-            } else {
-                return true;
             }
-        } else {
-            return false;
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -316,7 +320,9 @@ class Util
 
         if ($httpCode >= 400 && $httpCode < 600) {
             throw new CurlException(curl_getinfo($ch, CURLINFO_HTTP_CODE));
-        } elseif ($data === false
+        }
+
+        if ($data === false
             || curl_errno($ch) > 0
         ) {
             throw new CurlException(curl_error($ch), curl_errno($ch));
@@ -332,14 +338,14 @@ class Util
      */
     public static function curlIsAvailable()
     {
-        return (function_exists('curl_init'));
+        return function_exists('curl_init');
     }
 
     /**
      * Info de la aplicación
      *
      * @param $index
-     * @return array
+     * @return string
      */
     public static function getAppInfo($index)
     {
@@ -352,7 +358,7 @@ class Util
 
         );
 
-        return (isset($appInfo[$index])) ? $appInfo[$index] : '';
+        return isset($appInfo[$index]) ? $appInfo[$index] : '';
     }
 
     /**

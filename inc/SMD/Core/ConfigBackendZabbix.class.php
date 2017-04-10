@@ -77,7 +77,7 @@ class ConfigBackendZabbix extends ConfigBackend
      */
     public function setVersion($version)
     {
-        $this->version = intval($version);
+        $this->version = (int)$version;
     }
 
     /**

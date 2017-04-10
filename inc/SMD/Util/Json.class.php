@@ -67,9 +67,9 @@ class Json
                         }
 
                         return $value;
-                    } else {
-                        return Json::safeJsonString($value);
                     }
+
+                    return Json::safeJsonString($value);
                 }
             );
         } elseif (is_string($data)) {
@@ -87,8 +87,8 @@ class Json
      */
     public static function safeJsonString(&$string)
     {
-        $strFrom = array("\\", '"', "'");
-        $strTo = array("\\", '\"', "\'");
+        $strFrom = array('\\', '"', '\'');
+        $strTo = array('\\\\', '\"', '\\\'');
 
         return str_replace($strFrom, $strTo, $string);
     }

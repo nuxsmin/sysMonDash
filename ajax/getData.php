@@ -137,8 +137,8 @@ if ($type !== 1) {
             <?php /** @var $downtime \SMD\Backend\Event\DowntimeInterface */ ?>
             <?php $tiempoRestante = $downtime->getStartTime() - time(); ?>
             <tr>
-                <td><?php echo (is_array($downtime->getHostName())) ? implode('<br>', $downtime->getHostName()) : $downtime->getHostName(); ?></td>
-                <td><?php echo ($downtime->getServiceDisplayName()) ? $downtime->getServiceDisplayName() : $downtime->getHostName(); ?></td>
+                <td><?php echo is_array($downtime->getHostName()) ? implode('<br>', $downtime->getHostName()) : $downtime->getHostName(); ?></td>
+                <td><?php echo $downtime->getServiceDisplayName() ? $downtime->getServiceDisplayName() : $downtime->getHostName(); ?></td>
                 <td><?php echo ($tiempoRestante > 0) ? sprintf(Language::t('Quedan %s'), Util::timeElapsed($tiempoRestante)) : Language::t('En parada'); ?></td>
                 <td><?php echo date('d-m-Y H:i', $downtime->getStartTime()), ' &#8594; ', date('d-m-Y H:i', $downtime->getEndTime()); ?></td>
                 <td><?php echo $downtime->getAuthor(); ?></td>

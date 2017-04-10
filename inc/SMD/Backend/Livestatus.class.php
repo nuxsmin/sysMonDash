@@ -161,7 +161,7 @@ class Livestatus extends Backend implements BackendInterface
     private function getJsonFromSocket(&$dataQuery)
     {
         try {
-            $this->Socket = (is_object($this->Socket)) ? $this->Socket : Socket::getSocket($this->backend->getPath());
+            $this->Socket = is_object($this->Socket) ? $this->Socket : Socket::getSocket($this->backend->getPath());
             $data = json_decode($this->Socket->getDataFromSocket($dataQuery));
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -187,6 +187,7 @@ class Livestatus extends Backend implements BackendInterface
      * Obtener el listado de hosts
      *
      * @return mixed
+     * @throws \Exception
      */
     public function getHostsProblems()
     {
@@ -280,6 +281,7 @@ class Livestatus extends Backend implements BackendInterface
      * Obtener el listado de servicios
      *
      * @return mixed
+     * @throws \Exception
      */
     public function getServicesProblems()
     {
@@ -381,8 +383,10 @@ class Livestatus extends Backend implements BackendInterface
     /**
      * @param ConfigBackendLivestatus $backend
      */
-    public function setBackend(ConfigBackendLivestatus $backend)
+    public function setBackend($backend)
     {
-        $this->backend = $backend;
+        if ($backend instanceof ConfigBackendLivestatus) {
+            $this->backend = $backend;
+        }
     }
 }

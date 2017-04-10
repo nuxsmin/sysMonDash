@@ -60,9 +60,14 @@ class Language
             || $language = 'es_ES')
         ) {
             return $language;
-        } elseif (preg_match('/^es_.*/i', $browserLang)) {
+        }
+
+        if (stripos($browserLang, 'es_') === 0) {
             return 'es_ES';
-        } elseif (self::checkLangFile($browserLang)) {
+        }
+
+        if (self::checkLangFile($browserLang)
+        ) {
             return $browserLang;
         }
     }
@@ -74,7 +79,7 @@ class Language
      */
     private static function getBrowserLang()
     {
-        return str_replace("-", "_", substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5));
+        return str_replace('-', '_', substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5));
     }
 
     /**
@@ -119,12 +124,12 @@ class Language
             ) {
                 Session::setLanguage($LANG);
 
-                return (isset($LANG[$string])) ? $LANG[$string] : $string;
+                return isset($LANG[$string]) ? $LANG[$string] : $string;
             }
 
             return $string;
         }
 
-        return (isset($sessionLang[$string])) ? $sessionLang[$string] : $string;
+        return isset($sessionLang[$string]) ? $sessionLang[$string] : $string;
     }
 }

@@ -143,6 +143,7 @@ class sysMonDash
      * Seleccionar el backend
      *
      * @return BackendInterface[]
+     * @throws \Exception
      */
     public function getBackends()
     {
@@ -168,7 +169,7 @@ class sysMonDash
                     case ConfigBackend::TYPE_ZABBIX:
                         $backends[] = new Zabbix($Backend);
                         break;
-                    case ((ConfigBackend::TYPE_SMD && $this->callType !== self::CALL_TYPE_API) ? true : false):
+                    case (ConfigBackend::TYPE_SMD && $this->callType !== self::CALL_TYPE_API):
                         $backends[] = new SMD($Backend);
                         break;
                 }
@@ -188,9 +189,11 @@ class sysMonDash
      */
     private function filterItems(EventInterface $item)
     {
+        if ($this->getFilterHosts($item) === false || $this->getFilterServices($item) === false) {
+            return false;
+        }
+
         return ($item->isAcknowledged()
-            || $this->getFilterHosts($item)
-            || $this->getFilterServices($item)
             || $this->getFilterIsFlapping($item)
             || $this->getFilterState($item)
             || $this->getFilterUnreachable($item)
@@ -207,7 +210,7 @@ class sysMonDash
      */
     private function getFilterHosts(EventInterface $item)
     {
-        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
+        $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
 
         if (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname)
             && !in_array($hostname, Config::getConfig()->getCriticalItems())
@@ -247,9 +250,9 @@ class sysMonDash
      */
     private function getFilterIsFlapping(EventInterface $item)
     {
-        if ($item->getCurrentAttempt() <= $item->getMaxCheckAttempts()
-            && $item->getStateType() === 0
+        if ($item->getStateType() === 0
             && !$item->isFlapping()
+            && $item->getCurrentAttempt() <= $item->getMaxCheckAttempts()
         ) {
             $item->setFilterStatus('OK & No Flapping');
             return true;
@@ -335,16 +338,22 @@ class sysMonDash
      * @param EventInterface $item El elemento que contiene los datos.
      * @param bool $newItem Si es un nuevo elemento
      * @param bool $newItemUp Si es un nuevo elemento recuperado
-     * @return EventInterface
+     * @return string
      */
     private function getHtmlItems(EventInterface $item, $newItem = false, $newItemUp = false)
     {
-        $lastStateTime = date("m-d-Y H:i:s", $item->getLastHardStateChange());
+        $lastStateTime = date('m-d-Y H:i:s', $item->getLastHardStateChange());
         $lastStateDuration = Util::timeElapsed(time() - $item->getLastHardStateChange());
         $lastCheckDuration = Util::timeElapsed(time() - $item->getLastCheck());
-        $serviceDesc = ($item->getDisplayName()) ? $item->getDisplayName() : $item->getCheckCommand();
-        $hostname = ($item->getHostDisplayName()) ? $item->getHostDisplayName() : $item->getDisplayName();
-        $hostAlias = ($item->getHostAlias()) ? $item->getHostAlias() : (($item->getAlias()) ? $item->getAlias() : $hostname);
+        $serviceDesc = $item->getDisplayName() ?: $item->getCheckCommand();
+        $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
+
+        if ($item->getAlias()) {
+            $hostAlias = $item->getHostAlias() ?: $item->getAlias();
+        } else {
+            $hostAlias = $item->getHostAlias() ?: $hostname;
+        }
+
         $scheduled = ($item->getScheduledDowntimeDepth() >= 1 || $item->getHostScheduledDowntimeDepth() >= 1);
         $tdClass = '';
         $trClass = EventState::getStateClass($item);
@@ -364,7 +373,7 @@ class sysMonDash
         }
 
         if ($newItem && !$item->isAcknowledged() && !$scheduled && !$newItemUp) {
-            $tdClass = "new";
+            $tdClass = 'new';
         } elseif ($newItemUp
             && time() - $item->getLastHardStateChange() <= Config::getConfig()->getNewItemTime() / 2
         ) {
@@ -386,7 +395,7 @@ class sysMonDash
         }
 
         if (Config::getConfig()->isColHost()) {
-            if (!is_null($link)) {
+            if (null !== $link) {
                 $line .= '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a></td>' . PHP_EOL;
             } else {
                 $line .= '<td>' . $hostAlias . '</td>' . PHP_EOL;
@@ -452,7 +461,7 @@ class sysMonDash
         }
 
         if ($downtimes === false) {
-            throw new Exception('No hay datos desde el backend');
+            throw new NoDataException(Language::t('No hay datos desde el backend'));
         }
 
         return $downtimes;

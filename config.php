@@ -107,38 +107,38 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                             <label
                                 for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
                             <input type="checkbox" id="event_new_item_audio"
-                                   name="event_new_item_audio" <?php echo (Config::getConfig()->isNewItemAudioEnabled()) ? 'checked' : ''; ?>/>
+                                   name="event_new_item_audio" <?php echo Config::getConfig()->isNewItemAudioEnabled() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label for="col_last_check"><?php echo Language::t('Mostrar hora de eventos'); ?></label>
                             <input type="checkbox" id="col_last_check"
-                                   name="col_last_check" <?php echo (Config::getConfig()->isColLastcheck()) ? 'checked' : ''; ?>/>
+                                   name="col_last_check" <?php echo Config::getConfig()->isColLastcheck() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label for="col_host"><?php echo Language::t('Mostrar host de eventos'); ?></label>
                             <input type="checkbox" id="col_host"
-                                   name="col_host" <?php echo (Config::getConfig()->isColHost()) ? 'checked' : ''; ?>/>
+                                   name="col_host" <?php echo Config::getConfig()->isColHost() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label for="col_service"><?php echo Language::t('Mostrar servicio de eventos'); ?></label>
                             <input type="checkbox" id="col_service"
-                                   name="col_service" <?php echo (Config::getConfig()->isColService()) ? 'checked' : ''; ?>/>
+                                   name="col_service" <?php echo Config::getConfig()->isColService() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label for="col_info"><?php echo Language::t('Mostrar info de eventos'); ?></label>
                             <input type="checkbox" id="col_info"
-                                   name="col_info" <?php echo (Config::getConfig()->isColStatusInfo()) ? 'checked' : ''; ?>/>
+                                   name="col_info" <?php echo Config::getConfig()->isColStatusInfo() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label for="col_backend"><?php echo Language::t('Mostrar nombre backend'); ?></label>
                             <input type="checkbox" id="col_backend"
-                                   name="col_backend" <?php echo (Config::getConfig()->isColBackend()) ? 'checked' : ''; ?>/>
+                                   name="col_backend" <?php echo Config::getConfig()->isColBackend() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label
                                 for="show_scheduled"><?php echo Language::t('Mostrar eventos programados'); ?></label>
                             <input type="checkbox" id="show_scheduled"
-                                   name="show_scheduled" <?php echo (Config::getConfig()->isShowScheduled()) ? 'checked' : ''; ?>/>
+                                   name="show_scheduled" <?php echo Config::getConfig()->isShowScheduled() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label
@@ -234,7 +234,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                 </div>
 
                 <input type="hidden" name="hash"
-                       value="<?php echo ($passOK) ? Session::getConfig()->getConfigPassword() : $hash; ?>"/>
+                       value="<?php echo $passOK ? Session::getConfig()->getConfigPassword() : $hash; ?>"/>
             </form>
 
             <?php include TPL_PATH . DIRECTORY_SEPARATOR . 'config-backends-tpl.phtml'; ?>

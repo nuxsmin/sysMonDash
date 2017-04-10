@@ -318,9 +318,11 @@ class Zabbix extends Backend implements BackendInterface
     /**
      * @param ConfigBackendZabbix $backend
      */
-    public function setBackend(ConfigBackendZabbix $backend)
+    public function setBackend($backend)
     {
-        $this->backend = $backend;
+        if ($backend instanceof ConfigBackendZabbix) {
+            $this->backend = $backend;
+        }
     }
 
     /**
