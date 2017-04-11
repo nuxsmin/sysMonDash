@@ -96,8 +96,8 @@ tr.item-data > td, thead > th {
     background-color: #5c6bc0;
 }
 
-.critical, .warning, .unknown, .downtime, .acknowledged, .new-up, .average, .information,
-.critical a, .warning a, .unknown a, .downtime a, .acknowledged a, .new-up a {
+.critical, .warning, .unknown, .downtime, .acknowledged, .new-up, .up, .average, .information,
+.critical a, .warning a, .unknown a, .downtime a, .acknowledged a, .new-up a, .up a {
     color: #fff;
     font-size: 1em;
     font-weight: bold;

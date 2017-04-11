@@ -74,6 +74,18 @@ class sysMonDash
      * @var array
      */
     private $errors = array();
+    /**
+     * @var ConfigData
+     */
+    private $Config;
+
+    /**
+     * sysMonDash constructor.
+     */
+    public function __construct()
+    {
+        $this->Config = Config::getConfig();
+    }
 
     /**
      * Función para obtener los eventos de los backends y devolver los avisos en formato HTML
@@ -103,7 +115,7 @@ class sysMonDash
             // Ordenar los rawItems por tiempo de último cambio
             Util::arraySortByProperty($rawItems, 'lastHardStateChange');
 
-            $newItemTime = Config::getConfig()->getNewItemTime();
+            $newItemTime = $this->Config->getNewItemTime();
 
             // Recorremos el array y mostramos los elementos
             foreach ($rawItems as $item) {
@@ -189,21 +201,23 @@ class sysMonDash
      */
     private function filterItems(EventInterface $item)
     {
-        if ($this->getFilterHosts($item) === false || $this->getFilterServices($item) === false) {
-            return ($item->isAcknowledged()
-                || $this->getFilterIsFlapping($item)
-                || $this->getFilterState($item)
-                || $this->getFilterUnreachable($item)
-                || $this->getFilterScheduled($item)
-                || $this->getFilterLevel($item)
-            );
+        if (($this->Config->getRegexHostShow() !== '' && $this->getFilterHosts($item) === false)
+            || ($this->Config->getRegexServiceNoShow() !== '' && $this->getFilterServices($item) === false)
+        ) {
+            return false;
         }
 
-        return true;
+        return ($item->isAcknowledged()
+            || $this->getFilterIsFlapping($item)
+            || $this->getFilterState($item)
+            || $this->getFilterUnreachable($item)
+            || $this->getFilterScheduled($item)
+            || $this->getFilterLevel($item)
+        );
     }
 
     /**
-     * Comprobar si el host se encuentra en la expresión regular
+     * Comprobar si el host se encuentra en la expresión regular o en elementos críticos
      *
      * @param EventInterface $item
      * @return bool
@@ -212,8 +226,8 @@ class sysMonDash
     {
         $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
 
-        if (!preg_match('#' . Config::getConfig()->getRegexHostShow() . '#i', $hostname)
-            && !in_array($hostname, Config::getConfig()->getCriticalItems())
+        if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)
+            && !in_array($hostname, $this->Config->getCriticalItems())
         ) {
             $item->setFilterStatus('No Regex Host & No Critical');
             return true;
@@ -231,9 +245,8 @@ class sysMonDash
     private function getFilterServices(EventInterface $item)
     {
 
-        if (Config::getConfig()->getRegexServiceNoShow() !== ''
-            && preg_match('#' . Config::getConfig()->getRegexServiceNoShow() . '#i', $item->getDisplayName())
-            && !in_array($item->getDisplayName(), Config::getConfig()->getCriticalItems())
+        if (preg_match('#' . $this->Config->getRegexServiceNoShow() . '#i', $item->getDisplayName())
+            && !in_array($item->getDisplayName(), $this->Config->getCriticalItems())
         ) {
             $item->setFilterStatus('Regex Service & No Critical');
             return true;
@@ -307,7 +320,7 @@ class sysMonDash
     private function getFilterScheduled(EventInterface $item)
     {
         if ($item->getScheduledDowntimeDepth() >= 1 || $item->getHostScheduledDowntimeDepth() >= 1) {
-            if (!Config::getConfig()->isShowScheduled()) {
+            if (!$this->Config->isShowScheduled()) {
                 $item->setFilterStatus('Scheduled & Show');
                 return true;
             }
@@ -390,11 +403,11 @@ class sysMonDash
         $line = '<tr class="item-data ' . $trClass . '" title="' . sprintf(Language::t('Estado %s desde %s'), $statusName, $lastStateTime) . '">' . PHP_EOL;
         $line .= '<td class="center">' . $statusName . '</td>';
 
-        if (Config::getConfig()->isColLastcheck()) {
+        if ($this->Config->isColLastcheck()) {
             $line .= '<td title="' . sprintf('%s : %s', Language::t('Último check'), $lastCheckDuration) . '" class="center ' . $tdClass . '">' . $lastStateDuration . '</td>' . PHP_EOL;
         }
 
-        if (Config::getConfig()->isColHost()) {
+        if ($this->Config->isColHost()) {
             if (null !== $link) {
                 $line .= '<td><a href="' . $link . '" target="blank" title="' . $hostname . '">' . $hostAlias . '</a></td>' . PHP_EOL;
             } else {
@@ -402,7 +415,7 @@ class sysMonDash
             }
         }
 
-        if (Config::getConfig()->isColStatusInfo()) {
+        if ($this->Config->isColStatusInfo()) {
             if ($item->getFilterStatus() === '' || $newItem) {
                 $line .= '<td class="statusinfo">' . $item->getPluginOutput() . '</td>' . PHP_EOL;
             } else {
@@ -410,11 +423,11 @@ class sysMonDash
             }
         }
 
-        if (Config::getConfig()->isColService()) {
+        if ($this->Config->isColService()) {
             $line .= '<td class="center">' . $serviceDesc . '</td>' . PHP_EOL;
         }
 
-        if (Config::getConfig()->isColBackend()) {
+        if ($this->Config->isColBackend()) {
             $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
         }
 
