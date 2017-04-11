@@ -72,7 +72,7 @@ class ConfigData
     /** @var string */
     private $dbUserPass = 'nagiosql_pass';
     /** @var string */
-    private $regexHostShow = '.*';
+    private $regexHostShow = '';
     /** @var string */
     private $regexServiceNoShow = '';
     /** @var array */
