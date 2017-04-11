@@ -197,17 +197,18 @@ class sysMonDash
      * Función para filtrar los avisos a mostrar
      *
      * @param EventInterface $item El elemento a verificar
-     * @return bool
+     * @return bool true si es necesario filtrar o false de lo contrario
      */
     private function filterItems(EventInterface $item)
     {
-        if (($this->Config->getRegexHostShow() !== '' && $this->getFilterHosts($item) === false)
-            || ($this->Config->getRegexServiceNoShow() !== '' && $this->getFilterServices($item) === false)
+        if ((count($this->Config->getCriticalItems()) > 0 && $this->getFilterCritical($item) === false)
+            || ($this->Config->getRegexHostShow() !== '' && $this->getFilterHosts($item) === false)
         ) {
             return false;
         }
 
         return ($item->isAcknowledged()
+            || $this->getFilterServices($item)
             || $this->getFilterIsFlapping($item)
             || $this->getFilterState($item)
             || $this->getFilterUnreachable($item)
@@ -217,21 +218,42 @@ class sysMonDash
     }
 
     /**
-     * Comprobar si el host se encuentra en la expresión regular o en elementos críticos
+     * Comprobar si es un elemento crítico
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
+     */
+    private function getFilterCritical(EventInterface $item)
+    {
+        $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
+        $criticalItems = $this->Config->getCriticalItems();
+
+        if (!in_array($hostname, $criticalItems)
+            && !in_array($item->getDisplayName(), $criticalItems)
+        ) {
+            return true;
+        }
+
+        $item->setFilterStatus('Critical Host/Service');
+
+        return false;
+    }
+
+    /**
+     * Comprobar si el host se encuentra en la expresión regular
+     *
+     * @param EventInterface $item
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterHosts(EventInterface $item)
     {
         $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
 
-        if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)
-            && !in_array($hostname, $this->Config->getCriticalItems())
-        ) {
-            $item->setFilterStatus('No Regex Host & No Critical');
+        if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)) {
             return true;
         }
+
+        $item->setFilterStatus('Regex Host');
 
         return false;
     }
@@ -240,17 +262,17 @@ class sysMonDash
      * Comprobar si el servicio se encuentra en la expresión regular y si es un elemento crítico
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterServices(EventInterface $item)
     {
-
-        if (preg_match('#' . $this->Config->getRegexServiceNoShow() . '#i', $item->getDisplayName())
-            && !in_array($item->getDisplayName(), $this->Config->getCriticalItems())
+        if ($this->Config->getRegexServiceNoShow() !== ''
+            && preg_match('#' . $this->Config->getRegexServiceNoShow() . '#i', $item->getDisplayName())
         ) {
-            $item->setFilterStatus('Regex Service & No Critical');
+            $item->setFilterStatus('Regex Service no show');
             return true;
         }
+
 
         return false;
     }
@@ -278,7 +300,7 @@ class sysMonDash
      * Comprobar si el host está caído y el servicio en alerta
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterState(EventInterface $item)
     {
@@ -297,7 +319,7 @@ class sysMonDash
      * Comprobar si está inalcanzable
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterUnreachable(EventInterface $item)
     {
@@ -315,7 +337,7 @@ class sysMonDash
      * Comprobar si está programado y se debe mostrar
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterScheduled(EventInterface $item)
     {
@@ -333,7 +355,7 @@ class sysMonDash
      * Comprobar si el evento supera el nivel mínimo para mostrarlo
      *
      * @param EventInterface $item
-     * @return bool
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
      */
     private function getFilterLevel(EventInterface $item)
     {
