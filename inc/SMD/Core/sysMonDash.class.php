@@ -190,16 +190,16 @@ class sysMonDash
     private function filterItems(EventInterface $item)
     {
         if ($this->getFilterHosts($item) === false || $this->getFilterServices($item) === false) {
-            return false;
+            return ($item->isAcknowledged()
+                || $this->getFilterIsFlapping($item)
+                || $this->getFilterState($item)
+                || $this->getFilterUnreachable($item)
+                || $this->getFilterScheduled($item)
+                || $this->getFilterLevel($item)
+            );
         }
 
-        return ($item->isAcknowledged()
-            || $this->getFilterIsFlapping($item)
-            || $this->getFilterState($item)
-            || $this->getFilterUnreachable($item)
-            || $this->getFilterScheduled($item)
-            || $this->getFilterLevel($item)
-        );
+        return true;
     }
 
     /**
