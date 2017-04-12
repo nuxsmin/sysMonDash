@@ -201,20 +201,23 @@ class sysMonDash
      */
     private function filterItems(EventInterface $item)
     {
-        if ((count($this->Config->getCriticalItems()) > 0 && $this->getFilterCritical($item) === false)
-            || ($this->Config->getRegexHostShow() !== '' && $this->getFilterHosts($item) === false)
-        ) {
-            return false;
+        if (count($this->Config->getCriticalItems()) > 1) {
+            return $this->getFilterCritical($item);
         }
 
-        return ($item->isAcknowledged()
+        $filters = ($item->isAcknowledged()
             || $this->getFilterServices($item)
             || $this->getFilterIsFlapping($item)
             || $this->getFilterState($item)
             || $this->getFilterUnreachable($item)
             || $this->getFilterScheduled($item)
-            || $this->getFilterLevel($item)
-        );
+            || $this->getFilterLevel($item));
+
+        if ($this->Config->getRegexHostShow() !== '') {
+            return $filters === true ?: $this->getFilterHosts($item);
+        }
+
+        return $filters;
     }
 
     /**
@@ -250,10 +253,9 @@ class sysMonDash
         $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
 
         if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)) {
+            $item->setFilterStatus('Regex Host');
             return true;
         }
-
-        $item->setFilterStatus('Regex Host');
 
         return false;
     }

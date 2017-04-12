@@ -439,9 +439,9 @@ class ConfigData
      */
     public function setRegexHostShow($regexHostShow)
     {
-        if (empty($regexHostShow)) {
-            $regexHostShow = '/.*/';
-        }
+//        if (empty($regexHostShow)) {
+//            $regexHostShow = '/.*/';
+//        }
 
         $this->regexHostShow = $regexHostShow;
     }

@@ -279,13 +279,13 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
 <script type="text/javascript" src="js/functions.min.js"></script>
 <script>
     (function () {
-        config.setLang('<?php echo Language::t('Seguro?'); ?>');
-        config.setLang('<?php echo Language::t('Conexión correcta'); ?>');
-        config.setLang('<?php echo Language::t('Respuesta:'); ?>');
-        config.setLang('<?php echo Language::t('Error de conexión'); ?>');
-        config.setLang('<?php echo Language::t('URL no indicada'); ?>');
-        config.setLang('<?php echo Language::t('No olvide guardar la configuración'); ?>');
-        smd.setConfig(config);
+        smd.Config.setLang('<?php echo Language::t('Seguro?'); ?>');
+        smd.Config.setLang('<?php echo Language::t('Conexión correcta'); ?>');
+        smd.Config.setLang('<?php echo Language::t('Respuesta:'); ?>');
+        smd.Config.setLang('<?php echo Language::t('Error de conexión'); ?>');
+        smd.Config.setLang('<?php echo Language::t('URL no indicada'); ?>');
+        smd.Config.setLang('<?php echo Language::t('No olvide guardar la configuración'); ?>');
+
         smd.setConfigHooks();
     }());
 </script>

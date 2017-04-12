@@ -1,3 +1,5 @@
+jQuery.noConflict();
+
 /**
  * Función para activar el parpadeo de los eventos recientes
  */
@@ -9,79 +11,82 @@
         return this.each(function () {
             var obj = $(this);
 
-            $(obj).css('color', options.fgcolor_on);
-            $(obj).css('background-color', options.bgcolor_on);
+            $(obj).css("color", options.fgcolor_on);
+            $(obj).css("background-color", options.bgcolor_on);
         });
     }
 }(jQuery));
 
-function SMD() {
-    jQuery.noConflict();
+var smd = (function () {
+    "use strict";
 
     var totalHeight;
-    var Config;
-    var self = this;
     var newItemsCount = 0;
     var audioEventAttached = false;
 
     /**
      * Objeto que contiene las variables de configuración de PHP
      */
-    this.SMDConfig = function () {
-        var timeout = 10000,
-            scroll = 0,
-            ajaxfile = '/ajax/getData.php',
-            remoteServer = '',
-            audio = false;
-        var LANG = [];
+    var config = {
+        timeout: 10000,
+        scroll: 0,
+        ajaxfile: "/ajax/getData.php",
+        remoteServer: '',
+        audio: false,
+        LANG: []
+    };
 
-        this.setTimeout = function (t) {
-            timeout = t * 1000;
-        };
-        this.getTimeout = function () {
-            return timeout;
-        };
-        this.setScroll = function (s) {
-            scroll = s;
-        };
-        this.getScroll = function () {
-            return scroll;
-        };
-        this.setAjaxFile = function (a) {
-            ajaxfile = a;
-        };
-        this.getAjaxFile = function () {
-            if (remoteServer === '') {
-                return self.getRootPath() + ajaxfile;
+    /**
+     * Objeto para manejar la configuración
+     */
+    var Config = {
+        setTimeout: function (t) {
+            config.timeout = t * 1000;
+        },
+        getTimeout: function () {
+            return config.timeout;
+        },
+        setScroll: function (s) {
+            config.scroll = s;
+        },
+        getScroll: function () {
+            return config.scroll;
+        },
+        setAjaxFile: function (a) {
+            config.ajaxfile = a;
+        },
+        getAjaxFile: function () {
+            if (config.remoteServer === "") {
+                return getRootPath() + config.ajaxfile;
             }
 
-            return ajaxfile;
-        };
-        this.setLang = function (l) {
-            LANG.push(l);
-        };
-        this.getLang = function (index) {
-            return LANG[index];
-        };
-        this.setRemoteServer = function (m) {
-            remoteServer = m;
-        };
-        this.getRemoteServer = function () {
-            return remoteServer;
-        };
-        this.setAudioEnabled = function (bool) {
-            audio = bool;
-        };
-        this.getAudioEnabled = function () {
-            return audio;
+            return config.ajaxfile;
+        },
+        setLang: function (l) {
+            config.LANG.push(l);
+        },
+        getLang: function (index) {
+            return config.LANG[index];
+        },
+        setRemoteServer: function (m) {
+            config.remoteServer = m;
+        },
+        getRemoteServer: function () {
+            return config.remoteServer;
+        },
+        setAudioEnabled: function (bool) {
+            config.audio = bool;
+        },
+        getAudioEnabled: function () {
+            return config.audio;
         }
     };
 
     /**
      * Devuelve la URL a la raíz de la web
      */
-    this.getRootPath = function () {
-        var path = window.location.pathname.split('/');
+    var getRootPath = function () {
+        var path = window.location.pathname.split("/");
         var rootPath = function () {
             var fullPath = '';
 
@@ -101,22 +106,22 @@ function SMD() {
      * @param hexStr
      * @returns {string}
      */
-    this.hex2rgb = function (hexStr) {
+    var hex2rgb = function (hexStr) {
         // note: hexStr should be #rrggbb
         var hex = parseInt(hexStr.substring(1), 16);
         var r = (hex & 0xff0000) >> 16;
         var g = (hex & 0x00ff00) >> 8;
         var b = hex & 0x0000ff;
-        return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        return "rgb(" + r + ", " + g + ", " + b + ")";
     };
 
     /**
      * Obtiene mediante AJAX los eventos a mostrar
      */
-    this.updateNagiosData = function () {
+    var updateNagiosData = function () {
         var placeHolder = jQuery("#monitor-data");
 
-        this.setTime();
+        setTime();
 
         var url = Config.getRemoteServer() + Config.getAjaxFile();
 
@@ -124,7 +129,7 @@ function SMD() {
             url: url,
             cache: false,
             timeout: Config.getTimeout(),
-            dataType: 'html',
+            dataType: "html",
             success: function (data) {
                 placeHolder.html(data);
 
@@ -133,7 +138,7 @@ function SMD() {
 
                     if (totalHeight > window.innerHeight) {
                         setTimeout(function () {
-                            self.pageScroll();
+                            pageScroll();
                         }, Config.getTimeout() / 2);
                     }
                 }
@@ -154,11 +159,12 @@ function SMD() {
     /**
      * Actualizar el contador de refresco
      */
-    this.updateCountDown = function () {
+    var updateCountDown = function () {
         var countdown = jQuery("#refreshing_countdown");
         var remaining = parseInt(countdown.text());
-        if (remaining == 0) {
-            self.updateNagiosData();
+
+        if (remaining === 0) {
+            updateNagiosData();
             countdown.text(Config.getTimeout());
         }
         else {
@@ -169,26 +175,26 @@ function SMD() {
     /**
      * Inserta la hora actual en la cabecera de la página
      */
-    this.setTime = function () {
+    var setTime = function () {
         var d = new Date();
 
-        var curr_date = ('0' + d.getDate()).slice(-2) + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + d.getFullYear();
-        var curr_hour = ('0' + d.getHours()).slice(-2);
-        var curr_min = ('0' + d.getMinutes()).slice(-2);
-        var curr_sec = ('0' + d.getSeconds()).slice(-2);
+        var curr_date = ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + '-' + d.getFullYear();
+        var curr_hour = ("0" + d.getHours()).slice(-2);
+        var curr_min = ("0" + d.getMinutes()).slice(-2);
+        var curr_sec = ("0" + d.getSeconds()).slice(-2);
 
-        jQuery('#hora').find('h1').html(curr_date + '<br>' + curr_hour + ':' + curr_min + ':' + curr_sec);
+        jQuery("#hora").find("h1").html(curr_date + "<br>" + curr_hour + ":" + curr_min + ":" + curr_sec);
     };
 
     /**
      * Realiza un scroll automático de la página
      */
-    this.pageScroll = function () {
-        jQuery('body,html').animate(
+    var pageScroll = function () {
+        jQuery("body").animate(
             {scrollTop: totalHeight},
             Config.getTimeout() / 2,
             function () {
-                self.pageUnScroll();
+                pageUnScroll();
             }
         ).on("mousemove",
             function () {
@@ -200,14 +206,14 @@ function SMD() {
     /**
      * Devuelve el scroll a la posición inicial
      */
-    this.pageUnScroll = function () {
-        jQuery('body,html').scrollTop(0);
+    var pageUnScroll = function () {
+        jQuery("body").scrollTop(0);
     };
 
     /**
      * Recargar la página
      */
-    this.reloadPage = function () {
+    reloadPage = function () {
         window.location.reload(false);
     };
 
@@ -216,11 +222,11 @@ function SMD() {
      *
      * @param obj
      */
-    this.saveConfig = function (obj) {
+    var saveConfig = function (obj) {
         jQuery.ajax({
-            url: self.getRootPath() + '/ajax/saveConfig.php',
-            type: 'post',
-            dataType: 'json',
+            url: getRootPath() + "/ajax/saveConfig.php",
+            type: "post",
+            dataType: "json",
             data: obj.serialize(),
             success: function (data) {
                 alertify.logPosition("bottom right");
@@ -241,29 +247,13 @@ function SMD() {
      *
      * @returns {*}
      */
-    this.getNewLivestatusBackend = function () {
-        var len = jQuery('.backendLivestatus').length;
-        var $html = jQuery('.livestatusTemplate').clone();
+    var getNewLivestatusBackend = function () {
+        var len = jQuery(".backendLivestatus").length;
+        var $html = jQuery(".livestatusTemplate").clone();
 
-        $html.find('[name=\'backend[livestatus][alias]\']')[0].name = "backend[livestatus][" + len + "][alias]]";
-        $html.find('[name=\'backend[livestatus][path]\']')[0].name = "backend[livestatus][" + len + "][path]]";
-        $html.find('[name=\'backend[livestatus][active]\']')[0].name = "backend[livestatus][" + len + "][active]]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    this.getNewCheckMKBackend = function () {
-        var len = jQuery('.backendCheckMK').length;
-        var $html = jQuery('.checkmkTemplate').clone();
-
-        $html.find('[name=\'backend[checkmk][alias]\']')[0].name = "backend[checkmk][" + len + "][alias]]";
-        $html.find('[name=\'backend[checkmk][path]\']')[0].name = "backend[checkmk][" + len + "][path]]";
-        $html.find('[name=\'backend[checkmk][active]\']')[0].name = "backend[checkmk][" + len + "][active]]";
+        $html.find("[name='backend[livestatus][alias]']")[0].name = "backend[livestatus][" + len + "][alias]]";
+        $html.find("[name='backend[livestatus][path]']")[0].name = "backend[livestatus][" + len + "][path]]";
+        $html.find("[name='backend[livestatus][active]']")[0].name = "backend[livestatus][" + len + "][active]]";
 
         return $html.html();
     };
@@ -273,33 +263,13 @@ function SMD() {
      *
      * @returns {*}
      */
-    this.getNewStatusBackend = function () {
-        var len = jQuery('.backendStatus').length;
-        var $html = jQuery('.statusTemplate').clone();
+    var getNewCheckMKBackend = function () {
+        var len = jQuery(".backendCheckMK").length;
+        var $html = jQuery(".checkmkTemplate").clone();
 
-        $html.find('[name=\'backend[status][alias]\']')[0].name = "backend[status][" + len + "][alias]]";
-        $html.find('[name=\'backend[status][path]\']')[0].name = "backend[status][" + len + "][path]]";
-        $html.find('[name=\'backend[status][active]\']')[0].name = "backend[status][" + len + "][active]]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    this.getNewZabbixBackend = function () {
-        var len = jQuery('.backendZabbix').length;
-        var $html = jQuery('.zabbixTemplate').clone();
-
-        $html.find('[name=\'backend[zabbix][alias]\']')[0].name = "backend[zabbix][" + len + "][alias]";
-        $html.find('[name=\'backend[zabbix][url]\']')[0].name = "backend[zabbix][" + len + "][url]";
-        $html.find('[name=\'backend[zabbix][version]\']')[0].name = "backend[zabbix][" + len + "][version]";
-        $html.find('[name=\'backend[zabbix][user]\']')[0].name = "backend[zabbix][" + len + "][user]";
-        $html.find('[name=\'backend[zabbix][pass]\']')[0].name = "backend[zabbix][" + len + "][pass]";
-        $html.find('[name=\'backend[zabbix][level]\']')[0].name = "backend[zabbix][" + len + "][level]";
-        $html.find('[name=\'backend[zabbix][active]\']')[0].name = "backend[zabbix][" + len + "][active]";
+        $html.find("[name='backend[checkmk][alias]']")[0].name = "backend[checkmk][" + len + "][alias]]";
+        $html.find("[name='backend[checkmk][path]']")[0].name = "backend[checkmk][" + len + "][path]]";
+        $html.find("[name='backend[checkmk][active]']")[0].name = "backend[checkmk][" + len + "][active]]";
 
         return $html.html();
     };
@@ -309,9 +279,45 @@ function SMD() {
      *
      * @returns {*}
      */
-    this.getNewSMDBackend = function () {
-        var len = jQuery('.backendSMD').length;
-        var $html = jQuery('.SMDTemplate').clone();
+    var getNewStatusBackend = function () {
+        var len = jQuery(".backendStatus").length;
+        var $html = jQuery(".statusTemplate").clone();
+
+        $html.find("[name='backend[status][alias]']")[0].name = "backend[status][" + len + "][alias]]";
+        $html.find("[name='backend[status][path]']")[0].name = "backend[status][" + len + "][path]]";
+        $html.find("[name='backend[status][active]']")[0].name = "backend[status][" + len + "][active]]";
+
+        return $html.html();
+    };
+
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
+    var getNewZabbixBackend = function () {
+        var len = jQuery(".backendZabbix").length;
+        var $html = jQuery(".zabbixTemplate").clone();
+
+        $html.find("[name='backend[zabbix][alias]']")[0].name = "backend[zabbix][" + len + "][alias]";
+        $html.find("[name='backend[zabbix][url]']")[0].name = "backend[zabbix][" + len + "][url]";
+        $html.find("[name='backend[zabbix][version]']")[0].name = "backend[zabbix][" + len + "][version]";
+        $html.find("[name='backend[zabbix][user]']")[0].name = "backend[zabbix][" + len + "][user]";
+        $html.find("[name='backend[zabbix][pass]']")[0].name = "backend[zabbix][" + len + "][pass]";
+        $html.find("[name='backend[zabbix][level]']")[0].name = "backend[zabbix][" + len + "][level]";
+        $html.find("[name='backend[zabbix][active]']")[0].name = "backend[zabbix][" + len + "][active]";
+
+        return $html.html();
+    };
+
+    /**
+     * Devolver un bloque de configuración de backend
+     *
+     * @returns {*}
+     */
+    var getNewSMDBackend = function () {
+        var len = jQuery(".backendSMD").length;
+        var $html = jQuery(".SMDTemplate").clone();
 
         $html.find('[name=\'backend[smd][alias]\']')[0].name = "backend[smd][" + len + "][alias]";
         $html.find('[name=\'backend[smd][url]\']')[0].name = "backend[smd][" + len + "][url]";
@@ -324,32 +330,23 @@ function SMD() {
     /**
      * Comprobar actualizaciones
      */
-    this.getUpdates = function () {
-        jQuery('#updates').load(this.getRootPath() + '/ajax/getUpdates.php');
+    var getUpdates = function () {
+        jQuery("#updates").load(getRootPath() + "/ajax/getUpdates.php");
     };
 
     /**
      * Inicializar sysMonDash
      */
-    this.startSMD = function () {
+    var startSMD = function () {
         jQuery.ajaxSetup({
             global: false,
             timeout: Config.getTimeout() / 2
         });
 
-        this.updateNagiosData();
+        updateNagiosData();
         setInterval(function () {
-            self.updateNagiosData();
+            updateNagiosData();
         }, Config.getTimeout());
-    };
-
-    /**
-     * Establecer el objeto de configuración
-     *
-     * @param c
-     */
-    this.setConfig = function (c) {
-        Config = c;
     };
 
     /**
@@ -358,7 +355,7 @@ function SMD() {
      * @param length
      * @returns {string}
      */
-    this.makeHash = function (length) {
+    var makeHash = function (length) {
         var hash = "";
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -372,13 +369,13 @@ function SMD() {
     /**
      * Avisar para guardar la configuración
      */
-    this.warnConfig = function () {
+    var warnConfig = function () {
         alertify.logPosition("bottom right");
         alertify.warn(Config.getLang(5));
 
         var warnSave = jQuery('#warn-save');
 
-        if (warnSave.css('display') !== 'block') {
+        if (warnSave.css("display") !== "block") {
             warnSave.show();
         }
     };
@@ -386,174 +383,173 @@ function SMD() {
     /**
      * Establecer los eventos para la vista de configuración
      */
-    this.setConfigHooks = function () {
-        var form = jQuery('#frmConfig');
+    var setConfigHooks = function () {
+        var form = jQuery("#frmConfig");
 
-        form.on('submit', function (e) {
+        form.on("submit", function (e) {
             e.preventDefault();
-            self.saveConfig(form);
+            saveConfig(form);
         }).find("select").each(function () {
-            var sel = jQuery(this)
-            var selvalue = sel.data('selected');
-            sel.val(selvalue);
+            var sel = jQuery(this);
+            sel.val(sel.data("selected"));
         });
 
-        form.on('change', 'input', function (e) {
-            var warnSave = jQuery('#warn-save');
+        form.on("change", "input", function (e) {
+            var warnSave = jQuery("#warn-save");
 
-            if (warnSave.css('display') !== 'block') {
+            if (warnSave.css("display") !== "block") {
                 warnSave.show();
             }
         });
 
-        jQuery('#addLivestatusBackend').on('click', function (e) {
+        jQuery("#addLivestatusBackend").on("click", function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
-                'class': 'backendLivestatus backendConfig',
-                html: self.getNewLivestatusBackend()
-            }).hide().appendTo('#backends-config-container').slideDown('slow');
+                class: "backendLivestatus backendConfig",
+                html: getNewLivestatusBackend()
+            }).hide().appendTo("#backends-config-container").slideDown("slow");
 
             var offset = el.offset();
             window.scroll(0, offset.top);
         });
 
-        jQuery('#addCheckMKBackend').on('click', function (e) {
+        jQuery('#addCheckMKBackend').on("click", function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
-                'class': 'backendCheckMK backendConfig',
-                html: self.getNewCheckMKBackend()
-            }).hide().appendTo('#backends-config-container').slideDown('slow');
+                class: "backendCheckMK backendConfig",
+                html: getNewCheckMKBackend()
+            }).hide().appendTo("#backends-config-container").slideDown("slow");
 
             var offset = el.offset();
             window.scroll(0, offset.top);
         });
 
-        jQuery('#addStatusBackend').on('click', function (e) {
+        jQuery('#addStatusBackend').on("click", function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
-                'class': 'backendStatus backendConfig',
-                html: self.getNewStatusBackend()
-            }).hide().appendTo('#backends-config-container').slideDown('slow');
+                class: "backendStatus backendConfig",
+                html: getNewStatusBackend()
+            }).hide().appendTo("#backends-config-container").slideDown("slow");
 
             var offset = el.offset();
             window.scroll(0, offset.top);
         });
 
-        jQuery('#addZabbixBackend').on('click', function (e) {
+        jQuery('#addZabbixBackend').on("click", function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
-                'class': 'backendZabbix backendConfig',
-                html: self.getNewZabbixBackend()
-            }).hide().appendTo('#backends-config-container').slideDown('slow');
+                class: "backendZabbix backendConfig",
+                html: getNewZabbixBackend()
+            }).hide().appendTo("#backends-config-container").slideDown("slow");
 
             var offset = el.offset();
             window.scroll(0, offset.top);
         });
 
-        jQuery('#addSMDBackend').on('click', function (e) {
+        jQuery('#addSMDBackend').on("click", function (e) {
             e.preventDefault();
 
             var el = jQuery('<div/>', {
-                'class': 'backendSMD backendConfig',
-                html: self.getNewSMDBackend()
-            }).hide().appendTo('#backends-config-container').slideDown('slow');
+                class: "backendSMD backendConfig",
+                html: getNewSMDBackend()
+            }).hide().appendTo("#backends-config-container").slideDown("slow");
 
             var offset = el.offset();
 
             window.scroll(0, offset.top);
         });
 
-        jQuery('#backends-config-container').on('click', '.backendDelete', function (e) {
+        jQuery('#backends-config-container').on("click", ".backendDelete", function (e) {
             e.preventDefault();
 
             var res = window.confirm(Config.getLang(0));
 
             if (res === true) {
-                var $parent = jQuery(this).parent().parent('.backendConfig');
+                var $parent = jQuery(this).parent().parent(".backendConfig");
 
                 $parent.slideUp('slow', function () {
                         $parent.remove();
                     }
                 );
 
-                self.warnConfig();
+                warnConfig();
             }
         }).on('click', '.backendCheckSMD', function (e) {
             e.preventDefault();
 
-            var parent = jQuery(this).parent().parent('.backendConfig');
+            var parent = jQuery(this).parent().parent(".backendConfig");
 
-            var url = parent.find('.backend_smd_url').val();
-            var token = parent.find('.backend_smd_token').val();
+            var url = parent.find(".backend_smd_url").val();
+            var token = parent.find(".backend_smd_token").val();
 
-            if (url === '') {
+            if (url === "") {
                 alertify.alert(Config.getLang(4));
                 return;
             }
 
-            var checkData = {'url': url, 'action': 10, 'token': token};
-            var ajaxData = {'action': 'smdBackend', 'data': JSON.stringify(checkData)};
+            var checkData = {url: url, action: 10, token: token};
+            var ajaxData = {action: 'smdBackend', data: JSON.stringify(checkData)};
 
             checkConfig(ajaxData);
-        }).on('click', '.backendCheckZabbix', function (e) {
+        }).on("click", ".backendCheckZabbix", function (e) {
             e.preventDefault();
 
-            var parent = jQuery(this).parent().parent('.backendConfig');
+            var parent = jQuery(this).parent().parent(".backendConfig");
 
-            var version = parent.find('.backend_zabbix_version').val();
-            var url = parent.find('.backend_zabbix_url').val();
-            var user = parent.find('.backend_zabbix_user').val();
-            var pass = parent.find('.backend_zabbix_pass').val();
+            var version = parent.find(".backend_zabbix_version").val();
+            var url = parent.find(".backend_zabbix_url").val();
+            var user = parent.find(".backend_zabbix_user").val();
+            var pass = parent.find(".backend_zabbix_pass").val();
 
             if (version === '' || url === '') {
                 alertify.alert(Config.getLang(4));
                 return;
             }
 
-            var checkData = {'url': url, 'version': version, 'user': user, 'pass': pass};
-            var ajaxData = {'action': 'zabbixBackend', 'data': JSON.stringify(checkData)};
+            var checkData = {url: url, version: version, user: user, pass: pass};
+            var ajaxData = {action: "zabbixBackend", data: JSON.stringify(checkData)};
 
             checkConfig(ajaxData);
         });
 
-        jQuery('.btn-gen-token, .btn-gen-pass').click(function (e) {
-            var hash = self.makeHash(32);
+        jQuery(".btn-gen-token, .btn-gen-pass").click(function (e) {
+            var hash = makeHash(32);
 
-            document.getElementById(this.getAttribute('data-dst')).value = hash;
-            jQuery(this).next('.fa-eye').attr('title', hash);
+            document.getElementById(this.getAttribute("data-dst")).value = hash;
+            jQuery(this).next(".fa-eye").attr("title", hash);
         });
 
-        jQuery('.fa-eye').click(function () {
-            var title = this.getAttribute('title');
+        jQuery(".fa-eye").click(function () {
+            var title = this.getAttribute("title");
             if (title !== "") {
                 alertify.alert(title);
             }
         });
 
-        jQuery('#special_config_pass').on('keyup', function () {
-            jQuery(this).parent().find('.fa-eye').attr('title', this.value);
+        jQuery("#special_config_pass").on("keyup", function () {
+            jQuery(this).parent().find(".fa-eye").attr("title", this.value);
         });
 
-        jQuery('#btnBack').click(function () {
-            location.href = self.getRootPath();
+        jQuery("#btnBack").click(function () {
+            location.href = getRootPath();
         });
 
-        jQuery('.container-state').on('click', function (e) {
-            var container = document.getElementById(this.getAttribute('data-container'));
-            var state = container.getAttribute('aria-expanded');
+        jQuery(".container-state").on("click", function (e) {
+            var container = document.getElementById(this.getAttribute("data-container"));
+            var state = container.getAttribute("aria-expanded");
 
-            if (state == 'true') {
-                container.setAttribute('aria-expanded', 'false');
-                jQuery(this).removeClass('fa-caret-up').addClass('fa-caret-down');
-                jQuery(container).slideUp('slow');
+            if (state == "true") {
+                container.setAttribute("aria-expanded", "false");
+                jQuery(this).removeClass("fa-caret-up").addClass("fa-caret-down");
+                jQuery(container).slideUp("slow");
             } else {
-                container.setAttribute('aria-expanded', 'true');
-                jQuery(this).removeClass('fa-caret-down').addClass('fa-caret-up');
-                jQuery(container).slideDown('slow');
+                container.setAttribute("aria-expanded", "true");
+                jQuery(this).removeClass("fa-caret-down").addClass("fa-caret-up");
+                jQuery(container).slideDown("slow");
             }
         });
     };
@@ -564,12 +560,12 @@ function SMD() {
     var playBeep = function playBeep() {
         //console.info('BEEP');
         if (Config.getAudioEnabled()) {
-            var audio = document.getElementById('audio-alarm');
+            var audio = document.getElementById("audio-alarm");
             var timeout = Config.getTimeout() / 1000;
 
             // Detectar si la duración del sonido es mayor a la duración del timeout de refresco
             if (audio.duration >= timeout && audioEventAttached === false) {
-                audio.addEventListener('timeupdate', function () {
+                audio.addEventListener("timeupdate", function () {
                     audioEventAttached = true;
 
                     if (audio.currentTime >= timeout - 2) {
@@ -590,25 +586,29 @@ function SMD() {
      */
     var checkConfig = function (ajaxData) {
         jQuery.ajax({
-            url: self.getRootPath() + '/ajax/checkConfig.php',
-            type: 'post',
-            dataType: 'json',
+            url: getRootPath() + "/ajax/checkConfig.php",
+            type: "post",
+            dataType: "json",
             data: ajaxData,
             success: function (data) {
                 var msg;
 
-                if (typeof data.status === "undefined" || data.status !== 0) {
-                    msg = Config.getLang(3) + '<br>' + Config.getLang(2) + ' ' + data.description || '';
+                if (data.status === undefined || data.status !== 0) {
+                    msg = Config.getLang(3) + "<br>" + Config.getLang(2) + " " + data.description || "";
                     alertify.alert(msg);
                 } else {
-                    msg = Config.getLang(1) + '<br>' + Config.getLang(2) + ' ' + data.description;
+                    msg = Config.getLang(1) + "<br>" + Config.getLang(2) + ' ' + data.description;
                     alertify.alert(msg);
                 }
 
             }
         });
     };
-}
 
-var smd = new SMD();
-var config = new smd.SMDConfig();
+    return {
+        startSMD: startSMD,
+        getUpdates: getUpdates,
+        setConfigHooks: setConfigHooks,
+        Config: Config
+    }
+})();

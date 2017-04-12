@@ -84,17 +84,16 @@ Session::setCssHash(Util::getCssHash());
     <audio id="audio-alarm" src="audio/beep.mp3" preload></audio>
 <?php endif; ?>
 
-<script type="text/javascript" src="js/functions.js"></script>
+<script type="text/javascript" src="js/functions.min.js"></script>
 <script type="text/javascript">
     (function () {
-        config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
-        config.setAjaxFile('<?php echo $ajaxFile; ?>');
-        config.setScroll(<?php echo $scroll ? 'true' : 'false'; ?>);
-        config.setTimeout(<?php echo $timeout; ?>);
-        config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
-        config.setAudioEnabled(<?php echo Config::getConfig()->isNewItemAudioEnabled() ? 'true' : 'false'; ?>);
+        smd.Config.setRemoteServer('<?php echo Config::getConfig()->getRemoteServer(); ?>');
+        smd.Config.setAjaxFile('<?php echo $ajaxFile; ?>');
+        smd.Config.setScroll(<?php echo $scroll ? 'true' : 'false'; ?>);
+        smd.Config.setTimeout(<?php echo $timeout; ?>);
+        smd.Config.setLang('<?php echo Language::t('Error al obtener los eventos de monitorización'); ?>');
+        smd.Config.setAudioEnabled(<?php echo Config::getConfig()->isNewItemAudioEnabled() ? 'true' : 'false'; ?>);
 
-        smd.setConfig(config);
         smd.startSMD();
         smd.getUpdates();
     }());
