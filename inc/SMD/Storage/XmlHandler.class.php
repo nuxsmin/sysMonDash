@@ -127,7 +127,7 @@ class XmlHandler implements StorageInterface
                     $nodes[] = $val;
                 } else {
                     if ($node->hasAttributes() && $node->getAttribute('type') === 'array') {
-                        $nodes[$node->nodeName] = [];
+                        $nodes[$node->nodeName] = array();
                     } else {
                         $nodes[$node->nodeName] = $val;
                     }
