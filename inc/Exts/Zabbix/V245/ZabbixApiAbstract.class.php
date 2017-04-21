@@ -24,6 +24,7 @@
 
 namespace Exts\Zabbix\V245;
 use Exception;
+use SMD\Core\Config;
 
 /**
  * @brief   Abstract class for the Zabbix API.
@@ -468,7 +469,7 @@ abstract class ZabbixApiAbstract
 
         // build filename for cached auth token
         if($tokenCacheDir && array_key_exists('user', $params) && is_dir($tokenCacheDir))
-            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user'].'|'.posix_getuid());
+            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user'].'|'.getmyuid());
 
         // try to read cached auth token
         if(isset($tokenCacheFile) && is_file($tokenCacheFile))
@@ -485,6 +486,8 @@ abstract class ZabbixApiAbstract
                 $this->authToken = '';
                 unlink($tokenCacheFile);
             }
+        } else {
+            error_log('NO_CACHE');
         }
 
         // no cached token found so far, so login (again)

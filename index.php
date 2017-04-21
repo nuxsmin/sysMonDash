@@ -53,7 +53,7 @@ Session::setCssHash(Util::getCssHash());
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/reset.min.css">
-    <link rel="stylesheet" type="text/css" href="css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/pure.min.css">
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.min.css?v=<?php echo Session::getCssHash(); ?>">
 </head>

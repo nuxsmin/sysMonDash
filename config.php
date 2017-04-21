@@ -48,7 +48,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="imgs/logo_small.png">
     <link rel="stylesheet" type="text/css" href="css/reset.min.css">
-    <link rel="stylesheet" type="text/css" href="css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/pure.min.css">
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/alertify.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.min.css?v=<?php echo Session::getCssHash(); ?>">
