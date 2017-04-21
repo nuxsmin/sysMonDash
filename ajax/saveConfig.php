@@ -88,7 +88,7 @@ $ConfigData->setColBackend($showColBackend);
 $ConfigData->setShowScheduled($showScheduled);
 $ConfigData->setRegexHostShow($regexHostShow);
 $ConfigData->setRegexServiceNoShow($regexServicesNoShow);
-$ConfigData->setCriticalItems(explode(',', $criticalItems));
+$ConfigData->setCriticalItems(!empty($criticalItems) ? explode(',', $criticalItems) : []);
 $ConfigData->setBackend($Backends);
 $ConfigData->setClientURL($specialClientURL);
 $ConfigData->setRemoteServer($specialRemoteServerURL);

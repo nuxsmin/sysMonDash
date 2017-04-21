@@ -201,7 +201,7 @@ class sysMonDash
      */
     private function filterItems(EventInterface $item)
     {
-        if (count($this->Config->getCriticalItems()) > 1) {
+        if (count($this->Config->getCriticalItems()) > 0) {
             return $this->getFilterCritical($item);
         }
 

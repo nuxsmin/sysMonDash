@@ -39,7 +39,7 @@ class XmlHandler implements StorageInterface
     /**
      * @var mixed
      */
-    protected $items = null;
+    protected $items;
     /**
      * @var string
      */
@@ -95,7 +95,6 @@ class XmlHandler implements StorageInterface
 
     /**
      * Comprobar que el archivo existe y se puede leer/escribir
-     *
      * @return bool
      */
     protected function checkSourceFile()
@@ -114,7 +113,7 @@ class XmlHandler implements StorageInterface
         $nodes = array();
 
         foreach ($NodeList as $node) {
-            /** @var $node DOMNode */
+            /** @var $node DOMNode|DOMElement */
             if (is_object($node->childNodes) && $node->childNodes->length > 1) {
                 if ($node->nodeName === 'item') {
                     $nodes[] = $this->readChildNodes($node->childNodes);
@@ -127,7 +126,12 @@ class XmlHandler implements StorageInterface
                 if ($node->nodeName === 'item') {
                     $nodes[] = $val;
                 } else {
-                    $nodes[$node->nodeName] = $val;
+                    if ($node->hasAttributes() && $node->getAttribute('type') === 'array') {
+                        $nodes[$node->nodeName] = [];
+                    } else {
+                        $nodes[$node->nodeName] = $val;
+                    }
+
                 }
             }
         }
@@ -143,7 +147,7 @@ class XmlHandler implements StorageInterface
      */
     public function __get($id)
     {
-        return $this->items[$id];
+        return isset($this->items[$id]) ? $this->items[$id] : null;
     }
 
     /**
@@ -187,10 +191,13 @@ class XmlHandler implements StorageInterface
             }
 
             if (is_array($value)) {
+                $newNode->setAttribute('type', 'array');
+                if (count($value) > 0) {
                     $this->writeChildNodes($value, $newNode, $key);
+                }
             } elseif (is_object($value)) {
-                    $newNode->setAttribute('class', get_class($value));
-                    $newNode->appendChild($this->Dom->createTextNode(base64_encode(serialize($value))));
+                $newNode->setAttribute('class', get_class($value));
+                $newNode->appendChild($this->Dom->createTextNode(base64_encode(serialize($value))));
             } else {
                 $newNode->appendChild($this->Dom->createTextNode(trim($value)));
             }
@@ -237,7 +244,7 @@ class XmlHandler implements StorageInterface
             $property->setAccessible(true);
             $value = $property->getValue($object);
 
-            if (is_numeric($value) || is_bool($value)){
+            if (is_numeric($value) || is_bool($value)) {
                 $items[$property->getName()] = (int)$value;
             } else {
                 $items[$property->getName()] = $value;
