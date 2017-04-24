@@ -56,7 +56,7 @@ Point to http://yourserver.com/sysMonDash/config.php and set it according to you
 
 ---
 
-**DEMO: http://sysmondash.cygnux.org** (No disponible/Not availablet)
+**DEMO: http://sysmondash.cygnux.org** (No disponible / Not available)
 
 https://github.com/nuxsmin/sysMonDash
 
