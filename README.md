@@ -65,5 +65,7 @@ http://cygnux.org
 
 ![Main View](http://cygnux.org/wp-content/uploads/2016/02/sysMonDash_v1-624x338.png)
 
+![Config View](http://cygnux.org/wp-content/uploads/2016/02/sysMonDash_v1_config-773x1024.png)
+
 
 
