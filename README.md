@@ -56,14 +56,16 @@ Point to http://yourserver.com/sysMonDash/config.php and set it according to you
 
 ---
 
-**DEMO: http://sysmondash.cygnux.org**
+**DEMO: http://sysmondash.cygnux.org** (No disponible / Not available)
 
 https://github.com/nuxsmin/sysMonDash
 
 http://cygnux.org
 
 
-![Main View](http://sysmondash.cygnux.org/assets/sysMonDash.png)
+![Main View](http://cygnux.org/wp-content/uploads/2016/02/sysMonDash_v1-624x338.png)
+
+![Config View](http://cygnux.org/wp-content/uploads/2016/02/sysMonDash_v1_config-773x1024.png)
 
 
 
