@@ -132,7 +132,7 @@ class Util
      */
     public static function getVersion($retBuild = false)
     {
-        $build = 2017042101;
+        $build = 2017083001;
         $version = array(1, 1);
 
         if ($retBuild) {
@@ -314,6 +314,12 @@ class Util
         curl_setopt($ch, CURLOPT_TIMEOUT, Config::getConfig()->getRefreshValue() / 3);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Cache-Control: max-age=0',
+            'Accept-Charset: utf-8;q=0.7,*;q=0.7',
+            'Accept-Language: en-us,en;q=0.5',
+            'Pragma: '
+        ]);
 
         $data = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -363,7 +369,7 @@ class Util
 
     /**
      * Comprobar si la configuración se ha actualizado
-     * 
+     *
      * @return bool
      */
     public static function checkConfigRefresh()

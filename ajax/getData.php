@@ -80,7 +80,7 @@ if ($type !== 1) {
             <tr>
                 <td colspan="5">
                     <div id="nomessages">
-                        <img src="imgs/smile.png"/>
+                        <img src="imgs/ok.png"/>
                         <br>
                         <?php echo Language::t('No hay avisos para mostrar'); ?>
                     </div>

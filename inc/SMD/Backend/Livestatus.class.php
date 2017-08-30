@@ -67,7 +67,7 @@ class Livestatus extends Backend implements BackendInterface
         $groupCount = 5;
         $hosts = array();
         $out = array();
-        $downtimes = Util::arraySortByProperty($this->getScheduledDowntimes(), 'start_time', false);
+        $downtimes = Util::arraySortByProperty($this->getScheduledDowntimes(), 'startTime', false);
 
         // Recorrer el array de eventos y contabilizar el número de veces que aparece cada host
         foreach ($downtimes as $downtime) {
