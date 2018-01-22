@@ -28,6 +28,7 @@ namespace SMD\Core;
 use Exception;
 use SMD\Backend\BackendInterface;
 use SMD\Backend\CheckMK;
+use SMD\Backend\Dummy;
 use SMD\Backend\Event\DowntimeInterface;
 use SMD\Backend\Event\EventInterface;
 use SMD\Backend\Event\EventState;
@@ -159,14 +160,14 @@ class sysMonDash
      */
     public function getBackends()
     {
-        $backends = (!Util::checkConfigRefresh()) ? Session::getActiveBackends() : array();
+        $backends = (!Util::checkConfigRefresh()) ? Session::getActiveBackends() : [];
 
         if (count($backends) > 0) {
             return $backends;
         }
 
         foreach (Config::getConfig()->getBackend() as $Backend) {
-            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD */
+            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD|ConfigBackendDummy */
             if ($Backend->isActive()) {
                 switch ($Backend->getType()) {
                     case ConfigBackend::TYPE_LIVESTATUS:
@@ -183,6 +184,9 @@ class sysMonDash
                         break;
                     case (ConfigBackend::TYPE_SMD && $this->callType !== self::CALL_TYPE_API):
                         $backends[] = new SMD($Backend);
+                        break;
+                    case ConfigBackend::TYPE_DUMMY:
+                        $backends[] = new Dummy($Backend);
                         break;
                 }
             }
@@ -238,24 +242,6 @@ class sysMonDash
         }
 
         $item->setFilterStatus('Critical Host/Service');
-
-        return false;
-    }
-
-    /**
-     * Comprobar si el host se encuentra en la expresión regular
-     *
-     * @param EventInterface $item
-     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
-     */
-    private function getFilterHosts(EventInterface $item)
-    {
-        $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
-
-        if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)) {
-            $item->setFilterStatus('Regex Host');
-            return true;
-        }
 
         return false;
     }
@@ -370,6 +356,24 @@ class sysMonDash
     }
 
     /**
+     * Comprobar si el host se encuentra en la expresión regular
+     *
+     * @param EventInterface $item
+     * @return bool Devuelve true si es necesario filtrar o false de lo contrario
+     */
+    private function getFilterHosts(EventInterface $item)
+    {
+        $hostname = $item->getHostDisplayName() ?: $item->getDisplayName();
+
+        if (!preg_match('#' . $this->Config->getRegexHostShow() . '#i', $hostname)) {
+            $item->setFilterStatus('Regex Host');
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Función para mostrar los elementos del Dashboard
      *
      * @param EventInterface $item El elemento que contiene los datos.
@@ -453,6 +457,7 @@ class sysMonDash
 
         if ($this->Config->isColBackend()) {
             $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
+            $line .= '<td class="center image"><img src="' . $item->getBackendImage() . '" alt="backend_image"/></td>' . PHP_EOL;
         }
 
         $line .= '</tr>' . PHP_EOL;

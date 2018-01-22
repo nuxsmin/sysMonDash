@@ -73,6 +73,7 @@ if ($type !== 1) {
         <?php endif; ?>
         <?php if (Config::getConfig()->isColBackend()): ?>
             <th width="20%"><?php echo Language::t('Backend'); ?></th>
+            <th>&nbsp;</th>
         <?php endif; ?>
         </thead>
 

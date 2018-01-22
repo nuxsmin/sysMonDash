@@ -321,6 +321,16 @@ interface EventInterface
     public function setBackendUrl($backendUrl);
 
     /**
+     * @return string
+     */
+    public function getBackendImage();
+
+    /**
+     * @param string $image
+     */
+    public function setBackendImage($image);
+
+    /**
      * @param $status string
      */
     public function setFilterStatus($status);

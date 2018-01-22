@@ -36,6 +36,7 @@ abstract class ConfigBackend
     const TYPE_ZABBIX = 3;
     const TYPE_SMD = 4;
     const TYPE_CHECKMK = 5;
+    const TYPE_DUMMY = 99;
 
     /**
      * @var int
@@ -154,5 +155,19 @@ abstract class ConfigBackend
      * @param int $level
      * @return mixed
      */
-    public abstract function setLevel($level);
+    abstract public function setLevel($level);
+
+    /**
+     * @param $file
+     * @return string
+     * @throws \RuntimeException
+     */
+    protected function checkFile($file)
+    {
+        if (!file_exists($file) || filetype($file) !== 'file') {
+            throw new \RuntimeException('Ruta o archivo no válido');
+        }
+
+        return $file;
+    }
 }

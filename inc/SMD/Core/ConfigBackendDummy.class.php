@@ -26,36 +26,27 @@ namespace SMD\Core;
 
 use SMD\Backend\Event\EventStateHost;
 
-/**
- * Class ConfigBackendStatus
- * @package SMD\Core
- */
-class ConfigBackendStatus extends ConfigBackend
+class ConfigBackendDummy extends ConfigBackend
 {
     /**
+     * @var string
+     */
+    private $imagePath;
+
+    /**
      * ConfigBackendStatus constructor.
-     * @param $path
+     * @param string $path
+     * @param string $imagePath
      * @param int $level
      * @throws \Exception
      */
-    public function __construct($path, $level = 0)
+    public function __construct($path, $imagePath, $level = 0)
     {
-        $this->setType(self::TYPE_STATUS);
-        $this->setPath($path);
+        $this->path = $this->checkFile($path);
+        $this->imagePath = $this->checkFile($imagePath);
+
+        $this->setType(self::TYPE_DUMMY);
         $this->setLevel($level);
-    }
-
-    /**
-     * @param string $path
-     * @throws \Exception
-     */
-    public function setPath($path)
-    {
-        if (!file_exists($path) || filetype($path) !== 'file') {
-            throw new \Exception('Ruta o archivo no válido');
-        }
-
-        $this->path = $path;
     }
 
     /**
@@ -73,5 +64,13 @@ class ConfigBackendStatus extends ConfigBackend
             throw new \InvalidArgumentException('Nivel no disponible');
 
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getImagePath()
+    {
+        return $this->imagePath;
     }
 }
