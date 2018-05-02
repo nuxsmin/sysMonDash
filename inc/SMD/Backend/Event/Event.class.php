@@ -160,6 +160,10 @@ abstract class Event implements EventInterface
      * @var string
      */
     public $filterStatus = '';
+    /**
+     * @var string
+     */
+    public $backendImage;
 
     /**
      * Event constructor.
@@ -664,5 +668,21 @@ abstract class Event implements EventInterface
     public function setBackendLevel($backendLevel)
     {
         $this->backendLevel = $backendLevel;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBackendImage()
+    {
+        return $this->backendImage;
+    }
+
+    /**
+     * @param string $backendImage
+     */
+    public function setBackendImage($backendImage)
+    {
+        $this->backendImage = $backendImage;
     }
 }

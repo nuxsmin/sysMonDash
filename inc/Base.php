@@ -25,7 +25,8 @@
 
 defined('APP_ROOT') || die(_('No es posible acceder directamente a este archivo'));
 
-define('XML_CONFIG_FILE', DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'sysMonDash' . DIRECTORY_SEPARATOR . 'config.xml');
+define('BASE_DIR', dirname(__DIR__));
+define('XML_CONFIG_FILE', BASE_DIR . DIRECTORY_SEPARATOR . 'config.xml');
 define('CONSTANTS_FILE', __DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 define('MODEL_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'SMD');
 define('LOCALES_PATH', __DIR__ . DIRECTORY_SEPARATOR . 'locales');

@@ -182,8 +182,10 @@ class sysMonDash
                     case ConfigBackend::TYPE_ZABBIX:
                         $backends[] = new Zabbix($Backend);
                         break;
-                    case (ConfigBackend::TYPE_SMD && $this->callType !== self::CALL_TYPE_API):
-                        $backends[] = new SMD($Backend);
+                    case (ConfigBackend::TYPE_SMD):
+                        if ($this->callType !== self::CALL_TYPE_API) {
+                            $backends[] = new SMD($Backend);
+                        }
                         break;
                     case ConfigBackend::TYPE_DUMMY:
                         $backends[] = new Dummy($Backend);
@@ -457,7 +459,7 @@ class sysMonDash
 
         if ($this->Config->isColBackend()) {
             $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
-            $line .= '<td class="center image"><img src="' . $item->getBackendImage() . '" alt="backend_image"/></td>' . PHP_EOL;
+            $line .= '<td class="center backend-image"><img src="assets/' . basename($item->getBackendImage()) . '" alt=""/></td>' . PHP_EOL;
         }
 
         $line .= '</tr>' . PHP_EOL;

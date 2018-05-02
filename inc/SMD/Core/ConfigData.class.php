@@ -155,7 +155,7 @@ class ConfigData
     }
 
     /**
-     * @return array|ConfigBackendStatus[]|ConfigBackendLivestatus[]|ConfigBackendZabbix[]|ConfigBackendSMD[]
+     * @return array|ConfigBackendStatus[]|ConfigBackendLivestatus[]|ConfigBackendZabbix[]|ConfigBackendSMD[]|ConfigBackendDummy[]
      */
     public function getBackend()
     {

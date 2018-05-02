@@ -24,8 +24,9 @@
 
 namespace SMD\Backend;
 
-use SMD\Backend\Event\Host;
-use SMD\Backend\Event\Service;
+use SMD\Backend\Event\Downtime;
+use SMD\Backend\Event\Event;
+use SMD\Backend\Event\Trigger;
 use SMD\Core\ConfigBackendDummy;
 
 /**
@@ -34,6 +35,12 @@ use SMD\Core\ConfigBackendDummy;
  */
 class Dummy extends Backend implements BackendInterface
 {
+    const EVENT_RND_TIME_OLD = 7200;
+    const MAINTENANCE_RND_TIME = 5400;
+    const MAINTENANCE_RND_TIME_OLD = 86400;
+    const MAINTENANCE_RND_TIME_MIN = 28800;
+    const MAINTENANCE_RND_TIME_MAX = 32400;
+
     /**
      * @var string
      */
@@ -76,43 +83,51 @@ class Dummy extends Backend implements BackendInterface
      * Devuelve los eventos
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getProblems()
     {
-        return array_merge($this->getHostsProblems(), $this->getServicesProblems());
+        return $this->getHostsProblems();
     }
 
     /**
      * Devuelve los eventos de los hosts
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getHostsProblems()
     {
+        $changed = false;
         $events = [];
 
-        foreach ($this->fileData as $event) {
-            $Event = new Host();
-            $Event->setAcknowledged($event->problem_has_been_acknowledged);
-            $Event->setActiveChecksEnabled($event->active_checks_enabled);
-            $Event->setCheckCommand($event->check_command);
-            $Event->setCurrentAttempt($event->current_attempt);
-            $Event->setDisplayName($event->host_name);
-            $Event->setHostAlias($event->host_name);
+        foreach ($this->fileData->triggers as $event) {
+            // Camiar la hora de los eventos de forma aleatoria
+            $time = $event->last_state_change;
+
+            if ($time < (time() - self::EVENT_RND_TIME_OLD)) {
+                $time = mt_rand(time() - self::EVENT_RND_TIME_OLD, time());
+
+                $event->last_state_change = $time;
+                $changed = true;
+            }
+
+            $Event = new Trigger();
+            $Event->setType(Event::TYPE_TRIGGER);
+            $Event->setState($event->state);
+            $Event->setStateType($event->state);
+            $Event->setAcknowledged($event->acknowledged);
             $Event->setHostDisplayName($event->host_name);
-            $Event->setFlapping($event->is_flapping);
-            $Event->setLastCheck($event->last_check);
-            $Event->setLastHardState($event->last_hard_state);
-            $Event->setLastHardStateChange($event->last_hard_state_change);
-            $Event->setLastTimeDown($event->last_time_down);
-            $Event->setLastTimeUp($event->last_time_up);
-            $Event->setLastTimeUnreachable($event->last_time_unreachable);
-            $Event->setPluginOutput($event->plugin_output);
-            $Event->setState($event->current_state);
-            $Event->setStateType($event->state_type);
-            $Event->setScheduledDowntimeDepth($event->scheduled_downtime_depth);
-            $Event->setMaxCheckAttempts($event->max_attempts);
-            $Event->setNotificationsEnabled($event->notifications_enabled);
+            $Event->setDisplayName($event->display_name);
+            $Event->setCheckCommand($event->trigger_id);
+            $Event->setPluginOutput($event->description);
+            $Event->setLastCheck($time);
+            $Event->setLastHardState($time);
+            $Event->setLastHardStateChange($time);
+            $Event->setActiveChecksEnabled($event->status);
+            $Event->setScheduledDowntimeDepth($event->maintenance_status);
+            $Event->setCurrentAttempt($event->value);
+            $Event->setNotificationsEnabled(true);
             $Event->setBackendAlias($this->backend->getAlias());
             $Event->setBackendUrl($this->backend->getUrl());
             $Event->setBackendLevel($this->backend->getLevel());
@@ -121,65 +136,94 @@ class Dummy extends Backend implements BackendInterface
             $events[] = $Event;
         }
 
+        // Escribir los datos si ha cambiado el tiempo de los eventos
+        if ($changed) {
+            $this->writeStatusData();
+        }
+
         return $events;
+    }
+
+    /**
+     * Escribir los datos de monitorización
+     * @throws \Exception
+     */
+    private function writeStatusData()
+    {
+        // Archivo con información de estado de Dummy
+        if (!file_put_contents($this->path, json_encode($this->fileData))) {
+            throw new \Exception('Error al escribir los datos de monitorización');
+        }
     }
 
     /**
      * Devuelve los eventos de los servicios
      *
-     * @return array|bool
+     * @return void
      */
     public function getServicesProblems()
     {
-        $events = [];
-
-        foreach ($this->fileData as $event) {
-            $Event = new Service();
-            $Event->setAcknowledged($event->problem_has_been_acknowledged);
-            $Event->setActiveChecksEnabled($event->active_checks_enabled);
-            $Event->setCheckCommand($event->check_command);
-            $Event->setCurrentAttempt($event->current_attempt);
-            $Event->setDisplayName($event->service_description);
-            $Event->setHostAlias($event->host_name);
-            $Event->setHostDisplayName($event->host_name);
-            $Event->setFlapping($event->is_flapping);
-            $Event->setLastCheck($event->last_check);
-            $Event->setLastHardState($event->last_hard_state);
-            $Event->setLastHardStateChange($event->last_hard_state_change);
-            $Event->setPluginOutput($event->plugin_output);
-            $Event->setState($event->current_state);
-            $Event->setStateType($event->state_type);
-            $Event->setScheduledDowntimeDepth($event->scheduled_downtime_depth);
-            $Event->setMaxCheckAttempts($event->max_attempts);
-            $Event->setNotificationsEnabled($event->notifications_enabled);
-            $Event->setBackendAlias($this->backend->getAlias());
-            $Event->setBackendUrl($this->backend->getUrl());
-            $Event->setBackendLevel($this->backend->getLevel());
-            $Event->setBackendImage($this->backend->getImagePath());
-
-            $events[] = $Event;
-        }
-
-        return $events;
-    }
-
-    /**
-     * Devuelve los eventos programados
-     *
-     * @return array|bool
-     */
-    public function getScheduledDowntimes()
-    {
-        return [];
+        throw new \RuntimeException('Not implemented');
     }
 
     /**
      * Devuelve los eventos programados agrupados
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function getScheduledDowntimesGroupped()
     {
-        return [];
+        return $this->getScheduledDowntimes();
+    }
+
+    /**
+     * Devuelve los eventos programados
+     *
+     * @return array|bool
+     * @throws \Exception
+     */
+    public function getScheduledDowntimes()
+    {
+        if (!isset($this->fileData->downtimes)) {
+            return [];
+        }
+
+        $changed = false;
+        $downtimes = [];
+
+        foreach ($this->fileData->downtimes as $maintenance) {
+            // Camiar la hora de los mantenimientos de forma aleatoria
+            // dentro de las 8-9 horas siguientes
+            $start = $maintenance->start;
+
+            if ($start < (time() - self::MAINTENANCE_RND_TIME_OLD)) {
+                $start = mt_rand(time() + self::MAINTENANCE_RND_TIME_MIN, time() + self::MAINTENANCE_RND_TIME_MAX);
+
+                $maintenance->start = $start;
+                $maintenance->active_till = $start + self::MAINTENANCE_RND_TIME;
+
+                $changed = true;
+            }
+
+            if (time() <= $maintenance->active_till) {
+                $downtime = new Downtime();
+                $downtime->setAuthor('Zabbix');
+                $downtime->setComment($maintenance->description);
+                $downtime->setHostName($maintenance->host_name);
+                $downtime->setServiceDisplayName('-');
+                $downtime->setStartTime($start);
+                $downtime->setEndTime($maintenance->active_till);
+                $downtime->setBackendAlias($this->backend->getAlias());
+
+                $downtimes[] = $downtime;
+            }
+        }
+
+        if ($changed) {
+            $this->writeStatusData();
+        }
+
+        return $downtimes;
     }
 }

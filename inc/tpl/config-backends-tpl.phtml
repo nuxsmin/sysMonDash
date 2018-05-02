@@ -21,6 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 use SMD\Backend\Event\EventStateTrigger;
 use SMD\Core\Language;
 
@@ -49,6 +50,7 @@ use SMD\Core\Language;
         </button>
     </div>
 </div>
+
 <div class="checkmkTemplate backendTemplate" style="display: none">
     <div class="pure-control-group">
         <label><?php echo Language::t('Alias'); ?></label>
@@ -73,6 +75,7 @@ use SMD\Core\Language;
         </button>
     </div>
 </div>
+
 <div class="statusTemplate backendTemplate" style="display: none">
     <div class="pure-control-group">
         <label><?php echo Language::t('Alias'); ?></label>
@@ -96,6 +99,7 @@ use SMD\Core\Language;
         </button>
     </div>
 </div>
+
 <div class="zabbixTemplate backendTemplate" style="display: none">
     <div class="pure-control-group">
         <label><?php echo Language::t('Alias'); ?></label>
@@ -146,6 +150,7 @@ use SMD\Core\Language;
         </button>
     </div>
 </div>
+
 <div class="SMDTemplate backendTemplate" style="display: none">
     <div class="pure-control-group">
         <label><?php echo Language::t('Alias'); ?></label>
@@ -178,3 +183,34 @@ use SMD\Core\Language;
         </button>
     </div>
 </div>
+
+<div class="dummyTemplate backendTemplate" style="display: none">
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Alias'); ?></label>
+        <input type="text" name="backend[dummy][alias]"
+               class="pure-input-1-2" placeholder=""/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Ruta archivo JSON'); ?></label>
+        <input type="text" name="backend[dummy][path]"
+               class="pure-input-1-2 backend_dummy_file" placeholder="/etc/sysMonDash/dummy_backend.json"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Ruta imagen'); ?></label>
+        <input type="text" name="backend[dummy][image]"
+               class="pure-input-1-2 backend_dummy_image" placeholder="/var/www/html/smd/assets/dummy.png"
+               required/>
+    </div>
+    <div class="pure-control-group">
+        <label><?php echo Language::t('Activo'); ?></label>
+        <input type="checkbox" name="backend[dummy][active]"/>
+    </div>
+    <div class="buttons">
+        <button type="button" class="button-error pure-button backendDelete">
+            <i class="fa fa-trash"></i>
+            <?php echo Language::t('Eliminar'); ?>
+        </button>
+    </div>
+</div>
+

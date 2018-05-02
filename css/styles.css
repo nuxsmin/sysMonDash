@@ -315,3 +315,12 @@ footer #updates i {
     color: #26a69a;
     font-size: 1.5em;
 }
+
+.backend-image {
+    background-color: #f2f2f2;
+}
+
+.backend-image img{
+    width: 48px;
+    /*height: 32px;*/
+}

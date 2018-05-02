@@ -32,6 +32,7 @@ $j = 0;
 $k = 0;
 $l = 0;
 $m = 0;
+$n = 0;
 ?>
 
 <fieldset>
@@ -49,19 +50,22 @@ $m = 0;
                     </a>
                     <ul class="pure-menu-children">
                         <li class="pure-menu-item">
-                            <a class="pure-menu-link" href="#" id="addLivestatusBackend">Livestatus</a>
+                            <a class="pure-menu-link add-backend" href="#" data-type="livestatus">Livestatus</a>
                         </li>
                         <li class="pure-menu-item">
-                            <a class="pure-menu-link" href="#" id="addCheckMKBackend">Check_MK</a>
+                            <a class="pure-menu-link add-backend" href="#" data-type="checkmklivestatus">Check_MK</a>
                         </li>
                         <li class="pure-menu-item">
-                            <a class="pure-menu-link" href="#" id="addStatusBackend">Status</a>
+                            <a class="pure-menu-link add-backend" href="#" data-type="status">Status</a>
                         </li>
                         <li class="pure-menu-item">
-                            <a class="pure-menu-link" href="#" id="addZabbixBackend">Zabbix</a>
+                            <a class="pure-menu-link add-backend" href="#" data-type="zabbix">Zabbix</a>
                         </li>
                         <li class="pure-menu-item">
-                            <a class="pure-menu-link" href="#" id="addSMDBackend">sysMonDash</a>
+                            <a class="pure-menu-link add-backend" href="#" data-type="smd">sysMonDash</a>
+                        </li>
+                        <li class="pure-menu-item">
+                            <a class="pure-menu-link add-backend" href="#" data-type="dummy">Dummy</a>
                         </li>
                     </ul>
                 </li>
@@ -171,7 +175,7 @@ $m = 0;
                                 data-selected="<?php echo $Backend->getLevel(); ?>" required>
                             <?php foreach (EventStateTrigger::getStates() as $level => $detail): ?>
                                 <option
-                                    value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
+                                        value="<?php echo $level; ?>"><?php echo Language::t($detail[0]); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -261,6 +265,43 @@ $m = 0;
                     </div>
                 </div>
                 <?php $m++; ?>
+            <?php elseif ($Backend->getType() === ConfigBackend::TYPE_DUMMY): ?>
+                <div class="backendDummy backendConfig">
+                    <div class="pure-control-group">
+                        <label><?php echo Language::t('Alias'); ?></label>
+                        <input type="text" name="backend[dummy][<?php echo $n; ?>][alias]"
+                               class="pure-input-1-2"
+                               value="<?php echo $Backend->getAlias(); ?>"/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label><?php echo Language::t('Ruta archivo JSON'); ?></label>
+                        <input type="text"
+                               name="backend[dummy][<?php echo $n; ?>][path]"
+                               class="pure-input-1-2 backend_dummy_file"
+                               value="<?php echo $Backend->getPath(); ?>"
+                               placeholder="/etc/sysMonDash/dummy_backend.json" required/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label><?php echo Language::t('URL imagen'); ?></label>
+                        <input type="text"
+                               name="backend[dummy][<?php echo $n; ?>][image]"
+                               class="pure-input-1-2 backend_dummy_image"
+                               value="<?php echo $Backend->getImagePath(); ?>"
+                               placeholder="/var/www/html/smd/assets/dummy.png" required/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label><?php echo Language::t('Activo'); ?></label>
+                        <input type="checkbox"
+                               name="backend[dummy][<?php echo $n; ?>][active]" <?php echo ($Backend->isActive()) ? 'checked' : ''; ?>/>
+                    </div>
+                    <div class="buttons">
+                        <button type="button" class="button-error pure-button backendDelete">
+                            <i class="fa fa-minus-circle"></i>
+                            <?php echo Language::t('Eliminar'); ?>
+                        </button>
+                    </div>
+                </div>
+                <?php $n++; ?>
             <?php endif; ?>
         <?php endforeach; ?>
     </div>

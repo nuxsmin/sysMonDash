@@ -1,4 +1,4 @@
-jQuery.noConflict();
+$.noConflict();
 
 /**
  * Función para activar el parpadeo de los eventos recientes
@@ -17,7 +17,7 @@ jQuery.noConflict();
     }
 }(jQuery));
 
-var smd = (function () {
+var smd = (function ($) {
     "use strict";
 
     var totalHeight;
@@ -119,13 +119,13 @@ var smd = (function () {
      * Obtiene mediante AJAX los eventos a mostrar
      */
     var updateNagiosData = function () {
-        var placeHolder = jQuery("#monitor-data");
+        var placeHolder = $("#monitor-data");
 
         setTime();
 
         var url = Config.getRemoteServer() + Config.getAjaxFile();
 
-        jQuery.ajax({
+        $.ajax({
             url: url,
             cache: false,
             timeout: Config.getTimeout(),
@@ -134,7 +134,7 @@ var smd = (function () {
                 placeHolder.html(data);
 
                 if (Config.getScroll()) {
-                    totalHeight = jQuery(document).height();
+                    totalHeight = $(document).height();
 
                     if (totalHeight > window.innerHeight) {
                         setTimeout(function () {
@@ -143,7 +143,7 @@ var smd = (function () {
                     }
                 }
 
-                var newItems = jQuery('.new');
+                var newItems = $('.new');
 
                 if (newItemsCount < newItems.length) {
                     newItemsCount = newItems.length;
@@ -160,7 +160,7 @@ var smd = (function () {
      * Actualizar el contador de refresco
      */
     var updateCountDown = function () {
-        var countdown = jQuery("#refreshing_countdown");
+        var countdown = $("#refreshing_countdown");
         var remaining = parseInt(countdown.text());
 
         if (remaining === 0) {
@@ -183,14 +183,14 @@ var smd = (function () {
         var curr_min = ("0" + d.getMinutes()).slice(-2);
         var curr_sec = ("0" + d.getSeconds()).slice(-2);
 
-        jQuery("#hora").find("h1").html(curr_date + "<br>" + curr_hour + ":" + curr_min + ":" + curr_sec);
+        $("#hora").find("h1").html(curr_date + "<br>" + curr_hour + ":" + curr_min + ":" + curr_sec);
     };
 
     /**
      * Realiza un scroll automático de la página
      */
     var pageScroll = function () {
-        jQuery("body").animate(
+        $("body").animate(
             {scrollTop: totalHeight},
             Config.getTimeout() / 2,
             function () {
@@ -198,7 +198,7 @@ var smd = (function () {
             }
         ).on("mousemove",
             function () {
-                jQuery(this).stop(true);
+                $(this).stop(true);
             }
         );
     };
@@ -207,13 +207,13 @@ var smd = (function () {
      * Devuelve el scroll a la posición inicial
      */
     var pageUnScroll = function () {
-        jQuery("body").scrollTop(0);
+        $("body").scrollTop(0);
     };
 
     /**
      * Recargar la página
      */
-    reloadPage = function () {
+    var reloadPage = function () {
         window.location.reload(false);
     };
 
@@ -223,7 +223,7 @@ var smd = (function () {
      * @param obj
      */
     var saveConfig = function (obj) {
-        jQuery.ajax({
+        $.ajax({
             url: getRootPath() + "/ajax/saveConfig.php",
             type: "post",
             dataType: "json",
@@ -232,7 +232,7 @@ var smd = (function () {
                 alertify.logPosition("bottom right");
 
                 if (data.status == 0) {
-                    jQuery('#warn-save').hide();
+                    $('#warn-save').hide();
                     alertify.delay(5000).closeLogOnClick(true).success(data.description)
                 } else {
                     alertify.error(data.description);
@@ -243,102 +243,17 @@ var smd = (function () {
     };
 
     /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    var getNewLivestatusBackend = function () {
-        var len = jQuery(".backendLivestatus").length;
-        var $html = jQuery(".livestatusTemplate").clone();
-
-        $html.find("[name='backend[livestatus][alias]']")[0].name = "backend[livestatus][" + len + "][alias]]";
-        $html.find("[name='backend[livestatus][path]']")[0].name = "backend[livestatus][" + len + "][path]]";
-        $html.find("[name='backend[livestatus][active]']")[0].name = "backend[livestatus][" + len + "][active]]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    var getNewCheckMKBackend = function () {
-        var len = jQuery(".backendCheckMK").length;
-        var $html = jQuery(".checkmkTemplate").clone();
-
-        $html.find("[name='backend[checkmk][alias]']")[0].name = "backend[checkmk][" + len + "][alias]]";
-        $html.find("[name='backend[checkmk][path]']")[0].name = "backend[checkmk][" + len + "][path]]";
-        $html.find("[name='backend[checkmk][active]']")[0].name = "backend[checkmk][" + len + "][active]]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    var getNewStatusBackend = function () {
-        var len = jQuery(".backendStatus").length;
-        var $html = jQuery(".statusTemplate").clone();
-
-        $html.find("[name='backend[status][alias]']")[0].name = "backend[status][" + len + "][alias]]";
-        $html.find("[name='backend[status][path]']")[0].name = "backend[status][" + len + "][path]]";
-        $html.find("[name='backend[status][active]']")[0].name = "backend[status][" + len + "][active]]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    var getNewZabbixBackend = function () {
-        var len = jQuery(".backendZabbix").length;
-        var $html = jQuery(".zabbixTemplate").clone();
-
-        $html.find("[name='backend[zabbix][alias]']")[0].name = "backend[zabbix][" + len + "][alias]";
-        $html.find("[name='backend[zabbix][url]']")[0].name = "backend[zabbix][" + len + "][url]";
-        $html.find("[name='backend[zabbix][version]']")[0].name = "backend[zabbix][" + len + "][version]";
-        $html.find("[name='backend[zabbix][user]']")[0].name = "backend[zabbix][" + len + "][user]";
-        $html.find("[name='backend[zabbix][pass]']")[0].name = "backend[zabbix][" + len + "][pass]";
-        $html.find("[name='backend[zabbix][level]']")[0].name = "backend[zabbix][" + len + "][level]";
-        $html.find("[name='backend[zabbix][active]']")[0].name = "backend[zabbix][" + len + "][active]";
-
-        return $html.html();
-    };
-
-    /**
-     * Devolver un bloque de configuración de backend
-     *
-     * @returns {*}
-     */
-    var getNewSMDBackend = function () {
-        var len = jQuery(".backendSMD").length;
-        var $html = jQuery(".SMDTemplate").clone();
-
-        $html.find('[name=\'backend[smd][alias]\']')[0].name = "backend[smd][" + len + "][alias]";
-        $html.find('[name=\'backend[smd][url]\']')[0].name = "backend[smd][" + len + "][url]";
-        $html.find('[name=\'backend[smd][token]\']')[0].name = "backend[smd][" + len + "][token]";
-        $html.find('[name=\'backend[smd][active]\']')[0].name = "backend[smd][" + len + "][active]";
-
-        return $html.html();
-    };
-
-    /**
      * Comprobar actualizaciones
      */
     var getUpdates = function () {
-        jQuery("#updates").load(getRootPath() + "/ajax/getUpdates.php");
+        $("#updates").load(getRootPath() + "/ajax/getUpdates.php");
     };
 
     /**
      * Inicializar sysMonDash
      */
     var startSMD = function () {
-        jQuery.ajaxSetup({
+        $.ajaxSetup({
             global: false,
             timeout: Config.getTimeout() / 2
         });
@@ -373,7 +288,7 @@ var smd = (function () {
         alertify.logPosition("bottom right");
         alertify.warn(Config.getLang(5));
 
-        var warnSave = jQuery('#warn-save');
+        var warnSave = $('#warn-save');
 
         if (warnSave.css("display") !== "block") {
             warnSave.show();
@@ -384,92 +299,56 @@ var smd = (function () {
      * Establecer los eventos para la vista de configuración
      */
     var setConfigHooks = function () {
-        var form = jQuery("#frmConfig");
+        var form = $("#frmConfig");
 
         form.on("submit", function (e) {
             e.preventDefault();
             saveConfig(form);
         }).find("select").each(function () {
-            var sel = jQuery(this);
+            var sel = $(this);
             sel.val(sel.data("selected"));
         });
 
         form.on("change", "input", function (e) {
-            var warnSave = jQuery("#warn-save");
+            var warnSave = $("#warn-save");
 
             if (warnSave.css("display") !== "block") {
                 warnSave.show();
             }
         });
 
-        jQuery("#addLivestatusBackend").on("click", function (e) {
+        $(".add-backend").on("click", function (e) {
             e.preventDefault();
 
-            var el = jQuery('<div/>', {
-                class: "backendLivestatus backendConfig",
-                html: getNewLivestatusBackend()
-            }).hide().appendTo("#backends-config-container").slideDown("slow");
-
-            var offset = el.offset();
-            window.scroll(0, offset.top);
+            switch ($(this).data("type")) {
+                case 'status':
+                    backends.add.status();
+                    break;
+                case 'livestatus':
+                    backends.add.livestatus();
+                    break;
+                case 'checkmk':
+                    backends.add.checkmk();
+                    break;
+                case 'zabbix':
+                    backends.add.zabbix();
+                    break;
+                case 'smd':
+                    backends.add.smd();
+                    break;
+                case 'dummy':
+                    backends.add.dummy();
+                    break;
+            }
         });
 
-        jQuery('#addCheckMKBackend').on("click", function (e) {
-            e.preventDefault();
-
-            var el = jQuery('<div/>', {
-                class: "backendCheckMK backendConfig",
-                html: getNewCheckMKBackend()
-            }).hide().appendTo("#backends-config-container").slideDown("slow");
-
-            var offset = el.offset();
-            window.scroll(0, offset.top);
-        });
-
-        jQuery('#addStatusBackend').on("click", function (e) {
-            e.preventDefault();
-
-            var el = jQuery('<div/>', {
-                class: "backendStatus backendConfig",
-                html: getNewStatusBackend()
-            }).hide().appendTo("#backends-config-container").slideDown("slow");
-
-            var offset = el.offset();
-            window.scroll(0, offset.top);
-        });
-
-        jQuery('#addZabbixBackend').on("click", function (e) {
-            e.preventDefault();
-
-            var el = jQuery('<div/>', {
-                class: "backendZabbix backendConfig",
-                html: getNewZabbixBackend()
-            }).hide().appendTo("#backends-config-container").slideDown("slow");
-
-            var offset = el.offset();
-            window.scroll(0, offset.top);
-        });
-
-        jQuery('#addSMDBackend').on("click", function (e) {
-            e.preventDefault();
-
-            var el = jQuery('<div/>', {
-                class: "backendSMD backendConfig",
-                html: getNewSMDBackend()
-            }).hide().appendTo("#backends-config-container").slideDown("slow");
-
-            var offset = el.offset();
-
-            window.scroll(0, offset.top);
-        });
-
-        jQuery('#backends-config-container').on("click", ".backendDelete", function (e) {
+        $('#backends-config-container').on("click", ".backendDelete", function (e) {
             e.preventDefault();
 
             var res = window.confirm(Config.getLang(0));
 
             if (res === true) {
-                var $parent = jQuery(this).parent().parent(".backendConfig");
+                var $parent = $(this).parent().parent(".backendConfig");
 
                 $parent.slideUp('slow', function () {
                         $parent.remove();
@@ -481,77 +360,210 @@ var smd = (function () {
         }).on('click', '.backendCheckSMD', function (e) {
             e.preventDefault();
 
-            var parent = jQuery(this).parent().parent(".backendConfig");
-
-            var url = parent.find(".backend_smd_url").val();
-            var token = parent.find(".backend_smd_token").val();
-
-            if (url === "") {
-                alertify.alert(Config.getLang(4));
-                return;
-            }
-
-            var checkData = {url: url, action: 10, token: token};
-            var ajaxData = {action: 'smdBackend', data: JSON.stringify(checkData)};
-
-            checkConfig(ajaxData);
+            backends.check.smd($(this));
         }).on("click", ".backendCheckZabbix", function (e) {
             e.preventDefault();
 
-            var parent = jQuery(this).parent().parent(".backendConfig");
-
-            var version = parent.find(".backend_zabbix_version").val();
-            var url = parent.find(".backend_zabbix_url").val();
-            var user = parent.find(".backend_zabbix_user").val();
-            var pass = parent.find(".backend_zabbix_pass").val();
-
-            if (version === '' || url === '') {
-                alertify.alert(Config.getLang(4));
-                return;
-            }
-
-            var checkData = {url: url, version: version, user: user, pass: pass};
-            var ajaxData = {action: "zabbixBackend", data: JSON.stringify(checkData)};
-
-            checkConfig(ajaxData);
+            backends.check.zabbix($(this));
         });
 
-        jQuery(".btn-gen-token, .btn-gen-pass").click(function (e) {
+        $(".btn-gen-token, .btn-gen-pass").click(function (e) {
             var hash = makeHash(32);
 
             document.getElementById(this.getAttribute("data-dst")).value = hash;
-            jQuery(this).next(".fa-eye").attr("title", hash);
+            $(this).next(".fa-eye").attr("title", hash);
         });
 
-        jQuery(".fa-eye").click(function () {
+        $(".fa-eye").click(function () {
             var title = this.getAttribute("title");
             if (title !== "") {
                 alertify.alert(title);
             }
         });
 
-        jQuery("#special_config_pass").on("keyup", function () {
-            jQuery(this).parent().find(".fa-eye").attr("title", this.value);
+        $("#special_config_pass").on("keyup", function () {
+            $(this).parent().find(".fa-eye").attr("title", this.value);
         });
 
-        jQuery("#btnBack").click(function () {
+        $("#btnBack").click(function () {
             location.href = getRootPath();
         });
 
-        jQuery(".container-state").on("click", function (e) {
+        $(".container-state").on("click", function (e) {
             var container = document.getElementById(this.getAttribute("data-container"));
             var state = container.getAttribute("aria-expanded");
 
             if (state == "true") {
                 container.setAttribute("aria-expanded", "false");
-                jQuery(this).removeClass("fa-caret-up").addClass("fa-caret-down");
-                jQuery(container).slideUp("slow");
+                $(this).removeClass("fa-caret-up").addClass("fa-caret-down");
+                $(container).slideUp("slow");
             } else {
                 container.setAttribute("aria-expanded", "true");
-                jQuery(this).removeClass("fa-caret-down").addClass("fa-caret-up");
-                jQuery(container).slideDown("slow");
+                $(this).removeClass("fa-caret-down").addClass("fa-caret-up");
+                $(container).slideDown("slow");
             }
         });
+    };
+
+    /**
+     *
+     * @type {{add: {livestatus: livestatus, status: status, checkmk: checkmk, zabbix: zabbix, smd: smd, dummy: dummy}, get: {livestatus: livestatus, status: status, checkmk: checkmk, zabbix: zabbix, smd: smd, dummy: dummy}}}
+     */
+    var backends = {
+        add: {
+            livestatus: function () {
+                var el = $('<div/>', {
+                    class: "backendLivestatus backendConfig",
+                    html: backends.get.livestatus()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            },
+            status: function () {
+                var el = $('<div/>', {
+                    class: "backendStatus backendConfig",
+                    html: backends.get.status()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            },
+            checkmk: function () {
+                var el = $('<div/>', {
+                    class: "backendCheckMK backendConfig",
+                    html: backends.get.checkmk()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            },
+            zabbix: function () {
+                var el = $('<div/>', {
+                    class: "backendZabbix backendConfig",
+                    html: backends.get.zabbix()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            },
+            smd: function () {
+                var el = $('<div/>', {
+                    class: "backendSMD backendConfig",
+                    html: backends.get.smd()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            },
+            dummy: function () {
+                var el = $('<div/>', {
+                    class: "backendDummy backendConfig",
+                    html: backends.get.dummy()
+                }).hide().appendTo("#backends-config-container").slideDown("slow");
+
+                window.scroll(0, el.offset().top);
+            }
+        },
+        get: {
+            livestatus: function () {
+                var len = $(".backendLivestatus").length;
+                var $html = $(".livestatusTemplate").clone();
+
+                $html.find("[name='backend[livestatus][alias]']")[0].name = "backend[livestatus][" + len + "][alias]]";
+                $html.find("[name='backend[livestatus][path]']")[0].name = "backend[livestatus][" + len + "][path]]";
+                $html.find("[name='backend[livestatus][active]']")[0].name = "backend[livestatus][" + len + "][active]]";
+
+                return $html.html();
+            },
+            status: function () {
+                var len = $(".backendStatus").length;
+                var $html = $(".statusTemplate").clone();
+
+                $html.find("[name='backend[status][alias]']")[0].name = "backend[status][" + len + "][alias]]";
+                $html.find("[name='backend[status][path]']")[0].name = "backend[status][" + len + "][path]]";
+                $html.find("[name='backend[status][active]']")[0].name = "backend[status][" + len + "][active]]";
+
+                return $html.html();
+            },
+            checkmk: function () {
+                var len = $(".backendCheckMK").length;
+                var $html = $(".checkmkTemplate").clone();
+
+                $html.find("[name='backend[checkmk][alias]']")[0].name = "backend[checkmk][" + len + "][alias]]";
+                $html.find("[name='backend[checkmk][path]']")[0].name = "backend[checkmk][" + len + "][path]]";
+                $html.find("[name='backend[checkmk][active]']")[0].name = "backend[checkmk][" + len + "][active]]";
+
+                return $html.html();
+            },
+            zabbix: function () {
+                var len = $(".backendZabbix").length;
+                var $html = $(".zabbixTemplate").clone();
+
+                $html.find("[name='backend[zabbix][alias]']")[0].name = "backend[zabbix][" + len + "][alias]";
+                $html.find("[name='backend[zabbix][url]']")[0].name = "backend[zabbix][" + len + "][url]";
+                $html.find("[name='backend[zabbix][version]']")[0].name = "backend[zabbix][" + len + "][version]";
+                $html.find("[name='backend[zabbix][user]']")[0].name = "backend[zabbix][" + len + "][user]";
+                $html.find("[name='backend[zabbix][pass]']")[0].name = "backend[zabbix][" + len + "][pass]";
+                $html.find("[name='backend[zabbix][level]']")[0].name = "backend[zabbix][" + len + "][level]";
+                $html.find("[name='backend[zabbix][active]']")[0].name = "backend[zabbix][" + len + "][active]";
+
+                return $html.html();
+            },
+            smd: function () {
+                var len = $(".backendSMD").length;
+                var $html = $(".SMDTemplate").clone();
+
+                $html.find('[name=\'backend[smd][alias]\']')[0].name = "backend[smd][" + len + "][alias]";
+                $html.find('[name=\'backend[smd][url]\']')[0].name = "backend[smd][" + len + "][url]";
+                $html.find('[name=\'backend[smd][token]\']')[0].name = "backend[smd][" + len + "][token]";
+                $html.find('[name=\'backend[smd][active]\']')[0].name = "backend[smd][" + len + "][active]";
+
+                return $html.html();
+            },
+            dummy: function () {
+                var len = $(".backendDummy").length;
+                var $html = $(".dummyTemplate").clone();
+
+                $html.find('[name=\'backend[dummy][alias]\']')[0].name = "backend[dummy][" + len + "][alias]";
+                $html.find('[name=\'backend[dummy][path]\']')[0].name = "backend[dummy][" + len + "][path]";
+                $html.find('[name=\'backend[dummy][image]\']')[0].name = "backend[dummy][" + len + "][image]";
+                $html.find('[name=\'backend[dummy][active]\']')[0].name = "backend[dummy][" + len + "][active]";
+
+                return $html.html();
+            }
+        },
+        check: {
+            zabbix: function ($obj) {
+                var parent = $obj.parent().parent(".backendConfig");
+
+                var version = parent.find(".backend_zabbix_version").val();
+                var url = parent.find(".backend_zabbix_url").val();
+                var user = parent.find(".backend_zabbix_user").val();
+                var pass = parent.find(".backend_zabbix_pass").val();
+
+                if (version === '' || url === '') {
+                    alertify.alert(Config.getLang(4));
+                    return;
+                }
+
+                var checkData = {url: url, version: version, user: user, pass: pass};
+                var ajaxData = {action: "zabbixBackend", data: JSON.stringify(checkData)};
+
+                checkConfig(ajaxData);
+            },
+            smd: function ($obj) {
+                var parent = $obj.parent().parent(".backendConfig");
+
+                var url = parent.find(".backend_smd_url").val();
+                var token = parent.find(".backend_smd_token").val();
+
+                if (url === "") {
+                    alertify.alert(Config.getLang(4));
+                    return;
+                }
+
+                var checkData = {url: url, action: 10, token: token};
+                var ajaxData = {action: 'smdBackend', data: JSON.stringify(checkData)};
+
+                checkConfig(ajaxData);
+            }
+        }
     };
 
     /**
@@ -585,7 +597,7 @@ var smd = (function () {
      * @param ajaxData
      */
     var checkConfig = function (ajaxData) {
-        jQuery.ajax({
+        $.ajax({
             url: getRootPath() + "/ajax/checkConfig.php",
             type: "post",
             dataType: "json",
@@ -611,4 +623,4 @@ var smd = (function () {
         setConfigHooks: setConfigHooks,
         Config: Config
     }
-})();
+})(jQuery);

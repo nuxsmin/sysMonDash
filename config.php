@@ -276,7 +276,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
 
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/alertify.min.js"></script>
-<script type="text/javascript" src="js/functions.min.js"></script>
+<script type="text/javascript" src="js/functions.js"></script>
 <script>
     (function () {
         smd.Config.setLang('<?php echo Language::t('Seguro?'); ?>');

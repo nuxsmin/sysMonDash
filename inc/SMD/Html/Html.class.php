@@ -26,6 +26,7 @@
 namespace SMD\Html;
 
 use SMD\Core\ConfigBackendCheckMK;
+use SMD\Core\ConfigBackendDummy;
 use SMD\Core\ConfigBackendLivestatus;
 use SMD\Core\ConfigBackendSMD;
 use SMD\Core\ConfigBackendStatus;
@@ -110,6 +111,9 @@ class Html
                         break;
                     case 'smd':
                         $ConfigBackend = new ConfigBackendSMD($config['url'], $config['token']);
+                        break;
+                    case 'dummy':
+                        $ConfigBackend = new ConfigBackendDummy($config['path'], $config['image']);
                         break;
                 }
 

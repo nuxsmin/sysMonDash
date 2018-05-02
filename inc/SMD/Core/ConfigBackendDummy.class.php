@@ -24,7 +24,7 @@
 
 namespace SMD\Core;
 
-use SMD\Backend\Event\EventStateHost;
+use SMD\Backend\Event\EventStateTrigger;
 
 class ConfigBackendDummy extends ConfigBackend
 {
@@ -56,7 +56,7 @@ class ConfigBackendDummy extends ConfigBackend
      */
     public function setLevel($level)
     {
-        $levels = EventStateHost::getStates();
+        $levels = EventStateTrigger::getStates();
 
         if (isset($levels[$level])) {
             $this->level = $level;

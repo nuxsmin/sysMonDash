@@ -116,3 +116,4 @@ $LANG['Nivel no disponible'] = 'Level not available';
 $LANG['Especial']  = 'Special';
 $LANG['N/D']  = 'N/A';
 $LANG['No olvide guardar la configuración']  = 'Do not forget to save the configuration';
+$LANG['Ruta o archivo no válido']  = 'Invalid path or file';

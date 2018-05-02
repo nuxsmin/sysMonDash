@@ -63,7 +63,7 @@ Session::setCssHash(Util::getCssHash());
     <div id="hora"><h1></h1></div>
     <div id="titulo">
         <h1><?php echo Config::getConfig()->getPageTitle(); ?></h1>
-        <h2><?php echo Language::t('Dpto. Sistemas'); ?></h2>
+        <h2>CAR</h2>
     </div>
 </div>
 
