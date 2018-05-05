@@ -36,8 +36,9 @@ Init::start();
 
 $apiToken = Request::analyze('token');
 $action = Request::analyze('action', 0);
+$useJson = Request::analyze('useJson', 0);
 
-$Api = new Api();
+$Api = new Api($useJson === 1);
 
 if (!$Api->checkToken($apiToken)){
     Response::printJSON('Token inválido');

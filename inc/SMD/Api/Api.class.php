@@ -39,6 +39,20 @@ class Api
     const ACTION_CHECK = 10;
 
     /**
+     * @var bool
+     */
+    private $useJson;
+
+    /**
+     * Api constructor.
+     * @param bool $useJson
+     */
+    public function __construct($useJson = false)
+    {
+        $this->useJson = $useJson;
+    }
+
+    /**
      * Devolver los eventos serializados y codificados en base64
      *
      * @return string
@@ -48,6 +62,11 @@ class Api
     {
         $SMD = new sysMonDash();
         $SMD->setCallType(sysMonDash::CALL_TYPE_API);
+
+        if ($this->useJson) {
+            return base64_encode(json_encode($SMD->getRawEvents()));
+        }
+
         return base64_encode(serialize($SMD->getRawEvents()));
     }
 
@@ -61,6 +80,11 @@ class Api
     {
         $SMD = new sysMonDash();
         $SMD->setCallType(sysMonDash::CALL_TYPE_API);
+
+        if ($this->useJson) {
+            return base64_encode(json_encode($SMD->getRawDowntimes()));
+        }
+
         return base64_encode(serialize($SMD->getRawDowntimes()));
     }
 
