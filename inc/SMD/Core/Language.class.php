@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 namespace SMD\Core;
@@ -57,7 +56,7 @@ class Language
         // Establecer a es_ES si no existe la traducción o no está establecido el lenguaje
         if (!empty($language)
             && (self::checkLangFile($language)
-            || $language = 'es_ES')
+                || $language = 'es_ES')
         ) {
             return $language;
         }
@@ -117,17 +116,13 @@ class Language
         if ($sessionLang === false
             && self::checkLangFile(self::$_lang)
         ) {
-            include_once self::getLangFile(self::$_lang);
+            $sessionLang = include_once self::getLangFile(self::$_lang);
 
-            if (isset($LANG)
-                && is_array($LANG)
-            ) {
-                Session::setLanguage($LANG);
-
-                return isset($LANG[$string]) ? $LANG[$string] : $string;
+            if (!is_array($sessionLang)) {
+                return $string;
             }
 
-            return $string;
+            Session::setLanguage($sessionLang);
         }
 
         return isset($sessionLang[$string]) ? $sessionLang[$string] : $string;

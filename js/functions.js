@@ -512,6 +512,7 @@ var smd = (function ($) {
                 $html.find('[name=\'backend[smd][alias]\']')[0].name = "backend[smd][" + len + "][alias]";
                 $html.find('[name=\'backend[smd][url]\']')[0].name = "backend[smd][" + len + "][url]";
                 $html.find('[name=\'backend[smd][token]\']')[0].name = "backend[smd][" + len + "][token]";
+                $html.find('[name=\'backend[smd][show_in_api]\']')[0].name = "backend[smd][" + len + "][show_in_api]";
                 $html.find('[name=\'backend[smd][active]\']')[0].name = "backend[smd][" + len + "][active]";
 
                 return $html.html();

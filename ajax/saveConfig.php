@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 use SMD\Core\Config;
@@ -48,6 +48,7 @@ if (!$hashOk && !$passOK) {
 
 $siteLanguage = Request::analyze('site_language');
 $siteTitle = Request::analyze('site_title');
+$siteSubtitle = Request::analyze('site_subtitle');
 $eventRefresh = Request::analyze('event_refresh', 10);
 $eventNewItemTime = Request::analyze('event_new_item_time', 900);
 $eventMaxItems = Request::analyze('event_max_items', 200);
@@ -76,6 +77,7 @@ try {
 $ConfigData = new ConfigData();
 $ConfigData->setLanguage($siteLanguage);
 $ConfigData->setPageTitle($siteTitle);
+$ConfigData->setPageSubtitle($siteSubtitle);
 $ConfigData->setRefreshValue($eventRefresh);
 $ConfigData->setNewItemTime($eventNewItemTime);
 $ConfigData->setMaxDisplayItems($eventMaxItems);

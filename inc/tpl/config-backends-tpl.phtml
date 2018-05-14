@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 use SMD\Backend\Event\EventStateTrigger;
@@ -169,6 +169,10 @@ use SMD\Core\Language;
                class="pure-input-1-2 backend_smd_token" placeholder=""/>
     </div>
     <div class="pure-control-group">
+        <label><?php echo Language::t('Mostrar en API'); ?></label>
+        <input type="checkbox" name="backend[smd][show_in_api]"/>
+    </div>
+    <div class="pure-control-group">
         <label><?php echo Language::t('Activo'); ?></label>
         <input type="checkbox" name="backend[smd][active]"/>
     </div>
@@ -197,7 +201,7 @@ use SMD\Core\Language;
                required/>
     </div>
     <div class="pure-control-group">
-        <label><?php echo Language::t('Ruta imagen'); ?></label>
+        <label><?php echo Language::t('Ruta archivo imagen'); ?></label>
         <input type="text" name="backend[dummy][image]"
                class="pure-input-1-2 backend_dummy_image" placeholder="/var/www/html/smd/assets/dummy.png"
                required/>

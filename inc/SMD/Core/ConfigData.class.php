@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 namespace SMD\Core;
@@ -34,7 +34,9 @@ class ConfigData
     /** @var string */
     private $language = 'en_US';
     /** @var string */
-    private $pageTitle = 'Panel Monitorización';
+    private $pageTitle = 'Monitoring Dashboard';
+    /** @var string */
+    private $pageSubtitle = 'IT Dept.';
     /** @var array */
     private $backend = array();
     /** @var string */
@@ -163,7 +165,7 @@ class ConfigData
     }
 
     /**
-     * @param string $backend
+     * @param array $backend
      */
     public function setBackend($backend)
     {
@@ -556,5 +558,21 @@ class ConfigData
     public function setShowScheduled($showScheduled)
     {
         $this->showScheduled = $showScheduled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageSubtitle()
+    {
+        return $this->pageSubtitle;
+    }
+
+    /**
+     * @param string $pageSubtitle
+     */
+    public function setPageSubtitle($pageSubtitle)
+    {
+        $this->pageSubtitle = $pageSubtitle;
     }
 }

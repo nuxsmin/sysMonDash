@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2014-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 namespace SMD\Core;
@@ -183,7 +182,7 @@ class sysMonDash
                         $backends[] = new Zabbix($Backend);
                         break;
                     case (ConfigBackend::TYPE_SMD):
-                        if ($this->callType !== self::CALL_TYPE_API) {
+                        if ($this->callType !== self::CALL_TYPE_API || $Backend->isShowInApi()) {
                             $backends[] = new SMD($Backend);
                         }
                         break;
@@ -458,8 +457,12 @@ class sysMonDash
         }
 
         if ($this->Config->isColBackend()) {
-            $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
-            $line .= '<td class="center backend-image"><img src="assets/' . basename($item->getBackendImage()) . '" alt=""/></td>' . PHP_EOL;
+            if (empty($item->getBackendImage())) {
+                $line .= '<td class="center" colspan="2">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
+            } else {
+                $line .= '<td class="center">' . $item->getBackendAlias() . '</td>' . PHP_EOL;
+                $line .= '<td class="center backend-image"><img src="assets/' . basename($item->getBackendImage()) . '" alt=""/></td>' . PHP_EOL;
+            }
         }
 
         $line .= '</tr>' . PHP_EOL;

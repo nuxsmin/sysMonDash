@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 namespace SMD\Html;
@@ -111,6 +110,7 @@ class Html
                         break;
                     case 'smd':
                         $ConfigBackend = new ConfigBackendSMD($config['url'], $config['token']);
+                        $ConfigBackend->setShowInApi((isset($config['show_in_api']) && $config['show_in_api'] === 'on'));
                         break;
                     case 'dummy':
                         $ConfigBackend = new ConfigBackendDummy($config['path'], $config['image']);
@@ -127,12 +127,12 @@ class Html
 
         return $BackendsConfig;
     }
-    
+
     /**
      * Truncar un texto a una determinada longitud.
      *
-     * @param string $text  la cadena a truncar
-     * @param int    $limit la longitud máxima de la cadena
+     * @param string $text la cadena a truncar
+     * @param int $limit la longitud máxima de la cadena
      * @param string $ellipsis
      * @return string con el texto truncado
      *

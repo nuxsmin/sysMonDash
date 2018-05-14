@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2014-2015 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 use SMD\Core\Config;
@@ -63,7 +62,7 @@ Session::setCssHash(Util::getCssHash());
     <div id="hora"><h1></h1></div>
     <div id="titulo">
         <h1><?php echo Config::getConfig()->getPageTitle(); ?></h1>
-        <h2>CAR</h2>
+        <h2><?php echo Config::getConfig()->getPageSubtitle(); ?></h2>
     </div>
 </div>
 

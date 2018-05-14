@@ -2,9 +2,9 @@
 /**
  * sysMonDash
  *
- * @author    nuxsmin
- * @link      http://cygnux.org
- * @copyright 2012-2016 Rubén Domínguez nuxsmin@cygnux.org
+ * @author     nuxsmin
+ * @link       https://github.com/nuxsmin/sysMonDash
+ * @copyright  2012-2018 Rubén Domínguez nuxsmin@cygnux.org
  *
  * This file is part of sysMonDash.
  *
@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with sysMonDash.  If not, see <http://www.gnu.org/licenses/>.
+ * along with sysMonDash. If not, see <http://www.gnu.org/licenses/gpl-3.0-standalone.html>.
  */
 
 use SMD\Core\Config;
@@ -60,7 +60,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
     <div id="hora"><h1></h1></div>
     <div id="titulo">
         <h1><?php echo Config::getConfig()->getPageTitle(); ?></h1>
-        <h2><?php echo Language::t('Dpto. Sistemas'); ?></h2>
+        <h2><?php echo Config::getConfig()->getPageSubtitle(); ?></h2>
     </div>
 </div>
 <div id="wrap">
@@ -87,25 +87,30 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                                    value="<?php echo Config::getConfig()->getPageTitle(); ?>"/>
                         </div>
                         <div class="pure-control-group">
+                            <label for="site_subtitle"><?php echo Language::t('Subtítulo del sitio'); ?></label>
+                            <input type="text" id="site_subtitle" name="site_subtitle" class="pure-input-1-2"
+                                   value="<?php echo Config::getConfig()->getPageSubtitle(); ?>"/>
+                        </div>
+                        <div class="pure-control-group">
                             <label for="event_refresh"><?php echo Language::t('Tiempo actualización (s)'); ?></label>
                             <input type="number" id="event_refresh" name="event_refresh" min="5" step="5"
                                    value="<?php echo Config::getConfig()->getRefreshValue(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="event_new_item_time"><?php echo Language::t('Tiempo nuevo evento (s)'); ?></label>
+                                    for="event_new_item_time"><?php echo Language::t('Tiempo nuevo evento (s)'); ?></label>
                             <input type="number" id="event_new_item_time" name="event_new_item_time" min="60" step="60"
                                    value="<?php echo Config::getConfig()->getNewItemTime(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="event_max_items"><?php echo Language::t('Número máximo de eventos a mostrar'); ?></label>
+                                    for="event_max_items"><?php echo Language::t('Número máximo de eventos a mostrar'); ?></label>
                             <input type="number" id="event_max_items" name="event_max_items" min="50"
                                    value="<?php echo Config::getConfig()->getMaxDisplayItems(); ?>" required/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
+                                    for="event_new_item_audio"><?php echo Language::t('Habilitar sonido en nuevos eventos'); ?></label>
                             <input type="checkbox" id="event_new_item_audio"
                                    name="event_new_item_audio" <?php echo Config::getConfig()->isNewItemAudioEnabled() ? 'checked' : ''; ?>/>
                         </div>
@@ -136,20 +141,20 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="show_scheduled"><?php echo Language::t('Mostrar eventos programados'); ?></label>
+                                    for="show_scheduled"><?php echo Language::t('Mostrar eventos programados'); ?></label>
                             <input type="checkbox" id="show_scheduled"
                                    name="show_scheduled" <?php echo Config::getConfig()->isShowScheduled() ? 'checked' : ''; ?>/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="regex_host_show"><?php echo Language::t('REGEX hosts visibles en inicio'); ?></label>
+                                    for="regex_host_show"><?php echo Language::t('REGEX hosts visibles en inicio'); ?></label>
                             <input type="text" id="regex_host_show" name="regex_host_show" class="pure-input-1-2"
                                    value="<?php echo Config::getConfig()->getRegexHostShow(); ?>"
                                    placeholder="(SERVER-|VM-).*"/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="regex_services_no_show"><?php echo Language::t('REGEX servicios ocultos en inicio'); ?></label>
+                                    for="regex_services_no_show"><?php echo Language::t('REGEX servicios ocultos en inicio'); ?></label>
                             <input type="text" id="regex_services_no_show" name="regex_services_no_show"
                                    class="pure-input-1-2"
                                    value="<?php echo Config::getConfig()->getRegexServiceNoShow(); ?>"
@@ -165,7 +170,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                 </fieldset>
 
                 <?php include TPL_PATH . DIRECTORY_SEPARATOR . 'config-backends.phtml'; ?>
-                    
+
                 <fieldset>
                     <legend>
                         <i class="fa fa-caret-up container-state" data-container="special-config-container"></i>
@@ -180,21 +185,21 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="special_remote_server_url"><?php echo Language::t('URL del servidor remoto'); ?></label>
+                                    for="special_remote_server_url"><?php echo Language::t('URL del servidor remoto'); ?></label>
                             <input type="text" id="special_remote_server_url" name="special_remote_server_url"
                                    value="<?php echo Config::getConfig()->getRemoteServer(); ?>"
                                    placeholder="http://server.foo.bar/sysMonDash"/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="special_monitor_server_url"><?php echo Language::t('URL del servidor de monitorización'); ?></label>
+                                    for="special_monitor_server_url"><?php echo Language::t('URL del servidor de monitorización'); ?></label>
                             <input type="text" id="special_monitor_server_url" name="special_monitor_server_url"
                                    value="<?php echo Config::getConfig()->getMonitorServerUrl(); ?>"
                                    placeholder="http://cloud.foo.bar/icinga"/>
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="special_api_token"><?php echo Language::t('Token API'); ?></label>
+                                    for="special_api_token"><?php echo Language::t('Token API'); ?></label>
                             <input type="text" id="special_api_token" name="special_api_token"
                                    value="<?php echo Config::getConfig()->getAPIToken(); ?>"
                                    placeholder=""/>
@@ -206,7 +211,7 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
                         </div>
                         <div class="pure-control-group">
                             <label
-                                for="special_config_pass"><?php echo Language::t('Clave de configuración'); ?></label>
+                                    for="special_config_pass"><?php echo Language::t('Clave de configuración'); ?></label>
                             <input type="password" id="special_config_pass" name="special_config_pass"
                                    value="<?php echo Session::getConfig()->getConfigPassword(); ?>"
                                    placeholder=""/>
@@ -240,7 +245,8 @@ $passOK = (sha1($hash) === (string)Session::getConfig()->getConfigPassword());
             <?php include TPL_PATH . DIRECTORY_SEPARATOR . 'config-backends-tpl.phtml'; ?>
 
             <div id="warn-save">
-                <i class="fa fa-warning" aria-hidden="true" title="<?php echo Language::t('No olvide guardar la configuración'); ?>"></i>
+                <i class="fa fa-warning" aria-hidden="true"
+                   title="<?php echo Language::t('No olvide guardar la configuración'); ?>"></i>
             </div>
         <?php else: ?>
             <div id="result" class="error">
