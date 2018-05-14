@@ -145,7 +145,7 @@ class Zabbix extends Backend implements BackendInterface
                 $Event->setLastCheck($event->lastEvent->clock);
                 $Event->setLastHardStateChange($event->lastEvent->clock);
                 $Event->setLastHardState($event->lastEvent->clock);
-                $Event->setActiveChecksEnabled($event->status);
+                $Event->setActiveChecksEnabled((int)$event->status === 0);
                 $Event->setScheduledDowntimeDepth($host->maintenance_status);
                 $Event->setCurrentAttempt($event->value);
                 $Event->setNotificationsEnabled(true);
