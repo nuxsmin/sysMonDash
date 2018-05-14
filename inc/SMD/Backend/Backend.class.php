@@ -26,7 +26,7 @@ namespace SMD\Backend;
 
 use SMD\Core\ConfigBackend;
 
-class Backend
+abstract class Backend
 {
     /** @var bool */
     protected $allHeaders = false;

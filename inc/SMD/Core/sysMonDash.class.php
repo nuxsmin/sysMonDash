@@ -165,28 +165,34 @@ class sysMonDash
             return $backends;
         }
 
+        /** @var ConfigBackend $Backend */
         foreach (Config::getConfig()->getBackend() as $Backend) {
-            /** @var $Backend ConfigBackendLivestatus|ConfigBackendStatus|ConfigBackendZabbix|ConfigBackendSMD|ConfigBackendDummy */
             if ($Backend->isActive()) {
                 switch ($Backend->getType()) {
                     case ConfigBackend::TYPE_LIVESTATUS:
+                        /** @var ConfigBackendLivestatus $Backend */
                         $backends[] = new Livestatus($Backend);
                         break;
                     case ConfigBackend::TYPE_CHECKMK:
+                        /** @var ConfigBackendCheckMK $Backend */
                         $backends[] = new CheckMK($Backend);
                         break;
                     case ConfigBackend::TYPE_STATUS:
+                        /** @var ConfigBackendStatus $Backend */
                         $backends[] = new Status($Backend);
                         break;
                     case ConfigBackend::TYPE_ZABBIX:
+                        /** @var ConfigBackendZabbix $Backend */
                         $backends[] = new Zabbix($Backend);
                         break;
                     case (ConfigBackend::TYPE_SMD):
+                        /** @var ConfigBackendSMD $Backend */
                         if ($this->callType !== self::CALL_TYPE_API || $Backend->isShowInApi()) {
                             $backends[] = new SMD($Backend);
                         }
                         break;
                     case ConfigBackend::TYPE_DUMMY:
+                        /** @var ConfigBackendDummy $Backend */
                         $backends[] = new Dummy($Backend);
                         break;
                 }
